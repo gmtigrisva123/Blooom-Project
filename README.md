@@ -14,7 +14,7 @@ Kết nối nhóm học theo môn · Tập trung với Pomodoro · Theo dõi hi�
 [![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)](https://vite.dev)
 
-[**🌐 Xem demo trực tiếp**](https://gmtigrisva123.github.io/Blooom-Project/) · [Báo lỗi](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=bug_report.yml) · [Đề xuất tính năng](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=feature_request.yml)
+[**🌐 Xem demo trực tiếp**]([https://gmtigrisva123.github.io/Blooom-Project](https://blooom-project.vercel.app/)) · [Báo lỗi](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=bug_report.yml) · [Đề xuất tính năng](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=feature_request.yml)
 
 <img src="public/og-image.png" alt="Ảnh xem trước StudyHub" width="720" />
 
