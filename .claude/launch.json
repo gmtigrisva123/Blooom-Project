@@ -7,6 +7,13 @@
       "runtimeArgs": ["node_modules/vite/bin/vite.js"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "studyhub-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "preview", "--port", "4173"],
+      "port": 4173,
+      "autoPort": true
     }
   ]
 }
