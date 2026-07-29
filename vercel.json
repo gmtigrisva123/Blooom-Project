@@ -7,7 +7,7 @@
   "build": {
     "env": {
       "BASE_PATH": "/",
-      "VITE_VERCEL_ANALYTICS": "1"
+      "VITE_ON_VERCEL": "1"
     }
   },
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
