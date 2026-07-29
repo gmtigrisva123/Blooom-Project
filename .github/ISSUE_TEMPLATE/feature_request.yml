@@ -1,0 +1,53 @@
+name: ✨ Đề xuất tính năng
+description: Gợi ý một ý tưởng hoặc cải tiến cho StudyHub
+title: '[Feature]: '
+labels: ['enhancement', 'triage']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề bạn đang gặp
+      description: Tính năng này giải quyết khó khăn gì? Bắt đầu từ vấn đề, không phải giải pháp.
+      placeholder: Tôi khó theo dõi mình đã học môn nào nhiều nhất trong tháng vì...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Giải pháp bạn mong muốn
+      placeholder: Thêm bộ lọc theo tháng trong tab Hiệu Suất...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Thuộc khu vực nào?
+      options:
+        - Tổng Quan (Dashboard)
+        - Nhóm Học Tập
+        - Bộ Đếm Giờ (Pomodoro)
+        - Editor's Pick
+        - Hiệu Suất
+        - Ghi Chú
+        - Hệ thống thành tích (streak / XP / huy hiệu)
+        - Điều hướng / Phím tắt
+        - Khu vực mới hoàn toàn
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Bạn đã cân nhắc cách nào khác chưa?
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Xác nhận
+      options:
+        - label: Tôi đã tìm trong các issue hiện có và không thấy đề xuất trùng
+          required: true
+        - label: Đề xuất này không phá vỡ tính năng nào đang hoạt động
+          required: true

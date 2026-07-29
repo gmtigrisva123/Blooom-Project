@@ -1,0 +1,60 @@
+{
+  "name": "studyhub",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Nền tảng nhóm học tập tương tác cho học sinh & sinh viên — nhóm học theo môn, Pomodoro, theo dõi hiệu suất và kho ghi chú số hóa.",
+  "keywords": [
+    "react",
+    "vite",
+    "pomodoro",
+    "study-groups",
+    "education",
+    "vietnamese"
+  ],
+  "author": "Viet Anh Ho",
+  "license": "MIT",
+  "homepage": "https://gmtigrisva123.github.io/Blooom-Project/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmtigrisva123/Blooom-Project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gmtigrisva123/Blooom-Project/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "assets": "python3 scripts/generate-assets.py",
+    "verify": "npm run lint && npm run format:check && npm run build"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "lucide-react": "^0.469.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.8.0",
+    "prettier": "^3.9.6",
+    "vite": "^6.0.7"
+  }
+}

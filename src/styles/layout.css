@@ -1,0 +1,619 @@
+/* ==========================================================================
+   STUDYHUB — APP SHELL: SIDEBAR + TOPBAR + CONTENT
+   ========================================================================== */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 100vh;
+  transition: grid-template-columns var(--t-base);
+}
+
+.shell.is-collapsed {
+  grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr);
+}
+
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-4);
+  background: var(--bg-canvas);
+  border-right: 1px solid var(--border);
+  overflow: hidden auto;
+  z-index: 200;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 var(--sp-2);
+  min-height: 2.5rem;
+  background: none;
+  text-align: left;
+  width: 100%;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: #fff;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, #8b5cf6, #ec4899 45%, #f97316);
+  box-shadow: 0 6px 18px -6px rgba(236, 72, 153, 0.7);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(100deg, #a78bfa, #f472b6 55%, #fb923c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.sidebar-label {
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  list-style: none;
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.62rem var(--sp-3);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  /* Buttons centre their text by default — nav labels must read as a list. */
+  text-align: left;
+  color: var(--text-soft);
+  border-radius: var(--r-sm);
+  transition:
+    color var(--t-fast),
+    background var(--t-fast);
+}
+
+/* Each nav item carries its own hue via --item-color so the sidebar reads as
+   a colour-coded index even when the item isn't active. */
+.nav-link-icon {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  border-radius: var(--r-xs);
+  color: var(--item-color);
+  background: color-mix(in srgb, var(--item-color) 13%, transparent);
+  transition: all var(--t-base);
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.nav-link:hover .nav-link-icon {
+  background: color-mix(in srgb, var(--item-color) 22%, transparent);
+  transform: scale(1.05);
+}
+
+.nav-link.is-active {
+  color: var(--text);
+  font-weight: 650;
+  background: color-mix(in srgb, var(--item-color) 12%, transparent);
+}
+
+.nav-link.is-active .nav-link-icon {
+  color: #fff;
+  background: var(--item-color);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--item-color) 80%, transparent);
+}
+
+/* Sliding active indicator on the left rail */
+.nav-link.is-active::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--sp-4) * -1);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.35rem;
+  border-radius: 0 var(--r-full) var(--r-full) 0;
+  background: var(--item-color);
+  animation: rise-in 0.24s var(--ease-spring);
+}
+
+.nav-link-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-link-key {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text-dim);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.nav-link:hover .nav-link-key,
+.nav-link.is-active .nav-link-key {
+  opacity: 1;
+}
+
+.sidebar-spacer {
+  flex: 1;
+}
+
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* ---- Collapsed (icon-only) state ---------------------------------------- */
+.shell.is-collapsed .sidebar {
+  padding-inline: var(--sp-3);
+  align-items: center;
+}
+.shell.is-collapsed .brand-text,
+.shell.is-collapsed .nav-link-text,
+.shell.is-collapsed .nav-link-key,
+.shell.is-collapsed .sidebar-label,
+.shell.is-collapsed .level-card-detail {
+  display: none;
+}
+.shell.is-collapsed .nav-link {
+  justify-content: center;
+  padding-inline: 0;
+}
+.shell.is-collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 0;
+}
+.shell.is-collapsed .level-card {
+  padding: var(--sp-2);
+  align-items: center;
+}
+
+/* ==========================================================================
+   LEVEL / XP CARD (sidebar foot)
+   ========================================================================== */
+.level-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: var(--sp-4);
+  background: linear-gradient(
+    150deg,
+    rgba(139, 92, 246, 0.14),
+    rgba(236, 72, 153, 0.1) 55%,
+    rgba(249, 115, 22, 0.1)
+  );
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  text-align: left;
+  width: 100%;
+  transition:
+    border-color var(--t-fast),
+    transform var(--t-fast);
+}
+
+.level-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.level-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.level-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: none;
+}
+
+.level-ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.level-ring-num {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--text);
+  z-index: 1;
+}
+
+.level-card-detail {
+  min-width: 0;
+  flex: 1;
+}
+
+.level-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.level-xp {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.streak-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--c-orange-2);
+}
+
+.streak-line svg {
+  animation: flame-flicker 2.4s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   TOPBAR
+   ========================================================================== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  height: var(--topbar-h);
+  padding: 0 var(--sp-6);
+  background: color-mix(in srgb, var(--bg-app) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+  flex: 1;
+}
+
+.topbar-title strong {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-title span {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+}
+
+/* The Ctrl+K trigger that lives in the topbar */
+.cmdk-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 15rem;
+  padding: 0.45rem 0.6rem 0.45rem 0.75rem;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast);
+}
+
+.cmdk-trigger:hover {
+  border-color: var(--accent-line);
+  background: var(--bg-hover);
+  color: var(--text-soft);
+}
+
+.cmdk-trigger-text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Role switcher */
+.role-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--bg-inset);
+  transition: all var(--t-fast);
+}
+
+.role-switch:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+
+.role-avatar {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  border-radius: var(--r-full);
+  object-fit: cover;
+  border: 1px solid var(--border-strong);
+}
+
+.role-tag {
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.role-tag-student {
+  color: var(--c-emerald-2);
+}
+.role-tag-admin {
+  color: var(--c-amber-2);
+}
+[data-theme='light'] .role-tag-student {
+  color: #047857;
+}
+[data-theme='light'] .role-tag-admin {
+  color: #b45309;
+}
+
+/* ==========================================================================
+   CONTENT COLUMN
+   ========================================================================== */
+.content-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-6) var(--sp-12);
+  animation: rise-in 0.3s var(--ease-out);
+}
+
+.app-footer {
+  padding: var(--sp-6);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: var(--bg-canvas);
+}
+
+.app-footer strong {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+  margin-bottom: 0.2rem;
+}
+
+.app-footer span {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   MOBILE — sidebar becomes an off-canvas drawer
+   ========================================================================== */
+/* Hamburger only exists once the sidebar becomes a drawer. */
+.topbar-menu-btn {
+  display: none;
+}
+
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  background: rgba(6, 6, 16, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: fade-in 0.2s var(--ease-out);
+  border: 0;
+}
+
+.sidebar-close {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .cmdk-trigger {
+    width: 2.4rem;
+    padding: 0.45rem;
+    justify-content: center;
+  }
+  .cmdk-trigger-text,
+  .cmdk-trigger .kbd {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .shell,
+  .shell.is-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(19rem, 84vw);
+    box-shadow: var(--sh-lg);
+    transform: translateX(-100%);
+    transition: transform var(--t-base);
+    padding: var(--sp-5);
+  }
+
+  .sidebar.is-open {
+    transform: none;
+  }
+
+  .sidebar-close {
+    display: inline-flex;
+  }
+  .topbar-menu-btn {
+    display: inline-flex;
+  }
+  /* Collapsing is meaningless while the sidebar is an overlay drawer. */
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
+  /* Collapsed rules must not apply while the drawer is open on mobile. */
+  .shell.is-collapsed .brand-text,
+  .shell.is-collapsed .nav-link-text,
+  .shell.is-collapsed .sidebar-label,
+  .shell.is-collapsed .level-card-detail {
+    display: revert;
+  }
+  .shell.is-collapsed .nav-link {
+    justify-content: flex-start;
+    padding-inline: var(--sp-3);
+  }
+  .shell.is-collapsed .sidebar-brand {
+    justify-content: flex-start;
+  }
+  .shell.is-collapsed .level-card {
+    padding: var(--sp-4);
+    align-items: stretch;
+  }
+
+  .topbar {
+    padding-inline: var(--sp-4);
+  }
+  .page {
+    padding: var(--sp-5) var(--sp-4) var(--sp-10);
+  }
+  .role-tag {
+    display: none;
+  }
+  .role-switch {
+    padding: 0.25rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding: var(--sp-5);
+  }
+  .hero h1 {
+    font-size: var(--fs-xl);
+  }
+  .hero-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-inner > .btn {
+    width: 100%;
+  }
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal {
+    max-width: none;
+    max-height: 92vh;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    animation: rise-in 0.28s var(--ease-out);
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-inline: var(--sp-5);
+  }
+  .modal-footer > .btn {
+    flex: 1;
+  }
+  .toast-stack {
+    right: var(--sp-3);
+    left: var(--sp-3);
+    bottom: var(--sp-3);
+  }
+  .toast {
+    min-width: 0;
+    max-width: none;
+  }
+  .search {
+    max-width: none;
+    min-width: 0;
+  }
+}

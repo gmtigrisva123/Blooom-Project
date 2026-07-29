@@ -1,0 +1,221 @@
+/* ==========================================================================
+   STUDYHUB — COMMAND PALETTE (Ctrl+K) & SHORTCUTS SHEET
+   ========================================================================== */
+
+.cmdk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1rem, 12vh, 8rem) var(--sp-4) var(--sp-4);
+  background: rgba(6, 6, 16, 0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fade-in 0.15s var(--ease-out);
+}
+
+.cmdk {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 38rem;
+  max-height: min(30rem, 70vh);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  animation: pop-in 0.2s var(--ease-spring);
+}
+
+.cmdk-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+
+.cmdk-input-row > svg {
+  color: var(--text-dim);
+  flex: none;
+}
+
+.cmdk-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  font-size: var(--fs-md);
+  color: var(--text);
+  background: none;
+  border: none;
+}
+
+.cmdk-input:hover,
+.cmdk-input:focus,
+.cmdk-input:focus-visible {
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.cmdk-list {
+  overflow-y: auto;
+  padding: var(--sp-2);
+  flex: 1;
+  min-height: 0;
+}
+
+.cmdk-group-label {
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.cmdk-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: 0.6rem var(--sp-3);
+  text-align: left;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  transition: background var(--t-fast);
+}
+
+.cmdk-item.is-active {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+.cmdk-item-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--r-xs);
+  color: var(--item-color, var(--accent-text));
+  background: color-mix(in srgb, var(--item-color, var(--accent)) 14%, transparent);
+}
+
+.cmdk-item-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.cmdk-item-title {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmdk-item-sub {
+  display: block;
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmdk-item-hint {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  flex: none;
+}
+
+.cmdk-empty {
+  padding: var(--sp-10) var(--sp-5);
+  text-align: center;
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+}
+
+.cmdk-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  flex: none;
+  flex-wrap: wrap;
+}
+
+.cmdk-foot-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ==========================================================================
+   SHORTCUTS SHEET
+   ========================================================================== */
+.shortcut-group {
+  margin-bottom: var(--sp-5);
+}
+
+.shortcut-group:last-child {
+  margin-bottom: 0;
+}
+
+.shortcut-group-title {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: var(--sp-3);
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+}
+
+.shortcut-row:last-child {
+  border-bottom: none;
+}
+
+.shortcut-keys {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+}
+
+@media (max-width: 560px) {
+  .cmdk-overlay {
+    padding-top: var(--sp-4);
+    align-items: stretch;
+  }
+  .cmdk {
+    max-height: none;
+    max-width: none;
+  }
+  .cmdk-foot {
+    display: none;
+  }
+}

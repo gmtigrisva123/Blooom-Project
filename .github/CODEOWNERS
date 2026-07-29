@@ -1,0 +1,10 @@
+# Every change requests a review from the repository owner by default.
+# See https://docs.github.com/articles/about-code-owners
+*                       @gmtigrisva123
+
+# Design system and interface work
+/src/styles/            @gmtigrisva123
+/src/components/        @gmtigrisva123
+
+# Automation and release plumbing
+/.github/               @gmtigrisva123

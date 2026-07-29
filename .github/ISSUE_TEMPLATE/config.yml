@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Câu hỏi & thảo luận
+    url: https://github.com/gmtigrisva123/Blooom-Project/discussions
+    about: Đặt câu hỏi hoặc chia sẻ ý tưởng chưa thành đề xuất cụ thể.
+  - name: 🔒 Báo cáo vấn đề bảo mật
+    url: https://github.com/gmtigrisva123/Blooom-Project/security/advisories/new
+    about: Vui lòng KHÔNG mở issue công khai cho lỗ hổng bảo mật.

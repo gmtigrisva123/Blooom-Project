@@ -1,0 +1,7 @@
+dist/
+node_modules/
+coverage/
+package-lock.json
+public/*.png
+public/*.svg
+.lighthouseci/

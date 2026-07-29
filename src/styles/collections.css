@@ -1,0 +1,428 @@
+/* ==========================================================================
+   STUDYHUB — CARD COLLECTIONS (Groups, Articles, Notes)
+   ========================================================================== */
+
+/* ==========================================================================
+   GROUP CARD
+   ========================================================================== */
+.group-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-5);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition:
+    transform var(--t-base),
+    border-color var(--t-base),
+    box-shadow var(--t-base);
+}
+
+/* Left edge stripe coloured by the group's subject */
+.group-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--subject-color);
+  opacity: 0.75;
+}
+
+.group-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--subject-color) 40%, transparent);
+  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--subject-color) 65%, transparent);
+}
+
+.group-card.is-member {
+  border-color: color-mix(in srgb, var(--subject-color) 32%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--subject-color) 7%, transparent),
+      transparent 55%
+    ),
+    var(--bg-elevated);
+}
+
+.group-privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.group-card h3 {
+  font-size: var(--fs-md);
+  line-height: 1.35;
+  margin-bottom: 0.4rem;
+}
+
+.group-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.55;
+  min-height: 3.4rem;
+  margin-bottom: var(--sp-4);
+}
+
+.group-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* The join button must never be clipped: it keeps its width and the member
+   summary on the left absorbs the shortfall. */
+.group-foot .btn {
+  flex: none;
+}
+.group-foot > .row {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Stacked member avatars */
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-pip {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin-left: -0.5rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #fff;
+  border-radius: var(--r-full);
+  border: 2px solid var(--bg-elevated);
+  background: var(--subject-color);
+}
+
+.avatar-pip:first-child {
+  margin-left: 0;
+}
+
+.avatar-pip.is-rest {
+  background: var(--bg-active);
+  color: var(--text-soft);
+  font-size: 0.5625rem;
+}
+
+/* ==========================================================================
+   ARTICLE CARDS (Editor's Pick)
+   ========================================================================== */
+.feature-article {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition:
+    transform var(--t-base),
+    box-shadow var(--t-base),
+    border-color var(--t-base);
+}
+
+.feature-article:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-line);
+  box-shadow: var(--sh-md);
+}
+
+.feature-article-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--sp-8);
+  min-width: 0;
+}
+
+.feature-article-body h2 {
+  font-size: var(--fs-xl);
+  line-height: 1.3;
+  margin: var(--sp-3) 0 var(--sp-3);
+}
+
+.feature-article-media {
+  position: relative;
+  min-height: 15rem;
+  background: var(--bg-inset);
+}
+
+.feature-article-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.card-media {
+  position: relative;
+  height: 10rem;
+  overflow: hidden;
+  background: var(--bg-inset);
+  flex: none;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--t-slow);
+}
+
+.card-hover:hover .card-media img {
+  transform: scale(1.06);
+}
+
+.card-media-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 100%;
+  color: var(--accent-text);
+  background: linear-gradient(135deg, var(--accent-soft), transparent 70%), var(--bg-inset);
+}
+
+.card-media-float {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: flex;
+  gap: 0.35rem;
+  z-index: 2;
+}
+
+.card-media-badge {
+  position: absolute;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  z-index: 2;
+}
+
+/* Badges sit on top of photos, so they need their own scrim to stay legible
+   no matter how busy or bright the image behind them is. */
+.card-media-badge.badge,
+.card-media-badge > .badge {
+  background: rgba(8, 8, 18, 0.66);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.card-media-badge > .badge-subject {
+  color: color-mix(in srgb, var(--subject-color) 70%, #ffffff);
+  border-color: color-mix(in srgb, var(--subject-color) 55%, transparent);
+}
+
+/* Frosted circular button floating over a card image */
+.float-btn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
+  background: rgba(12, 12, 24, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r-full);
+  transition: all var(--t-fast);
+}
+
+.float-btn:hover {
+  background: rgba(12, 12, 24, 0.8);
+  transform: scale(1.08);
+}
+.float-btn.is-on {
+  color: var(--c-rose-2);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  min-width: 0;
+}
+
+.card-content h3 {
+  font-size: var(--fs-md);
+  line-height: 1.35;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding-top: var(--sp-3);
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+}
+
+.card-title-btn {
+  text-align: left;
+  width: 100%;
+  transition: color var(--t-fast);
+}
+
+.card-title-btn:hover h3 {
+  color: var(--accent-text);
+}
+
+/* ==========================================================================
+   ARTICLE READER (modal body)
+   ========================================================================== */
+.reader-cover {
+  width: 100%;
+  max-height: 18rem;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-5);
+}
+
+.reader-title {
+  font-size: var(--fs-2xl);
+  line-height: 1.25;
+  margin-bottom: var(--sp-3);
+}
+
+.reader-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-4);
+  margin-bottom: var(--sp-5);
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.reader-body {
+  font-size: var(--fs-md);
+  line-height: 1.78;
+  color: var(--text-soft);
+  white-space: pre-line;
+}
+
+/* ==========================================================================
+   NOTE CARDS
+   ========================================================================== */
+.note-media {
+  position: relative;
+  height: 10rem;
+  overflow: hidden;
+  background: var(--bg-inset);
+  flex: none;
+}
+
+.note-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--t-slow);
+}
+
+.card-hover:hover .note-media img {
+  transform: scale(1.06);
+}
+
+.note-pdf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 100%;
+  color: var(--accent-text);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 12px,
+      color-mix(in srgb, var(--accent) 6%, transparent) 12px,
+      color-mix(in srgb, var(--accent) 6%, transparent) 24px
+    ),
+    var(--bg-inset);
+}
+
+.note-group-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.preview-frame {
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.preview-frame img {
+  max-width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: var(--r-sm);
+}
+
+.preview-pdf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-10) var(--sp-5);
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 760px) {
+  .feature-article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .feature-article-media {
+    min-height: 11rem;
+    order: -1;
+  }
+  .feature-article-body {
+    padding: var(--sp-5);
+  }
+  .feature-article-body h2 {
+    font-size: var(--fs-lg);
+  }
+  .reader-title {
+    font-size: var(--fs-xl);
+  }
+}

@@ -1,0 +1,130 @@
+name: Monthly Lighthouse audit
+
+# Once a month, audit the built site and file an issue with the scores so
+# interface quality is tracked over time instead of guessed at.
+on:
+  schedule:
+    - cron: '0 2 1 * *' # 09:00 giờ Việt Nam, ngày 1 hằng tháng
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Audit & report
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        # Audit at the site root so the report URLs stay simple.
+        run: npm run build
+        env:
+          BASE_PATH: /
+
+      - name: Serve the build
+        run: |
+          npx --yes serve dist --listen 4173 --no-clipboard &
+          npx --yes wait-on http://localhost:4173 --timeout 60000
+
+      - name: Run Lighthouse
+        run: |
+          npx --yes lighthouse http://localhost:4173 \
+            --output=json --output=html \
+            --output-path=./lighthouse \
+            --chrome-flags="--headless=new --no-sandbox --disable-gpu" \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --quiet
+
+      - name: Extract scores
+        id: scores
+        run: |
+          node --input-type=module -e '
+            import { readFileSync } from "node:fs";
+            import { appendFileSync } from "node:fs";
+            const r = JSON.parse(readFileSync("./lighthouse.report.json", "utf8"));
+            const pct = (c) => Math.round((r.categories[c]?.score ?? 0) * 100);
+            const out = {
+              performance: pct("performance"),
+              accessibility: pct("accessibility"),
+              bestPractices: pct("best-practices"),
+              seo: pct("seo"),
+            };
+            const audits = r.audits ?? {};
+            const metric = (id) => audits[id]?.displayValue ?? "n/a";
+            out.fcp = metric("first-contentful-paint");
+            out.lcp = metric("largest-contentful-paint");
+            out.cls = metric("cumulative-layout-shift");
+            out.tbt = metric("total-blocking-time");
+            // Everything scoring below 90 is worth a look.
+            out.failing = Object.values(audits)
+              .filter((a) => a.score !== null && a.score < 0.9 && a.scoreDisplayMode !== "notApplicable")
+              .slice(0, 15)
+              .map((a) => `- **${a.title}** — ${a.description.replace(/\[.*?\]\(.*?\)/g, "").trim()}`)
+              .join("\n") || "_Không có mục nào dưới 90 điểm. Tuyệt vời!_";
+            appendFileSync(process.env.GITHUB_OUTPUT, `json<<EOF\n${JSON.stringify(out)}\nEOF\n`);
+          '
+
+      - name: Upload full HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: lighthouse.report.html
+          retention-days: 90
+
+      - name: File the report as an issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const s = JSON.parse(`${{ steps.scores.outputs.json }}`);
+            const badge = (n) => (n >= 90 ? '🟢' : n >= 50 ? '🟠' : '🔴');
+            const month = new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+
+            const body = [
+              `# 🔦 Báo cáo Lighthouse — ${month}`,
+              '',
+              'Chạy tự động trên bản build mới nhất của `main`.',
+              '',
+              '| Hạng mục | Điểm |',
+              '| --- | --- |',
+              `| Hiệu năng | ${badge(s.performance)} **${s.performance}** |`,
+              `| Khả năng tiếp cận | ${badge(s.accessibility)} **${s.accessibility}** |`,
+              `| Thực hành tốt nhất | ${badge(s.bestPractices)} **${s.bestPractices}** |`,
+              `| SEO | ${badge(s.seo)} **${s.seo}** |`,
+              '',
+              '## Chỉ số tải trang',
+              '',
+              `- **First Contentful Paint:** ${s.fcp}`,
+              `- **Largest Contentful Paint:** ${s.lcp}`,
+              `- **Cumulative Layout Shift:** ${s.cls}`,
+              `- **Total Blocking Time:** ${s.tbt}`,
+              '',
+              '## Cần xem lại',
+              '',
+              s.failing,
+              '',
+              '---',
+              `📎 Báo cáo HTML đầy đủ nằm trong artifact \`lighthouse-report\` của [lần chạy này](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}).`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔦 Lighthouse — ${month}`,
+              body,
+              labels: ['audit', 'automated'],
+            });

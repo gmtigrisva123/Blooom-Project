@@ -1,0 +1,486 @@
+/* ==========================================================================
+   STUDYHUB — DASHBOARD + GAMIFICATION
+   ========================================================================== */
+
+/* ==========================================================================
+   GREETING HERO
+   ========================================================================== */
+.dash-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-8);
+  margin-bottom: var(--sp-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(30rem 20rem at 0% 0%, rgba(139, 92, 246, 0.2), transparent 65%),
+    radial-gradient(26rem 18rem at 100% 100%, rgba(249, 115, 22, 0.16), transparent 60%),
+    var(--bg-elevated);
+}
+
+.dash-hello {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+  letter-spacing: 0.02em;
+}
+
+.dash-hero h1 {
+  font-size: var(--fs-3xl);
+  margin: 0.2rem 0 var(--sp-2);
+}
+
+.dash-hero p {
+  margin-bottom: var(--sp-5);
+}
+
+.dash-hero-cta {
+  display: flex;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+/* ---- Streak + XP block on the right of the hero ------------------------- */
+.gamify-block {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(6px);
+}
+
+.streak-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 5.5rem;
+}
+
+.streak-flame {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: var(--r-full);
+  color: #fff;
+  background: linear-gradient(160deg, #fbbf24, #f97316 55%, #ef4444);
+  box-shadow: 0 8px 22px -8px rgba(249, 115, 22, 0.85);
+}
+
+.streak-flame svg {
+  animation: flame-flicker 2.4s ease-in-out infinite;
+}
+
+.streak-badge.is-cold .streak-flame {
+  background: var(--bg-active);
+  color: var(--text-dim);
+  box-shadow: none;
+}
+
+.streak-badge.is-cold .streak-flame svg {
+  animation: none;
+}
+
+.streak-num {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.streak-cap {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.xp-block {
+  min-width: 15rem;
+  flex: 1;
+}
+
+.xp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: 0.35rem;
+}
+
+.xp-level {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.xp-title {
+  font-size: var(--fs-xs);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.xp-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+  white-space: nowrap;
+}
+
+.xp-bar-fill {
+  background: linear-gradient(90deg, #8b5cf6, #ec4899 55%, #f97316);
+}
+
+/* ==========================================================================
+   QUICK ACTION TILES
+   ========================================================================== */
+.quick-tile {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: var(--sp-5);
+  text-align: left;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition:
+    transform var(--t-base),
+    border-color var(--t-base),
+    box-shadow var(--t-base);
+}
+
+.quick-tile::after {
+  content: '';
+  position: absolute;
+  right: -2.5rem;
+  bottom: -2.5rem;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: var(--tile-color);
+  opacity: 0.1;
+  transition:
+    transform var(--t-base),
+    opacity var(--t-base);
+}
+
+.quick-tile:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--tile-color) 45%, transparent);
+  box-shadow: 0 14px 32px -14px color-mix(in srgb, var(--tile-color) 70%, transparent);
+}
+
+.quick-tile:hover::after {
+  transform: scale(1.25);
+  opacity: 0.17;
+}
+
+.quick-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--r-sm);
+  color: #fff;
+  background: var(--tile-color);
+  box-shadow: 0 6px 16px -6px var(--tile-color);
+  z-index: 1;
+}
+
+.quick-tile-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text);
+  z-index: 1;
+}
+
+.quick-tile-desc {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  z-index: 1;
+}
+
+/* ==========================================================================
+   7-DAY BAR CHART
+   ========================================================================== */
+.chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--sp-2);
+  height: 11rem;
+  padding-top: var(--sp-4);
+}
+
+.chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  height: 100%;
+  min-width: 0;
+}
+
+.chart-bar-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+}
+
+.chart-bar {
+  width: min(100%, 2.4rem);
+  min-height: 4px;
+  border-radius: var(--r-xs) var(--r-xs) 2px 2px;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  transform-origin: bottom;
+  animation: grow-bar 0.55s var(--ease-out) both;
+  transition: filter var(--t-fast);
+}
+
+.chart-col:hover .chart-bar {
+  filter: brightness(1.2);
+}
+
+.chart-bar.is-empty {
+  background: var(--bg-inset);
+  border: 1px dashed var(--border);
+}
+
+.chart-bar.is-today {
+  box-shadow:
+    0 0 0 2px var(--bg-elevated),
+    0 0 0 3px var(--accent);
+}
+
+.chart-val {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.chart-day {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.chart-col.is-today .chart-day {
+  color: var(--accent-text);
+}
+
+/* ==========================================================================
+   ACTIVITY FEED
+   ========================================================================== */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.feed-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--r-sm);
+  transition: background var(--t-fast);
+}
+
+.feed-item:hover {
+  background: var(--bg-hover);
+}
+
+.feed-dot {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  margin-top: 0.1rem;
+  border-radius: var(--r-full);
+  color: var(--feed-color, var(--accent-text));
+  background: color-mix(in srgb, var(--feed-color, var(--accent)) 15%, transparent);
+}
+
+/* Connector line between feed dots */
+.feed-item:not(:last-child) .feed-dot::after {
+  content: '';
+  position: absolute;
+  top: 2.6rem;
+  left: calc(var(--sp-2) + 1rem - 1px);
+  width: 2px;
+  height: calc(100% - 2.1rem);
+  background: var(--border);
+}
+
+.feed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-text {
+  font-size: var(--fs-sm);
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.feed-text strong {
+  font-weight: 650;
+}
+
+.feed-time {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   ACHIEVEMENT BADGES
+   ========================================================================== */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: var(--sp-3);
+}
+
+.achv {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: var(--sp-4) var(--sp-2);
+  text-align: center;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition:
+    transform var(--t-base),
+    border-color var(--t-base);
+}
+
+.achv:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+}
+
+.achv-medal {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.5rem;
+  border-radius: var(--r-full);
+  background: var(--bg-active);
+  filter: grayscale(1);
+  opacity: 0.4;
+  transition: all var(--t-base);
+}
+
+.achv.is-unlocked .achv-medal {
+  filter: none;
+  opacity: 1;
+  background: linear-gradient(
+    150deg,
+    var(--achv-color),
+    color-mix(in srgb, var(--achv-color) 45%, #000)
+  );
+  box-shadow: 0 8px 20px -8px var(--achv-color);
+}
+
+.achv.is-new::before {
+  content: 'MỚI';
+  position: absolute;
+  top: -0.5rem;
+  right: -0.35rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--c-rose);
+  border-radius: var(--r-full);
+  animation: pop-in 0.4s var(--ease-spring);
+}
+
+.achv-name {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.achv:not(.is-unlocked) .achv-name {
+  color: var(--text-dim);
+}
+
+.achv-req {
+  font-size: 0.625rem;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .dash-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gamify-block {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .dash-hero {
+    padding: var(--sp-5);
+  }
+  .dash-hero h1 {
+    font-size: var(--fs-2xl);
+  }
+  .dash-hero-cta > .btn {
+    flex: 1;
+  }
+  .gamify-block {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-4);
+  }
+  .streak-badge {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--sp-3);
+  }
+  .streak-cap {
+    text-align: left;
+  }
+  .chart {
+    height: 9rem;
+  }
+  .chart-val {
+    display: none;
+  }
+}

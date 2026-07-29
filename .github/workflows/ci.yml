@@ -1,0 +1,70 @@
+name: CI
+
+# Every push and every pull request must lint, format-check and build cleanly
+# before it can be merged. This is the gate Dependabot PRs have to pass too.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A new push to the same branch cancels the previous run — no point burning
+# minutes on a commit that is already outdated.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, format & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Report bundle size
+        run: |
+          {
+            echo "### 📦 Kích thước bản build"
+            echo ""
+            echo "| Tệp | Dung lượng |"
+            echo "| --- | ---------- |"
+            find dist/assets -type f \( -name '*.js' -o -name '*.css' \) -print0 \
+              | sort -z \
+              | while IFS= read -r -d '' f; do
+                  echo "| \`${f#dist/}\` | $(du -h "$f" | cut -f1) |"
+                done
+            echo ""
+            echo "**Tổng thư mục dist:** $(du -sh dist | cut -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7

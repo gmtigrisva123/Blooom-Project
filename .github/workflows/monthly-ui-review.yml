@@ -1,0 +1,92 @@
+name: Monthly UI review
+
+# Opens a checklist issue at the start of each month. GitHub Actions cannot
+# redesign an interface on its own, so this is the honest version of a
+# "monthly interface update": a scheduled, structured prompt to review it,
+# paired with the automated audits in lighthouse.yml and dependabot.yml.
+on:
+  schedule:
+    - cron: '0 3 1 * *' # 10:00 giờ Việt Nam, ngày 1 hằng tháng
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  open-review-issue:
+    name: Open review checklist
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Create the issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const month = now.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
+            const title = `💄 Rà soát giao diện — ${month}`;
+
+            // Don't stack duplicates if the workflow is also run manually.
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ui-review',
+            });
+            if (existing.data.some((i) => i.title === title)) {
+              core.notice(`Issue "${title}" đã tồn tại — bỏ qua.`);
+              return;
+            }
+
+            const body = `# Rà soát giao diện tháng ${month}
+
+            Mỗi tháng một lần, đi qua danh sách này để giao diện không bị xuống cấp âm thầm.
+            Tick xong mục nào thì đánh dấu mục đó; mở issue riêng cho những gì cần sửa.
+
+            ## 📱 Responsive
+            - [ ] 375px (iPhone SE) — không tràn ngang, nút đủ lớn để chạm
+            - [ ] 768px (tablet) — lưới không bị vỡ nửa vời
+            - [ ] 1280px trở lên — nội dung không bị kéo giãn quá rộng
+            - [ ] Sidebar thu thành drawer đúng ở dưới 900px
+
+            ## 🌗 Giao diện sáng / tối
+            - [ ] Cả 6 khu vực đều đọc được ở chế độ sáng
+            - [ ] Cả 6 khu vực đều đọc được ở chế độ tối
+            - [ ] Độ tương phản chữ đạt WCAG AA (tối thiểu 4.5:1 cho chữ thường)
+            - [ ] Màu nhấn từng khu vực vẫn đổi đúng (tím → cam → hồng → xanh lá → cyan)
+
+            ## 🧩 Trạng thái giao diện
+            - [ ] Empty state hiện đúng khi chưa có dữ liệu (xóa hết nhóm / ghi chú / phiên học để thử)
+            - [ ] Skeleton loading hiện khi mới mở trang
+            - [ ] Toast thông báo hiện và tự tắt
+            - [ ] Modal đóng được bằng Esc và bằng cách bấm ra ngoài
+
+            ## ⌨️ Bàn phím & tiếp cận
+            - [ ] Tab đi qua được toàn bộ phần tử tương tác, viền focus nhìn thấy rõ
+            - [ ] Ctrl+K, phím 1–6, Space/R, Shift+D, ? đều còn hoạt động
+            - [ ] Gõ trong ô input không kích hoạt nhầm phím tắt
+            - [ ] Ảnh có alt, nút icon có aria-label
+
+            ## ⚙️ Sức khỏe kỹ thuật
+            - [ ] Console không có lỗi hay cảnh báo mới
+            - [ ] \`npm run lint\` và \`npm run build\` đều xanh
+            - [ ] Đã xem qua PR Dependabot của tháng
+            - [ ] Đã xem qua báo cáo Lighthouse của tháng
+            - [ ] Link demo GitHub Pages vẫn mở được
+
+            ## ✍️ Ghi chú
+
+            _Ghi lại những gì bạn thấy ở đây._
+            `.replace(/^ {12}/gm, '');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['ui-review', 'automated'],
+            });
+
+            core.notice(`Đã tạo ${issue.data.html_url}`);

@@ -1,0 +1,236 @@
+/* ==========================================================================
+   STUDYHUB — DESIGN TOKENS
+   Multi-accent ("rainbow") system: each section owns an accent colour that is
+   injected into --accent* by [data-section] on the app shell. Every component
+   below styles itself from --accent, so the whole UI re-tints when the user
+   switches tab.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- Raw palette ------------------------------------------------------ */
+  --c-violet: #8b5cf6;
+  --c-violet-2: #a78bfa;
+  --c-indigo: #6366f1;
+  --c-indigo-2: #818cf8;
+  --c-orange: #f97316;
+  --c-orange-2: #fb923c;
+  --c-pink: #ec4899;
+  --c-pink-2: #f472b6;
+  --c-emerald: #10b981;
+  --c-emerald-2: #34d399;
+  --c-cyan: #06b6d4;
+  --c-cyan-2: #22d3ee;
+  --c-amber: #f59e0b;
+  --c-amber-2: #fbbf24;
+  --c-rose: #f43f5e;
+  --c-rose-2: #fb7185;
+  --c-blue: #3b82f6;
+  --c-blue-2: #60a5fa;
+
+  /* ---- Semantic surfaces (dark is the default) -------------------------- */
+  --bg-app: #0a0a14;
+  --bg-canvas: #0f1020;
+  --bg-elevated: #171830;
+  --bg-raised: #1e2040;
+  --bg-inset: rgba(255, 255, 255, 0.04);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.09);
+
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #f4f4fb;
+  --text-soft: #b9bad6;
+  --text-dim: #7c7d9e;
+  --text-on-accent: #ffffff;
+
+  --success: var(--c-emerald);
+  --warning: var(--c-amber);
+  --danger: var(--c-rose);
+
+  /* ---- Accent (overridden per section) ---------------------------------- */
+  --accent: var(--c-indigo);
+  --accent-2: var(--c-violet);
+  --accent-text: var(--c-indigo-2);
+  --accent-soft: rgba(99, 102, 241, 0.14);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  /* NOTE: do not compose gradients/shadows out of --accent here. A custom
+     property that references another one is substituted on the element where
+     it is DECLARED, so a token built at :root would freeze the indigo default
+     and never re-tint per section. Write those values at the use site. */
+
+  /* ---- Radii ------------------------------------------------------------ */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 999px;
+
+  /* ---- Elevation -------------------------------------------------------- */
+  --sh-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --sh-md: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  --sh-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+
+  /* ---- Type scale ------------------------------------------------------- */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+
+  --fs-2xs: 0.6875rem; /* 11 */
+  --fs-xs: 0.75rem; /* 12 */
+  --fs-sm: 0.8125rem; /* 13 */
+  --fs-base: 0.9375rem; /* 15 */
+  --fs-md: 1rem; /* 16 */
+  --fs-lg: 1.125rem; /* 18 */
+  --fs-xl: 1.375rem; /* 22 */
+  --fs-2xl: 1.75rem; /* 28 */
+  --fs-3xl: 2.25rem; /* 36 */
+  --fs-4xl: 3rem; /* 48 */
+
+  /* ---- Spacing ---------------------------------------------------------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 0.14s var(--ease-out);
+  --t-base: 0.24s var(--ease-out);
+  --t-slow: 0.4s var(--ease-out);
+  --t-spring: 0.42s var(--ease-spring);
+
+  /* ---- Layout ----------------------------------------------------------- */
+  --sidebar-w: 264px;
+  --sidebar-w-collapsed: 76px;
+  --topbar-h: 64px;
+  --content-max: 1240px;
+}
+
+/* ==========================================================================
+   LIGHT THEME
+   ========================================================================== */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-app: #f4f4f9;
+  --bg-canvas: #fafaff;
+  --bg-elevated: #ffffff;
+  --bg-raised: #ffffff;
+  --bg-inset: rgba(15, 16, 32, 0.035);
+  --bg-hover: rgba(15, 16, 32, 0.05);
+  --bg-active: rgba(15, 16, 32, 0.08);
+
+  --border: rgba(15, 16, 32, 0.09);
+  --border-strong: rgba(15, 16, 32, 0.18);
+
+  --text: #14152b;
+  --text-soft: #4a4c69;
+  --text-dim: #7b7d99;
+
+  --sh-xs: 0 1px 2px rgba(20, 21, 43, 0.06);
+  --sh-sm: 0 2px 8px rgba(20, 21, 43, 0.07);
+  --sh-md: 0 8px 24px -6px rgba(20, 21, 43, 0.12);
+  --sh-lg: 0 24px 48px -12px rgba(20, 21, 43, 0.18);
+}
+
+/* ==========================================================================
+   PER-SECTION ACCENTS — the "rainbow" behaviour
+   ========================================================================== */
+[data-section='dashboard'] {
+  --accent: #6366f1;
+  --accent-2: #8b5cf6;
+  --accent-text: #818cf8;
+  --accent-soft: rgba(99, 102, 241, 0.14);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --accent-glow: rgba(99, 102, 241, 0.45);
+}
+
+[data-section='groups'] {
+  --accent: #8b5cf6;
+  --accent-2: #c084fc;
+  --accent-text: #a78bfa;
+  --accent-soft: rgba(139, 92, 246, 0.14);
+  --accent-line: rgba(139, 92, 246, 0.35);
+  --accent-glow: rgba(139, 92, 246, 0.45);
+}
+
+[data-section='timer'] {
+  --accent: #f97316;
+  --accent-2: #fbbf24;
+  --accent-text: #fb923c;
+  --accent-soft: rgba(249, 115, 22, 0.14);
+  --accent-line: rgba(249, 115, 22, 0.35);
+  --accent-glow: rgba(249, 115, 22, 0.45);
+}
+
+[data-section='editor'] {
+  --accent: #ec4899;
+  --accent-2: #f472b6;
+  --accent-text: #f472b6;
+  --accent-soft: rgba(236, 72, 153, 0.14);
+  --accent-line: rgba(236, 72, 153, 0.35);
+  --accent-glow: rgba(236, 72, 153, 0.45);
+}
+
+[data-section='performance'] {
+  --accent: #10b981;
+  --accent-2: #34d399;
+  --accent-text: #34d399;
+  --accent-soft: rgba(16, 185, 129, 0.14);
+  --accent-line: rgba(16, 185, 129, 0.35);
+  --accent-glow: rgba(16, 185, 129, 0.45);
+}
+
+[data-section='notes'] {
+  --accent: #06b6d4;
+  --accent-2: #22d3ee;
+  --accent-text: #22d3ee;
+  --accent-soft: rgba(6, 182, 212, 0.14);
+  --accent-line: rgba(6, 182, 212, 0.35);
+  --accent-glow: rgba(6, 182, 212, 0.45);
+}
+
+/* Accent text needs to darken in light mode to stay legible on white. */
+[data-theme='light'] [data-section='dashboard'] {
+  --accent-text: #4f46e5;
+}
+[data-theme='light'] [data-section='groups'] {
+  --accent-text: #7c3aed;
+}
+[data-theme='light'] [data-section='timer'] {
+  --accent-text: #c2410c;
+}
+[data-theme='light'] [data-section='editor'] {
+  --accent-text: #be185d;
+}
+[data-theme='light'] [data-section='performance'] {
+  --accent-text: #047857;
+}
+[data-theme='light'] [data-section='notes'] {
+  --accent-text: #0e7490;
+}
+
+/* ==========================================================================
+   SUBJECT COLOURS — one hue per school subject, used by badges & charts
+   ========================================================================== */
+:root {
+  --subj-toan: #3b82f6;
+  --subj-anh: #a855f7;
+  --subj-ly: #06b6d4;
+  --subj-hoa: #10b981;
+  --subj-sinh: #f43f5e;
+  --subj-van: #f59e0b;
+  --subj-tin: #6366f1;
+  --subj-khac: #94a3b8;
+}

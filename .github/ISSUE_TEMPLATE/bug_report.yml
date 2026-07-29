@@ -1,0 +1,98 @@
+name: 🐛 Báo lỗi
+description: Có gì đó chạy sai hoặc hiển thị sai
+title: '[Bug]: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn bạn đã dành thời gian báo lỗi! Càng nhiều chi tiết, lỗi càng nhanh được sửa.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Chuyện gì đã xảy ra?
+      description: Mô tả lỗi bạn gặp phải.
+      placeholder: Khi tôi bấm "Bắt Đầu Học", bộ đếm giờ không chạy...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Bạn mong đợi điều gì?
+      placeholder: Bộ đếm giờ đáng lẽ phải đếm ngược từ 25:00.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái hiện
+      description: Liệt kê từng bước để người khác gặp lại đúng lỗi này.
+      value: |
+        1. Mở tab "..."
+        2. Bấm vào "..."
+        3. Thấy lỗi
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Khu vực bị ảnh hưởng
+      options:
+        - Tổng Quan (Dashboard)
+        - Nhóm Học Tập
+        - Bộ Đếm Giờ (Pomodoro)
+        - Editor's Pick
+        - Hiệu Suất
+        - Ghi Chú
+        - Điều hướng / Sidebar / Phím tắt
+        - Khác / Chưa rõ
+    validations:
+      required: true
+
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: Kích thước màn hình
+      options:
+        - Desktop (trên 1024px)
+        - Tablet (768–1024px)
+        - Mobile (dưới 768px)
+        - Xảy ra ở mọi kích thước
+    validations:
+      required: true
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Giao diện
+      options:
+        - Tối
+        - Sáng
+        - Cả hai
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Trình duyệt và phiên bản
+      placeholder: Chrome 140, Safari 18, Firefox 133...
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Lỗi trong Console (nếu có)
+      description: Mở DevTools → tab Console và dán nội dung lỗi vào đây.
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Ảnh chụp màn hình
+      description: Kéo thả ảnh vào đây nếu có.

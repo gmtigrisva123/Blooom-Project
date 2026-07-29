@@ -1,0 +1,260 @@
+/* ==========================================================================
+   STUDYHUB — PERFORMANCE TRACKER
+   ========================================================================== */
+
+/* ==========================================================================
+   GOAL RING (big radial completion gauge)
+   ========================================================================== */
+.goal-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 9.5rem;
+  height: 9.5rem;
+  flex: none;
+}
+
+.goal-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.goal-ring-track {
+  fill: none;
+  stroke: var(--bg-inset);
+  stroke-width: 9;
+}
+
+.goal-ring-fill {
+  fill: none;
+  stroke: url(#goalGradient);
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s var(--ease-out);
+}
+
+.goal-ring-face {
+  text-align: center;
+  z-index: 1;
+}
+
+.goal-ring-pct {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-ring-cap {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.goal-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.goal-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  flex: 1;
+  min-width: 14rem;
+}
+
+.goal-metric-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: 0.3rem;
+  font-size: var(--fs-sm);
+}
+
+.goal-metric-head b {
+  font-weight: 650;
+  color: var(--text);
+}
+.goal-metric-head span {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   WEEK HEATMAP STRIP
+   ========================================================================== */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: var(--sp-3) 0.25rem;
+  min-width: 0;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition:
+    transform var(--t-fast),
+    border-color var(--t-fast);
+}
+
+.week-day:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+.week-day.is-today {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent-line);
+}
+
+/* Intensity levels driven by minutes studied */
+.week-day.lv1 {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.week-day.lv2 {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+.week-day.lv3 {
+  background: color-mix(in srgb, var(--accent) 44%, transparent);
+}
+.week-day.lv4 {
+  background: color-mix(in srgb, var(--accent) 66%, transparent);
+  border-color: var(--accent);
+}
+
+.week-dow {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.week-day.is-today .week-dow {
+  color: var(--accent-text);
+}
+
+.week-num {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.week-mins {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.week-mins.is-zero {
+  color: var(--text-dim);
+  opacity: 0.55;
+}
+
+.week-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin-top: var(--sp-4);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.week-legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+/* ==========================================================================
+   SUBJECT DISTRIBUTION
+   ========================================================================== */
+.subj-row {
+  margin-bottom: var(--sp-4);
+}
+
+.subj-row:last-child {
+  margin-bottom: 0;
+}
+
+.subj-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: 0.35rem;
+  font-size: var(--fs-sm);
+}
+
+.subj-name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+}
+
+.subj-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  flex: none;
+  border-radius: var(--r-full);
+  background: var(--subject-color);
+}
+
+.subj-val {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.subj-bar-fill {
+  background: var(--subject-color);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 620px) {
+  .goal-summary {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-5);
+  }
+  .goal-ring {
+    margin: 0 auto;
+  }
+  .week-grid {
+    gap: 0.3rem;
+  }
+  .week-day {
+    padding: var(--sp-2) 0.15rem;
+  }
+  .week-mins {
+    font-size: 0.5625rem;
+  }
+  .week-num {
+    font-size: var(--fs-sm);
+  }
+}

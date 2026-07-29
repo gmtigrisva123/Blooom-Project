@@ -1,0 +1,34 @@
+{
+  "name": "StudyHub — Nền Tảng Nhóm Học Tập Tương Tác",
+  "short_name": "StudyHub",
+  "description": "Nền tảng nhóm học tập tương tác giúp học sinh kết nối theo môn học, quản lý thời gian Pomodoro, theo dõi hiệu suất và số hóa ghi chú bài học.",
+  "lang": "vi",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a14",
+  "theme_color": "#8b5cf6",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

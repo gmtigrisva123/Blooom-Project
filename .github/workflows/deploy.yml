@@ -1,0 +1,79 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Ship every change that lands on main.
+  push:
+    branches: [main]
+  # Monthly rebuild — keeps the live demo fresh even in a quiet month and
+  # proves the build still works against the current toolchain.
+  schedule:
+    - cron: '0 1 1 * *' # 08:00 giờ Việt Nam, ngày 1 hằng tháng
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deployments at once, but let a queued one finish rather than
+# cancelling it — a half-cancelled deploy would leave the site stale.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build
+        run: npm run build
+        env:
+          # Comes from actions/configure-pages, e.g. "/Blooom-Project/".
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Add SPA fallback
+        # GitHub Pages has no server-side routing. Serving index.html for 404s
+        # means a deep link or a refresh still loads the app.
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        run: |
+          echo "🚀 Đã deploy: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"

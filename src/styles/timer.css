@@ -1,0 +1,287 @@
+/* ==========================================================================
+   STUDYHUB — POMODORO TIMER
+   ========================================================================== */
+
+.timer-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-6);
+  text-align: center;
+}
+
+/* ==========================================================================
+   MODE SWITCH (Học / Nghỉ)
+   ========================================================================== */
+/* Fixed width with two equal halves so the sliding thumb lines up exactly
+   with each button regardless of how long the labels are. */
+.mode-switch {
+  position: relative;
+  display: flex;
+  width: min(20rem, 100%);
+  padding: 0.28rem;
+  margin-bottom: var(--sp-5);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+}
+
+.mode-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 50%;
+  padding: 0.45rem 0.75rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-dim);
+  border-radius: var(--r-full);
+  transition: color var(--t-base);
+  white-space: nowrap;
+}
+
+.mode-btn.is-active {
+  color: var(--text-on-accent);
+}
+
+/* Sliding pill that sits behind the active mode button */
+.mode-thumb {
+  position: absolute;
+  top: 0.28rem;
+  bottom: 0.28rem;
+  left: 0.28rem;
+  width: calc(50% - 0.28rem);
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 8px 24px -8px var(--accent-glow);
+  transition: transform var(--t-spring);
+}
+
+.mode-thumb.at-break {
+  transform: translateX(100%);
+}
+
+/* ==========================================================================
+   COUNTDOWN RING
+   ========================================================================== */
+.ring-wrap {
+  position: relative;
+  width: 17rem;
+  height: 17rem;
+  max-width: 100%;
+  margin: 0 auto var(--sp-6);
+  display: grid;
+  place-items: center;
+}
+
+.ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--bg-inset);
+  stroke-width: 10;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: url(#ringGradient);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.9s linear;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.ring-face {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.ring-time {
+  font-family: var(--font-display);
+  font-size: 3.4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ring-caption {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+.ring-pct {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Running state: soft breathing halo. Final minute: urgent pulse. */
+.ring-wrap.is-running .ring-face {
+  animation: none;
+}
+
+.ring-wrap.is-running::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.07;
+  animation: pulse-ring 2.6s ease-in-out infinite;
+}
+
+.ring-wrap.is-urgent .ring-time {
+  color: var(--c-rose-2);
+}
+.ring-wrap.is-urgent .ring-progress {
+  filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.75));
+}
+
+/* ==========================================================================
+   CONTROLS
+   ========================================================================== */
+.timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.timer-controls .btn-lg {
+  min-width: 11rem;
+}
+
+/* ==========================================================================
+   PRESETS
+   ========================================================================== */
+.preset-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--sp-3);
+  width: 100%;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+
+.preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: var(--sp-3);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast);
+}
+
+.preset:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.preset:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.preset.is-active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.preset-time {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: inherit;
+}
+
+.preset-name {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.preset.is-active .preset-name {
+  color: var(--accent-text);
+}
+
+/* ==========================================================================
+   SESSION LOG
+   ========================================================================== */
+.log-panel {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-5);
+  max-height: 40rem;
+}
+
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.log-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  margin-top: var(--sp-4);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-sm);
+}
+
+.log-total-value {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--accent-text);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 560px) {
+  .ring-wrap {
+    width: 14rem;
+    height: 14rem;
+  }
+  .ring-time {
+    font-size: 2.75rem;
+  }
+  .timer-panel {
+    padding: var(--sp-5) var(--sp-4);
+  }
+  .timer-controls .btn-lg {
+    min-width: 0;
+    flex: 1;
+  }
+  .mode-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: var(--fs-xs);
+  }
+}
