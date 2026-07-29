@@ -19,13 +19,17 @@ export default defineConfig(({ command }) => ({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    // Keep vendor libraries in their own chunks so editing app code doesn't
-    // invalidate the browser cache for all of React on every deploy.
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ['react', 'react-dom'],
-          icons: ['lucide-react']
+        // Keep vendor libraries in their own chunks so editing app code doesn't
+        // invalidate the browser cache for all of React on every deploy.
+        // Rolldown (the bundler behind Vite 8) only accepts the function form,
+        // so the grouping is expressed as module-id matching rather than a map.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          // Must come before the React test — the name contains "react".
+          if (id.includes('lucide-react')) return 'icons';
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'react';
         }
       }
     }
