@@ -87,7 +87,7 @@ jobs:
           retention-days: 90
 
       - name: File the report as an issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const s = JSON.parse(`${{ steps.scores.outputs.json }}`);
