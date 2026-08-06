@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="public/icon-192.png" alt="" width="88" height="88" />
+<img src="public/blooom-logo.png" alt="" width="260" />
 
-# StudyHub
+# Blooom
 
 **Nền tảng nhóm học tập tương tác cho học sinh &amp; sinh viên**
 
@@ -16,7 +16,7 @@ Kết nối nhóm học theo môn · Tập trung với Pomodoro · Theo dõi hi�
 
 [**🌐 Xem demo trực tiếp**](https://blooom-project.vercel.app/) · [Báo lỗi](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=bug_report.yml) · [Đề xuất tính năng](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=feature_request.yml)
 
-<img src="public/og-image.png" alt="Ảnh xem trước StudyHub" width="720" />
+<img src="public/og-image.png" alt="Ảnh xem trước Blooom" width="720" />
 
 </div>
 
@@ -24,7 +24,7 @@ Kết nối nhóm học theo môn · Tập trung với Pomodoro · Theo dõi hi�
 
 ## Giới thiệu
 
-StudyHub gom bốn thứ một học sinh thường phải dùng bốn ứng dụng khác nhau vào một chỗ: tìm
+Blooom gom bốn thứ một học sinh thường phải dùng bốn ứng dụng khác nhau vào một chỗ: tìm
 nhóm học cùng môn, đồng hồ Pomodoro để tập trung, bảng theo dõi tiến độ, và kho ghi chú.
 Toàn bộ dữ liệu nằm trong `localStorage` của trình duyệt — không cần đăng ký, không cần
 máy chủ, mở là dùng được ngay.
