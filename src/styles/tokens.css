@@ -1,84 +1,104 @@
-/* ==========================================================================
-   STUDYHUB — DESIGN TOKENS
-   Multi-accent ("rainbow") system: each section owns an accent colour that is
-   injected into --accent* by [data-section] on the app shell. Every component
-   below styles itself from --accent, so the whole UI re-tints when the user
-   switches tab.
+/* Hallmark · macrostructure: Workbench · tone: technical · anchor hue: teal 175°
+ * pre-emit critique: P5 H5 E4 S5 R5 V4
+ * ==========================================================================
+   BLOOOM — DESIGN TOKENS ("Lab" system)
+   One anchor accent for the whole product, a separate categorical palette for
+   data, and a monospace face reserved for numerals. Sections no longer repaint
+   the interface; they only carry a small identifying marker colour, so charts
+   stay the loudest thing on any screen.
    ========================================================================== */
 
 :root {
   color-scheme: dark;
 
-  /* ---- Raw palette ------------------------------------------------------ */
-  --c-violet: #8b5cf6;
-  --c-violet-2: #a78bfa;
-  --c-indigo: #6366f1;
-  --c-indigo-2: #818cf8;
-  --c-orange: #f97316;
-  --c-orange-2: #fb923c;
-  --c-pink: #ec4899;
-  --c-pink-2: #f472b6;
-  --c-emerald: #10b981;
-  --c-emerald-2: #34d399;
-  --c-cyan: #06b6d4;
-  --c-cyan-2: #22d3ee;
-  --c-amber: #f59e0b;
-  --c-amber-2: #fbbf24;
-  --c-rose: #f43f5e;
-  --c-rose-2: #fb7185;
-  --c-blue: #3b82f6;
-  --c-blue-2: #60a5fa;
+  /* ---- Raw palette ------------------------------------------------------
+     Kept under the historic --c-* names so every existing component keeps
+     resolving; the values are retuned for the lab surface. */
+  --c-teal: #2dd4bf;
+  --c-teal-2: #5eead4;
+  --c-indigo: #818cf8;
+  --c-indigo-2: #a5b4fc;
+  --c-violet: #a78bfa;
+  --c-violet-2: #c4b5fd;
+  --c-orange: #f0a85c;
+  --c-orange-2: #f8c98c;
+  --c-pink: #f472b6;
+  --c-pink-2: #f9a8d4;
+  --c-emerald: #34d399;
+  --c-emerald-2: #6ee7b7;
+  --c-cyan: #7dd3fc;
+  --c-cyan-2: #bae6fd;
+  --c-amber: #fbbf24;
+  --c-amber-2: #fcd34d;
+  --c-rose: #fb7185;
+  --c-rose-2: #fda4af;
+  --c-blue: #60a5fa;
+  --c-blue-2: #93c5fd;
+
+  /* ---- Categorical data palette -----------------------------------------
+     Six hues, ordered by how often a chart needs them. Never used for UI
+     chrome — only for marks that encode a value. */
+  --d-1: #2dd4bf;
+  --d-2: #818cf8;
+  --d-3: #f0a85c;
+  --d-4: #f472b6;
+  --d-5: #7dd3fc;
+  --d-6: #a3e635;
 
   /* ---- Semantic surfaces (dark is the default) -------------------------- */
-  --bg-app: #0a0a14;
-  --bg-canvas: #0f1020;
-  --bg-elevated: #171830;
-  --bg-raised: #1e2040;
-  --bg-inset: rgba(255, 255, 255, 0.04);
+  --bg-app: #0b0e14;
+  --bg-canvas: #0e1219;
+  --bg-elevated: #131820;
+  --bg-raised: #171d27;
+  --bg-inset: rgba(255, 255, 255, 0.035);
   --bg-hover: rgba(255, 255, 255, 0.06);
-  --bg-active: rgba(255, 255, 255, 0.09);
+  --bg-active: rgba(255, 255, 255, 0.095);
 
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --border: rgba(148, 163, 184, 0.16);
+  --border-strong: rgba(148, 163, 184, 0.32);
 
-  --text: #f4f4fb;
-  --text-soft: #b9bad6;
-  --text-dim: #7c7d9e;
-  --text-on-accent: #ffffff;
+  --text: #e8edf4;
+  --text-soft: #a3aebf;
+  /* Dim text still has to clear 4.5:1 on the LIGHTEST surface it lands on
+     (an inset panel inside an elevated panel), not just on the app bg. */
+  --text-dim: #7d8a9c;
+  --text-on-accent: #042a26;
 
-  --success: var(--c-emerald);
-  --warning: var(--c-amber);
-  --danger: var(--c-rose);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
 
-  /* ---- Accent (overridden per section) ---------------------------------- */
-  --accent: var(--c-indigo);
-  --accent-2: var(--c-violet);
-  --accent-text: var(--c-indigo-2);
-  --accent-soft: rgba(99, 102, 241, 0.14);
-  --accent-line: rgba(99, 102, 241, 0.35);
-  --accent-glow: rgba(99, 102, 241, 0.4);
-  /* NOTE: do not compose gradients/shadows out of --accent here. A custom
-     property that references another one is substituted on the element where
-     it is DECLARED, so a token built at :root would freeze the indigo default
-     and never re-tint per section. Write those values at the use site. */
+  /* ---- Accent — one anchor for the entire product ------------------------
+     Fills use --accent with --text-on-accent (7.9:1); prose uses --accent-text
+     against the app background (12.6:1). */
+  --accent: #2dd4bf;
+  --accent-2: #818cf8;
+  --accent-text: #5eead4;
+  --accent-soft: rgba(45, 212, 191, 0.12);
+  --accent-line: rgba(45, 212, 191, 0.34);
+  --accent-glow: rgba(45, 212, 191, 0.28);
 
-  /* ---- Radii ------------------------------------------------------------ */
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  /* Grid rule used by the plotting surfaces. */
+  --grid-line: rgba(148, 163, 184, 0.13);
+
+  /* ---- Radii — tighter than the old system; cards sit at 12px ----------- */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
   --r-full: 999px;
 
-  /* ---- Elevation -------------------------------------------------------- */
-  --sh-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --sh-md: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
-  --sh-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  /* ---- Elevation — hairlines carry the hierarchy, not shadows ----------- */
+  --sh-xs: 0 1px 1px rgba(0, 0, 0, 0.24);
+  --sh-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sh-md: 0 6px 18px -8px rgba(0, 0, 0, 0.5);
+  --sh-lg: 0 22px 44px -18px rgba(0, 0, 0, 0.65);
 
-  /* ---- Type scale ------------------------------------------------------- */
+  /* ---- Type ------------------------------------------------------------- */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   --fs-2xs: 0.6875rem; /* 11 */
   --fs-xs: 0.75rem; /* 12 */
@@ -104,17 +124,17 @@
 
   /* ---- Motion ----------------------------------------------------------- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --t-fast: 0.14s var(--ease-out);
-  --t-base: 0.24s var(--ease-out);
-  --t-slow: 0.4s var(--ease-out);
-  --t-spring: 0.42s var(--ease-spring);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --t-fast: 0.12s var(--ease-out);
+  --t-base: 0.2s var(--ease-out);
+  --t-slow: 0.34s var(--ease-out);
+  --t-spring: 0.36s var(--ease-spring);
 
   /* ---- Layout ----------------------------------------------------------- */
-  --sidebar-w: 264px;
-  --sidebar-w-collapsed: 76px;
-  --topbar-h: 64px;
-  --content-max: 1240px;
+  --sidebar-w: 252px;
+  --sidebar-w-collapsed: 68px;
+  --topbar-h: 56px;
+  --content-max: 1280px;
 }
 
 /* ==========================================================================
@@ -123,114 +143,129 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  --bg-app: #f4f4f9;
-  --bg-canvas: #fafaff;
+  --bg-app: #f7f8fa;
+  --bg-canvas: #ffffff;
   --bg-elevated: #ffffff;
   --bg-raised: #ffffff;
-  --bg-inset: rgba(15, 16, 32, 0.035);
-  --bg-hover: rgba(15, 16, 32, 0.05);
-  --bg-active: rgba(15, 16, 32, 0.08);
+  --bg-inset: rgba(15, 23, 42, 0.035);
+  --bg-hover: rgba(15, 23, 42, 0.05);
+  --bg-active: rgba(15, 23, 42, 0.08);
 
-  --border: rgba(15, 16, 32, 0.09);
-  --border-strong: rgba(15, 16, 32, 0.18);
+  --border: rgba(15, 23, 42, 0.11);
+  --border-strong: rgba(15, 23, 42, 0.22);
 
-  --text: #14152b;
-  --text-soft: #4a4c69;
-  --text-dim: #7b7d99;
+  --text: #0f172a;
+  --text-soft: #47556a;
+  /* One step darker than slate-500: dim text also sits on the tinted topbar
+     and inset surfaces, where slate-500 lands just under 4.5:1. */
+  --text-dim: #5b6a7d;
+  --text-on-accent: #ffffff;
 
-  --sh-xs: 0 1px 2px rgba(20, 21, 43, 0.06);
-  --sh-sm: 0 2px 8px rgba(20, 21, 43, 0.07);
-  --sh-md: 0 8px 24px -6px rgba(20, 21, 43, 0.12);
-  --sh-lg: 0 24px 48px -12px rgba(20, 21, 43, 0.18);
+  /* Teal has to drop two steps to stay legible on white. */
+  --accent: #0f766e;
+  --accent-2: #4f46e5;
+  --accent-text: #0f766e;
+  --accent-soft: rgba(15, 118, 110, 0.09);
+  --accent-line: rgba(15, 118, 110, 0.28);
+  --accent-glow: rgba(15, 118, 110, 0.2);
+
+  --success: #047857;
+  --warning: #b45309;
+  --danger: #be123c;
+
+  --grid-line: rgba(15, 23, 42, 0.09);
+
+  /* Data marks darken so they hold their own against white. */
+  --d-1: #0d9488;
+  --d-2: #4f46e5;
+  --d-3: #b45309;
+  --d-4: #be185d;
+  --d-5: #0369a1;
+  --d-6: #4d7c0f;
+
+  --c-orange-2: #c2410c;
+  --c-emerald-2: #047857;
+  --c-amber-2: #b45309;
+  --c-teal-2: #0f766e;
+
+  --sh-xs: 0 1px 1px rgba(15, 23, 42, 0.05);
+  --sh-sm: 0 1px 3px rgba(15, 23, 42, 0.07);
+  --sh-md: 0 6px 18px -8px rgba(15, 23, 42, 0.13);
+  --sh-lg: 0 22px 44px -18px rgba(15, 23, 42, 0.2);
 }
 
 /* ==========================================================================
-   PER-SECTION ACCENTS — the "rainbow" behaviour
+   SECTION MARKERS
+   The interface no longer repaints per section — only --section-color moves,
+   and it is used for small locators (nav icon, page rule, hero tick) so the
+   user still knows where they are without the whole screen changing hue.
    ========================================================================== */
 [data-section='dashboard'] {
-  --accent: #6366f1;
-  --accent-2: #8b5cf6;
-  --accent-text: #818cf8;
-  --accent-soft: rgba(99, 102, 241, 0.14);
-  --accent-line: rgba(99, 102, 241, 0.35);
-  --accent-glow: rgba(99, 102, 241, 0.45);
+  --section-color: #2dd4bf;
 }
-
 [data-section='groups'] {
-  --accent: #8b5cf6;
-  --accent-2: #c084fc;
-  --accent-text: #a78bfa;
-  --accent-soft: rgba(139, 92, 246, 0.14);
-  --accent-line: rgba(139, 92, 246, 0.35);
-  --accent-glow: rgba(139, 92, 246, 0.45);
+  --section-color: #818cf8;
 }
-
 [data-section='timer'] {
-  --accent: #f97316;
-  --accent-2: #fbbf24;
-  --accent-text: #fb923c;
-  --accent-soft: rgba(249, 115, 22, 0.14);
-  --accent-line: rgba(249, 115, 22, 0.35);
-  --accent-glow: rgba(249, 115, 22, 0.45);
+  --section-color: #f0a85c;
 }
-
 [data-section='editor'] {
-  --accent: #ec4899;
-  --accent-2: #f472b6;
-  --accent-text: #f472b6;
-  --accent-soft: rgba(236, 72, 153, 0.14);
-  --accent-line: rgba(236, 72, 153, 0.35);
-  --accent-glow: rgba(236, 72, 153, 0.45);
+  --section-color: #f472b6;
 }
-
 [data-section='performance'] {
-  --accent: #10b981;
-  --accent-2: #34d399;
-  --accent-text: #34d399;
-  --accent-soft: rgba(16, 185, 129, 0.14);
-  --accent-line: rgba(16, 185, 129, 0.35);
-  --accent-glow: rgba(16, 185, 129, 0.45);
+  --section-color: #7dd3fc;
 }
-
 [data-section='notes'] {
-  --accent: #06b6d4;
-  --accent-2: #22d3ee;
-  --accent-text: #22d3ee;
-  --accent-soft: rgba(6, 182, 212, 0.14);
-  --accent-line: rgba(6, 182, 212, 0.35);
-  --accent-glow: rgba(6, 182, 212, 0.45);
+  --section-color: #a3e635;
+}
+[data-section='recall'] {
+  --section-color: #c4b5fd;
+}
+[data-section='lab'] {
+  --section-color: #5eead4;
+}
+[data-section='insights'] {
+  --section-color: #fcd34d;
 }
 
-/* Accent text needs to darken in light mode to stay legible on white. */
 [data-theme='light'] [data-section='dashboard'] {
-  --accent-text: #4f46e5;
+  --section-color: #0d9488;
 }
 [data-theme='light'] [data-section='groups'] {
-  --accent-text: #7c3aed;
+  --section-color: #4f46e5;
 }
 [data-theme='light'] [data-section='timer'] {
-  --accent-text: #c2410c;
+  --section-color: #b45309;
 }
 [data-theme='light'] [data-section='editor'] {
-  --accent-text: #be185d;
+  --section-color: #be185d;
 }
 [data-theme='light'] [data-section='performance'] {
-  --accent-text: #047857;
+  --section-color: #0369a1;
 }
 [data-theme='light'] [data-section='notes'] {
-  --accent-text: #0e7490;
+  --section-color: #4d7c0f;
+}
+[data-theme='light'] [data-section='recall'] {
+  --section-color: #6d28d9;
+}
+[data-theme='light'] [data-section='lab'] {
+  --section-color: #0f766e;
+}
+[data-theme='light'] [data-section='insights'] {
+  --section-color: #a16207;
 }
 
 /* ==========================================================================
    SUBJECT COLOURS — one hue per school subject, used by badges & charts
    ========================================================================== */
 :root {
-  --subj-toan: #3b82f6;
-  --subj-anh: #a855f7;
-  --subj-ly: #06b6d4;
-  --subj-hoa: #10b981;
-  --subj-sinh: #f43f5e;
-  --subj-van: #f59e0b;
-  --subj-tin: #6366f1;
+  --subj-toan: #60a5fa;
+  --subj-anh: #a78bfa;
+  --subj-ly: #7dd3fc;
+  --subj-hoa: #34d399;
+  --subj-sinh: #fb7185;
+  --subj-van: #f0a85c;
+  --subj-tin: #818cf8;
   --subj-khac: #94a3b8;
 }
