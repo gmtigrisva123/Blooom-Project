@@ -99,7 +99,7 @@ const buildActivity = ({ sessions, notes, groups, articles, userId }) => {
     events.push({
       id: `n-${n.id}`,
       at: new Date(n.uploadedAt),
-      color: '#06b6d4',
+      color: 'var(--d-5)',
       icon: <FileText size={14} />,
       text: (
         <>
@@ -130,7 +130,7 @@ const buildActivity = ({ sessions, notes, groups, articles, userId }) => {
     events.push({
       id: `a-${a.id}`,
       at: new Date(a.createdAt),
-      color: '#ec4899',
+      color: 'var(--d-4)',
       icon: <Sparkles size={14} />,
       text: (
         <>
@@ -285,14 +285,14 @@ export const Dashboard = () => {
           value={todayMinutes}
           unit="phút"
           note={`${buckets[buckets.length - 1]?.sessions || 0} phiên đã hoàn thành`}
-          color="#6366f1"
+          color="var(--d-2)"
         />
         <StatCard
           icon={<Target size={22} />}
           label="Mục tiêu tuần"
           value={`${goalPercent}%`}
           note={`${(weekMinutes / 60).toFixed(1)}/${performanceGoals.targetHoursPerWeek} giờ`}
-          color="#10b981"
+          color="var(--d-1)"
         />
         <StatCard
           icon={<BookOpen size={22} />}
@@ -310,7 +310,7 @@ export const Dashboard = () => {
               ? `🎉 ${newBadgeIds.length} huy hiệu mới!`
               : `Tổng ${stats.totalSessions} phiên học`
           }
-          color="#f59e0b"
+          color="var(--d-3)"
         />
       </div>
 
