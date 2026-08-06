@@ -110,7 +110,7 @@ Phương pháp Pomodoro 50/10 (50 phút học sâu, 10 phút nghỉ ngơi hoàn 
 10 phút nghỉ ngơi nên được dùng để đứng dậy đi dạo, uống nước hoặc duỗi cơ thể chứ không nên tiếp tục lướt mảng xã hội!`,
     imageUrl:
       'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80',
-    createdBy: 'Ban Biên Tập StudyHub',
+    createdBy: 'Ban Biên Tập Blooom',
     createdAt: '2026-07-20',
     likesCount: 142
   },
@@ -120,10 +120,10 @@ Phương pháp Pomodoro 50/10 (50 phút học sâu, 10 phút nghỉ ngơi hoàn 
     category: 'Kỹ năng ghi nhớ',
     content: `Thay vì đọc đi đọc lại một cuốn sách SGK (Passive Review), hãy tự đặt câu hỏi và tự trả lời mà không nhìn vào tài liệu (Active Recall).
 
-Kết hợp với Spaced Repetition (Ôn tập ngắt quãng theo chu kỳ 1 ngày, 3 ngày, 7 ngày, 14 ngày), thông tin sẽ được chuyển từ bộ nhớ ngắn hạn sang bộ nhớ dài hạn một cách bền vững. Bạn có thể sử dụng ứng dụng ghi chú của StudyHub để gắn thẻ và xem lại theo chu kỳ này.`,
+Kết hợp với Spaced Repetition (Ôn tập ngắt quãng theo chu kỳ 1 ngày, 3 ngày, 7 ngày, 14 ngày), thông tin sẽ được chuyển từ bộ nhớ ngắn hạn sang bộ nhớ dài hạn một cách bền vững. Bạn có thể sử dụng ứng dụng ghi chú của Blooom để gắn thẻ và xem lại theo chu kỳ này.`,
     imageUrl:
       'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
-    createdBy: 'Ban Biên Tập StudyHub',
+    createdBy: 'Ban Biên Tập Blooom',
     createdAt: '2026-07-22',
     likesCount: 98
   },
@@ -133,10 +133,10 @@ Kết hợp với Spaced Repetition (Ôn tập ngắt quãng theo chu kỳ 1 ng�
     category: 'Năng suất',
     content: `Không gian học tập ảnh hưởng trực tiếp đến trạng thái tâm lý (Mindset) của bạn. Hãy đảm bảo bàn học đủ ánh sáng tự nhiên, dọn dẹp sạch các vật dụng không cần thiết và chuẩn bị sẵn một ly nước ấm.
 
-Đặc biệt, việc có một nhóm học tập cùng chí hướng trên StudyHub sẽ tạo động lực đồng lứa (Peer Pressure tích cực) giúp bạn duy trì thói quen học tập đều đặn hàng ngày.`,
+Đặc biệt, việc có một nhóm học tập cùng chí hướng trên Blooom sẽ tạo động lực đồng lứa (Peer Pressure tích cực) giúp bạn duy trì thói quen học tập đều đặn hàng ngày.`,
     imageUrl:
       'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
-    createdBy: 'Ban Biên Tập StudyHub',
+    createdBy: 'Ban Biên Tập Blooom',
     createdAt: '2026-07-25',
     likesCount: 210
   }

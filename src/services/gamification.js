@@ -47,7 +47,7 @@ const LEVEL_TITLES = [
   { min: 5, title: 'Chiến Binh Pomodoro' },
   { min: 7, title: 'Cao Thủ Tập Trung' },
   { min: 10, title: 'Bậc Thầy Kỷ Luật' },
-  { min: 14, title: 'Huyền Thoại StudyHub' }
+  { min: 14, title: 'Huyền Thoại Blooom' }
 ];
 
 export const levelTitle = (level) =>
