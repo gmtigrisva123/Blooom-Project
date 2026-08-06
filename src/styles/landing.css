@@ -1,0 +1,512 @@
+/* ==========================================================================
+   BLOOOM — LANDING PAGE
+   A document, not a dashboard: one column of running argument on the left, one
+   live instrument on the right, then flat grids of evidence below. No cards
+   float, nothing pulses, and the only image on the page is a plot drawn from
+   the app's own model.
+   ========================================================================== */
+
+.landing {
+  min-height: 100vh;
+  background: var(--bg-app);
+}
+
+/* ==========================================================================
+   NAV
+   ========================================================================== */
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  padding: var(--sp-4) var(--sp-6);
+  background: color-mix(in srgb, var(--bg-app) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.landing-brand img {
+  width: 6.5rem;
+  height: auto;
+}
+
+.landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  margin-left: var(--sp-4);
+  flex: 1;
+}
+
+.landing-nav-links a {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.landing-nav-links a:hover {
+  color: var(--text);
+}
+
+.landing-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-left: auto;
+}
+
+/* ==========================================================================
+   SHARED SECTION RHYTHM
+   ========================================================================== */
+.landing main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--sp-6);
+}
+
+.landing-section {
+  padding: var(--sp-12) 0;
+  border-top: 1px solid var(--border);
+}
+
+.landing-section-head {
+  max-width: 46rem;
+  margin-bottom: var(--sp-8);
+}
+
+.landing-section-head h2 {
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--sp-3);
+}
+
+.landing-section-head p {
+  font-size: var(--fs-md);
+  color: var(--text-soft);
+  margin: 0;
+}
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: var(--sp-10);
+  align-items: center;
+  padding: var(--sp-12) 0;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2.1rem, 5.2vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  margin: var(--sp-4) 0 var(--sp-5);
+}
+
+.landing-lede {
+  font-size: var(--fs-md);
+  line-height: 1.7;
+  color: var(--text-soft);
+  max-width: 34rem;
+  margin: 0;
+}
+
+.landing-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.landing-fineprint {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   RETENTION PLOT
+   ========================================================================== */
+.plot-figure {
+  margin: 0;
+}
+
+.plot-frame {
+  padding: var(--sp-5);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.plot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.plot-title {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.plot-eq {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+.plot-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.plot-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.plot-line-scheduled {
+  stroke: var(--d-1);
+}
+
+.plot-line-control {
+  stroke: var(--text-dim);
+  stroke-dasharray: 4 3;
+  stroke-width: 1.5;
+}
+
+.plot-review-dot {
+  fill: var(--d-1);
+  stroke: var(--bg-elevated);
+  stroke-width: 1.5;
+}
+
+.plot-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.plot-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+}
+
+.plot-key b {
+  color: var(--text);
+}
+
+.plot-swatch {
+  width: 0.85rem;
+  height: 2px;
+  flex: none;
+  border-radius: 2px;
+}
+
+.plot-swatch-scheduled {
+  background: var(--d-1);
+}
+
+.plot-swatch-control {
+  background: var(--text-dim);
+}
+
+.plot-caption {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   INSTRUMENT GRID
+   ========================================================================== */
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.instrument {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  background: var(--bg-elevated);
+}
+
+.instrument-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.instrument-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--r-sm);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.instrument h3 {
+  font-size: var(--fs-md);
+  margin: 0;
+}
+
+.instrument-formula {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--accent-text);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  overflow-x: auto;
+}
+
+.instrument p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+.instrument-source {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   WORKSPACE LIST
+   ========================================================================== */
+.workspace-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--sp-2);
+  list-style: none;
+}
+
+.workspace-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.workspace-list svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--accent-text);
+}
+
+.workspace-list strong {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.workspace-list span {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   STEPS
+   ========================================================================== */
+.step-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--sp-6);
+  list-style: none;
+  counter-reset: none;
+}
+
+.step-list li {
+  padding-top: var(--sp-4);
+  border-top: 2px solid var(--accent);
+}
+
+.step-n {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  margin-bottom: var(--sp-2);
+}
+
+.step-list h3 {
+  font-size: var(--fs-md);
+  margin-bottom: var(--sp-2);
+}
+
+.step-list p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   DISCLOSURES
+   ========================================================================== */
+.disclosure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--sp-5);
+}
+
+.disclosure {
+  padding: var(--sp-5);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.disclosure-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-bottom: var(--sp-3);
+  border-radius: var(--r-sm);
+  color: var(--text-soft);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+}
+
+.disclosure h3 {
+  font-size: var(--fs-base);
+  margin-bottom: var(--sp-2);
+}
+
+.disclosure p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   CLOSE + FOOTER
+   ========================================================================== */
+.landing-close {
+  padding: var(--sp-12) 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.landing-close h2 {
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--sp-3);
+}
+
+.landing-close p {
+  max-width: 34rem;
+  margin: 0 auto;
+  color: var(--text-soft);
+}
+
+.landing-close .landing-cta {
+  justify-content: center;
+}
+
+.landing-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-10);
+  border-top: 1px solid var(--border);
+}
+
+.landing-footer-logo {
+  width: 6rem;
+  margin-bottom: var(--sp-3);
+}
+
+.landing-footer p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+
+.landing-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  text-align: right;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 900px) {
+  .landing-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-8);
+    padding: var(--sp-8) 0;
+  }
+
+  .landing-nav-links {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .landing main,
+  .landing-footer {
+    padding-inline: var(--sp-4);
+  }
+
+  .landing-nav {
+    padding-inline: var(--sp-4);
+  }
+
+  .landing-section {
+    padding: var(--sp-10) 0;
+  }
+
+  .landing-cta .btn {
+    width: 100%;
+  }
+
+  .landing-footer {
+    align-items: flex-start;
+  }
+
+  .landing-footer-meta {
+    text-align: left;
+  }
+}
