@@ -8,8 +8,11 @@ import react from '@vitejs/plugin-react';
  */
 const BASE_PATH = process.env.BASE_PATH ?? '/Blooom-Project/';
 
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? BASE_PATH : '/',
+export default defineConfig(({ command, isPreview }) => ({
+  // `vite preview` runs as a "serve" command but hands back the built output,
+  // whose asset URLs already carry BASE_PATH — serving it from "/" would 404
+  // every chunk, so preview has to mirror the build.
+  base: command === 'build' || isPreview ? BASE_PATH : '/',
   plugins: [react()],
   server: {
     // Honour PORT when provided, otherwise fall back to the usual 3000.
