@@ -1,6 +1,6 @@
 # Hướng dẫn đóng góp
 
-Cảm ơn bạn đã quan tâm tới StudyHub! Tài liệu này mô tả cách gửi thay đổi sao cho được
+Cảm ơn bạn đã quan tâm tới Blooom! Tài liệu này mô tả cách gửi thay đổi sao cho được
 duyệt nhanh nhất.
 
 ## Chuẩn bị môi trường
