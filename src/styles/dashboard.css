@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STUDYHUB — DASHBOARD + GAMIFICATION
+   BLOOOM — DASHBOARD + GAMIFICATION
    ========================================================================== */
 
 /* ==========================================================================
@@ -16,10 +16,27 @@
   margin-bottom: var(--sp-5);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  background:
-    radial-gradient(30rem 20rem at 0% 0%, rgba(139, 92, 246, 0.2), transparent 65%),
-    radial-gradient(26rem 18rem at 100% 100%, rgba(249, 115, 22, 0.16), transparent 60%),
-    var(--bg-elevated);
+  background: var(--bg-elevated);
+}
+
+/* Same graph-paper texture as the section heroes, so the dashboard reads as
+   part of the same instrument panel. */
+.dash-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom right, #000, transparent 60%);
+  -webkit-mask-image: linear-gradient(to bottom right, #000, transparent 60%);
+}
+
+.dash-hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .dash-hello {
@@ -67,12 +84,12 @@
 .streak-flame {
   display: grid;
   place-items: center;
-  width: 3.4rem;
-  height: 3.4rem;
-  border-radius: var(--r-full);
-  color: #fff;
-  background: linear-gradient(160deg, #fbbf24, #f97316 55%, #ef4444);
-  box-shadow: 0 8px 22px -8px rgba(249, 115, 22, 0.85);
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: var(--r-md);
+  color: var(--c-orange-2);
+  background: color-mix(in srgb, var(--c-orange) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-orange) 34%, transparent);
 }
 
 .streak-flame svg {
@@ -90,9 +107,10 @@
 }
 
 .streak-num {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: var(--fs-xl);
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.1;
   color: var(--text);
 }
@@ -117,9 +135,9 @@
 }
 
 .xp-level {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: var(--fs-md);
-  font-weight: 800;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -140,7 +158,7 @@
 }
 
 .xp-bar-fill {
-  background: linear-gradient(90deg, #8b5cf6, #ec4899 55%, #f97316);
+  background: var(--accent);
 }
 
 /* ==========================================================================
@@ -250,8 +268,8 @@
 .chart-bar {
   width: min(100%, 2.4rem);
   min-height: 4px;
-  border-radius: var(--r-xs) var(--r-xs) 2px 2px;
-  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  border-radius: 2px 2px 0 0;
+  background: var(--d-1);
   transform-origin: bottom;
   animation: grow-bar 0.55s var(--ease-out) both;
   transition: filter var(--t-fast);
@@ -272,18 +290,21 @@
     0 0 0 3px var(--accent);
 }
 
-.chart-val {
+.chart-val,
+.chart-day {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: var(--fs-2xs);
-  font-weight: 700;
-  color: var(--text-soft);
   white-space: nowrap;
 }
 
+.chart-val {
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
 .chart-day {
-  font-size: var(--fs-2xs);
-  font-weight: 600;
   color: var(--text-dim);
-  white-space: nowrap;
 }
 
 .chart-col.is-today .chart-day {
@@ -382,32 +403,27 @@
 }
 
 .achv:hover {
-  transform: translateY(-3px);
   border-color: var(--border-strong);
 }
 
 .achv-medal {
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
-  font-size: 1.5rem;
-  border-radius: var(--r-full);
+  width: 2.8rem;
+  height: 2.8rem;
+  font-size: 1.4rem;
+  border-radius: var(--r-sm);
   background: var(--bg-active);
   filter: grayscale(1);
-  opacity: 0.4;
+  opacity: 0.35;
   transition: all var(--t-base);
 }
 
 .achv.is-unlocked .achv-medal {
   filter: none;
   opacity: 1;
-  background: linear-gradient(
-    150deg,
-    var(--achv-color),
-    color-mix(in srgb, var(--achv-color) 45%, #000)
-  );
-  box-shadow: 0 8px 20px -8px var(--achv-color);
+  background: color-mix(in srgb, var(--achv-color) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--achv-color) 36%, transparent);
 }
 
 .achv.is-new::before {
@@ -417,17 +433,17 @@
   right: -0.35rem;
   padding: 0.1rem 0.4rem;
   font-size: 0.5625rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  color: #fff;
+  color: #0b0e14;
   background: var(--c-rose);
-  border-radius: var(--r-full);
+  border-radius: var(--r-xs);
   animation: pop-in 0.4s var(--ease-spring);
 }
 
 .achv-name {
   font-size: var(--fs-2xs);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
   line-height: 1.3;
 }
