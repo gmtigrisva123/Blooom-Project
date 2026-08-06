@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STUDYHUB — STYLE ENTRY POINT
+   BLOOOM — STYLE ENTRY POINT
    Import order matters: tokens define the variables everything else consumes.
    ========================================================================== */
 
@@ -8,8 +8,11 @@
 @import './styles/utilities.css';
 @import './styles/components.css';
 @import './styles/layout.css';
+@import './styles/landing.css';
+@import './styles/auth.css';
 @import './styles/dashboard.css';
 @import './styles/timer.css';
 @import './styles/collections.css';
 @import './styles/performance.css';
+@import './styles/science.css';
 @import './styles/command-palette.css';
