@@ -7,16 +7,37 @@ import {
   useRef,
   useCallback
 } from 'react';
-import { storageService } from '../services/storage';
+import { storageService, setStorageNamespace } from '../services/storage';
 import { computeGamification } from '../services/gamification';
+import { applyReview, createCard } from '../services/srs';
+import { createExperiment, recordTrial } from '../services/experiments';
 
 const AppContext = createContext();
 
 let toastSeq = 0;
 
-export const AppProvider = ({ children }) => {
+/* `account` is the signed-in local profile (or null for the shared/anonymous
+   store). App.jsx remounts this provider whenever it changes, so the namespace
+   below is set exactly once per session — before any state initialiser runs. */
+export const AppProvider = ({ children, account = null, onSignOut, theme, toggleTheme }) => {
+  setStorageNamespace(account?.id || null);
+
   /* ---- Domain data ------------------------------------------------------ */
-  const [user, setUser] = useState(storageService.getUser());
+  const [user, setUser] = useState(() => {
+    const stored = storageService.getUser();
+    if (!account || stored.id === account.id) return stored;
+
+    /* First visit inside this account's namespace: the seeded demo profile is
+       replaced by the real one, keeping any role the student had chosen. */
+    return storageService.setUser({
+      ...stored,
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      avatar: account.avatar || null
+    });
+  });
+
   const [groups, setGroups] = useState(storageService.getGroups());
   const [timerSessions, setTimerSessions] = useState(storageService.getTimerSessions());
   const [performanceGoals, setPerformanceGoals] = useState(
@@ -25,10 +46,11 @@ export const AppProvider = ({ children }) => {
   const [editorPicks, setEditorPicks] = useState(storageService.getEditorPicks());
   const [bookmarks, setBookmarks] = useState(storageService.getBookmarks());
   const [notes, setNotes] = useState(storageService.getNotes());
+  const [cards, setCards] = useState(storageService.getCards());
+  const [experiments, setExperiments] = useState(storageService.getExperiments());
 
   /* ---- Interface state -------------------------------------------------- */
   const [activeTab, setActiveTabRaw] = useState('dashboard');
-  const [theme, setTheme] = useState(() => localStorage.getItem('studyhub_theme') || 'dark');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => storageService.getUiPrefs().sidebarCollapsed
@@ -42,15 +64,8 @@ export const AppProvider = ({ children }) => {
      having to live in context — WorkTimer registers its controls here. */
   const timerControlsRef = useRef(null);
 
-  /* ---- Theme ------------------------------------------------------------ */
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('studyhub_theme', theme);
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  }, []);
+  /* Theme lives above the shell (see hooks/useTheme) because the landing and
+     sign-in screens render outside this provider and share the same switch. */
 
   /* ---- Skeleton on first paint ------------------------------------------ */
   useEffect(() => {
@@ -199,6 +214,83 @@ export const AppProvider = ({ children }) => {
     [showToast]
   );
 
+  /* ---- Flashcards (SM-2) ------------------------------------------------ */
+  const handleAddCard = useCallback(
+    (cardData) => {
+      const created = storageService.addCard(createCard(cardData));
+      setCards(storageService.getCards());
+      showToast('Đã thêm thẻ ghi nhớ vào bộ ôn tập.');
+      return created;
+    },
+    [showToast]
+  );
+
+  /* Grading is the only place the schedule changes; the new interval comes
+     straight back from the algorithm so the UI can show what it decided. */
+  const handleReviewCard = useCallback((card, quality) => {
+    const updated = applyReview(card, quality);
+    setCards(storageService.updateCard(updated));
+    return updated;
+  }, []);
+
+  const handleDeleteCard = useCallback(
+    (id) => {
+      setCards(storageService.deleteCard(id));
+      showToast('Đã xóa thẻ ghi nhớ.', 'info');
+    },
+    [showToast]
+  );
+
+  /* ---- N-of-1 experiments ----------------------------------------------- */
+  const handleCreateExperiment = useCallback(
+    (design) => {
+      const created = storageService.addExperiment(createExperiment(design));
+      setExperiments(storageService.getExperiments());
+      showToast('Đã khởi tạo thí nghiệm. Điều kiện đầu tiên đã được bốc ngẫu nhiên.');
+      return created;
+    },
+    [showToast]
+  );
+
+  const handleRecordTrial = useCallback(
+    (experiment, entry) => {
+      const updated = recordTrial(experiment, entry);
+      setExperiments(storageService.updateExperiment(updated));
+      showToast(
+        `Đã ghi phiên ${updated.trials.length}. Phiên tới sẽ chạy điều kiện ${updated.pendingCondition}.`
+      );
+      return updated;
+    },
+    [showToast]
+  );
+
+  const handleFinishExperiment = useCallback(
+    (experiment) => {
+      const updated = {
+        ...experiment,
+        status: experiment.status === 'completed' ? 'running' : 'completed',
+        completedAt: experiment.status === 'completed' ? null : new Date().toISOString()
+      };
+      setExperiments(storageService.updateExperiment(updated));
+      showToast(
+        updated.status === 'completed'
+          ? 'Đã chốt thí nghiệm. Kết quả được khóa lại để báo cáo.'
+          : 'Đã mở lại thí nghiệm để thu thập thêm dữ liệu.',
+        'info'
+      );
+      return updated;
+    },
+    [showToast]
+  );
+
+  const handleDeleteExperiment = useCallback(
+    (id) => {
+      setExperiments(storageService.deleteExperiment(id));
+      showToast('Đã xóa thí nghiệm.', 'info');
+    },
+    [showToast]
+  );
+
   /* ---- Gamification (derived, never stored) ----------------------------- */
   const gamification = useMemo(
     () =>
@@ -227,6 +319,9 @@ export const AppProvider = ({ children }) => {
   }, [newBadgeIds]);
 
   const value = {
+    // identity
+    account,
+    onSignOut,
     // data
     user,
     setUser,
@@ -246,6 +341,15 @@ export const AppProvider = ({ children }) => {
     notes,
     handleAddNote,
     handleDeleteNote,
+    cards,
+    handleAddCard,
+    handleReviewCard,
+    handleDeleteCard,
+    experiments,
+    handleCreateExperiment,
+    handleRecordTrial,
+    handleFinishExperiment,
+    handleDeleteExperiment,
     // ui
     activeTab,
     setActiveTab,
