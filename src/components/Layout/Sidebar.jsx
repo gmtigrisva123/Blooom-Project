@@ -1,6 +1,6 @@
 import { useApp } from '../../context/AppContext';
-import { NAV_ITEMS } from '../../constants/nav';
-import { PanelLeftClose, PanelLeftOpen, X, Flame, Trophy } from 'lucide-react';
+import { NAV_GROUPS, navItemsInGroup } from '../../constants/nav';
+import { PanelLeftClose, PanelLeftOpen, X, Flame, Trophy, LogOut } from 'lucide-react';
 
 // Served straight from public/ so the splash in index.html and the sidebar
 // share one cached file. BASE_URL keeps the GitHub Pages sub-path working.
@@ -21,29 +21,22 @@ const LevelRing = ({ percent, level }) => {
           r={radius}
           fill="none"
           stroke="var(--bg-active)"
-          strokeWidth="4"
+          strokeWidth="3"
         />
         <circle
           cx="20"
           cy="20"
           r={radius}
           fill="none"
-          stroke="url(#levelGradient)"
-          strokeWidth="4"
+          stroke="var(--accent)"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - percent / 100)}
           style={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.22, 1, 0.36, 1)' }}
         />
-        <defs>
-          <linearGradient id="levelGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="55%" stopColor="#ec4899" />
-            <stop offset="100%" stopColor="#f97316" />
-          </linearGradient>
-        </defs>
       </svg>
-      <span className="level-ring-num">{level}</span>
+      <span className="level-ring-num mono">{level}</span>
     </div>
   );
 };
@@ -57,7 +50,10 @@ export const Sidebar = () => {
     sidebarCollapsed,
     toggleSidebarCollapsed,
     gamification,
-    newBadgeIds
+    newBadgeIds,
+    account,
+    user,
+    onSignOut
   } = useApp();
 
   const { level, streak, unlockedCount, badges } = gamification;
@@ -74,7 +70,7 @@ export const Sidebar = () => {
           <img className="brand-mark" src={BRAND_MARK} alt="" aria-hidden="true" />
           <span className="brand-text">
             <img className="brand-logo" src={BRAND_LOGO} alt="Blooom" />
-            <span className="brand-sub">Học nhóm • Tập trung • Tiến bộ</span>
+            <span className="brand-sub mono">học · đo · kiểm chứng</span>
           </span>
         </button>
 
@@ -87,31 +83,35 @@ export const Sidebar = () => {
         </button>
       </div>
 
-      <div>
-        <div className="sidebar-label mb-2">Khu vực</div>
-        <ul className="sidebar-nav">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <li key={item.id}>
-                <button
-                  className={`nav-link ${isActive ? 'is-active' : ''}`}
-                  style={{ '--item-color': item.color }}
-                  onClick={() => setActiveTab(item.id)}
-                  title={sidebarCollapsed ? item.label : undefined}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <span className="nav-link-icon">
-                    <Icon size={16} />
-                  </span>
-                  <span className="nav-link-text">{item.label}</span>
-                  <span className="nav-link-key kbd">{item.key}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+      <div className="sidebar-groups">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.id}>
+            <div className="sidebar-label mono mb-2">{group.label}</div>
+            <ul className="sidebar-nav">
+              {navItemsInGroup(group.id).map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <li key={item.id}>
+                    <button
+                      className={`nav-link ${isActive ? 'is-active' : ''}`}
+                      style={{ '--item-color': item.color }}
+                      onClick={() => setActiveTab(item.id)}
+                      title={sidebarCollapsed ? item.label : undefined}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      <span className="nav-link-icon">
+                        <Icon size={15} />
+                      </span>
+                      <span className="nav-link-text">{item.label}</span>
+                      <span className="nav-link-key kbd">{item.key}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </div>
 
       <div className="sidebar-spacer" />
@@ -126,7 +126,7 @@ export const Sidebar = () => {
             <LevelRing percent={level.percent} level={level.level} />
             <div className="level-card-detail">
               <div className="level-title">{level.title}</div>
-              <div className="level-xp">
+              <div className="level-xp mono">
                 {level.xpIntoLevel}/{level.xpForNextLevel} XP → Cấp {level.level + 1}
               </div>
             </div>
@@ -138,11 +138,11 @@ export const Sidebar = () => {
             </div>
 
             <div className="row-between" style={{ marginTop: '0.45rem' }}>
-              <span className="streak-line">
+              <span className="streak-line mono">
                 <Flame size={13} />
-                {streak.current} ngày liên tiếp
+                {streak.current} ngày
               </span>
-              <span className="t-xs t-dim row" style={{ gap: '0.2rem' }}>
+              <span className="t-xs t-dim row mono" style={{ gap: '0.2rem' }}>
                 <Trophy size={12} />
                 {unlockedCount}/{badges.length}
                 {newBadgeIds.length > 0 && (
@@ -154,6 +154,26 @@ export const Sidebar = () => {
             </div>
           </div>
         </button>
+
+        <div className="account-row">
+          <span className="account-avatar" aria-hidden="true">
+            {(account?.name || user.name || '?').trim().charAt(0).toUpperCase()}
+          </span>
+          <div className="account-detail">
+            <span className="account-name truncate">{account?.name || user.name}</span>
+            <span className="account-mail truncate mono">
+              {account ? account.email : 'Chế độ khách'}
+            </span>
+          </div>
+          <button
+            className="icon-btn account-out"
+            onClick={onSignOut}
+            title={account ? 'Đăng xuất' : 'Thoát về trang giới thiệu'}
+            aria-label={account ? 'Đăng xuất' : 'Thoát về trang giới thiệu'}
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
 
         <button
           className="btn btn-ghost btn-sm btn-block sidebar-collapse-btn"

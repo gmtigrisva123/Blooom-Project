@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STUDYHUB — APP SHELL: SIDEBAR + TOPBAR + CONTENT
+   BLOOOM — APP SHELL: SIDEBAR + TOPBAR + CONTENT
    ========================================================================== */
 
 .shell {
@@ -68,15 +68,24 @@
 
 .brand-sub {
   font-size: var(--fs-2xs);
+  letter-spacing: 0.02em;
   color: var(--text-dim);
   white-space: nowrap;
+}
+
+/* The two rails — "Không gian học" and "Phòng thí nghiệm" — are what keep
+   nine sections navigable without a second level of menu. */
+.sidebar-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
 }
 
 .sidebar-label {
   padding: 0 var(--sp-3);
   font-size: var(--fs-2xs);
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
 }
@@ -132,14 +141,13 @@
 
 .nav-link.is-active {
   color: var(--text);
-  font-weight: 650;
-  background: color-mix(in srgb, var(--item-color) 12%, transparent);
+  font-weight: 600;
+  background: var(--bg-active);
 }
 
 .nav-link.is-active .nav-link-icon {
-  color: #fff;
-  background: var(--item-color);
-  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--item-color) 80%, transparent);
+  color: var(--item-color);
+  background: color-mix(in srgb, var(--item-color) 20%, transparent);
 }
 
 /* Sliding active indicator on the left rail */
@@ -149,7 +157,7 @@
   left: calc(var(--sp-4) * -1);
   top: 50%;
   transform: translateY(-50%);
-  width: 3px;
+  width: 2px;
   height: 1.35rem;
   border-radius: 0 var(--r-full) var(--r-full) 0;
   background: var(--item-color);
@@ -196,8 +204,15 @@
 .shell.is-collapsed .nav-link-text,
 .shell.is-collapsed .nav-link-key,
 .shell.is-collapsed .sidebar-label,
+.shell.is-collapsed .account-detail,
+.shell.is-collapsed .account-out,
 .shell.is-collapsed .level-card-detail {
   display: none;
+}
+
+.shell.is-collapsed .account-row {
+  justify-content: center;
+  padding: var(--sp-2);
 }
 .shell.is-collapsed .nav-link {
   justify-content: center;
@@ -223,24 +238,16 @@
   flex-direction: column;
   gap: 0.55rem;
   padding: var(--sp-4);
-  background: linear-gradient(
-    150deg,
-    rgba(139, 92, 246, 0.14),
-    rgba(236, 72, 153, 0.1) 55%,
-    rgba(249, 115, 22, 0.1)
-  );
+  background: var(--bg-inset);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   text-align: left;
   width: 100%;
-  transition:
-    border-color var(--t-fast),
-    transform var(--t-fast);
+  transition: border-color var(--t-fast);
 }
 
 .level-card:hover {
   border-color: var(--border-strong);
-  transform: translateY(-2px);
 }
 
 .level-card-top {
@@ -305,6 +312,57 @@
 }
 
 /* ==========================================================================
+   ACCOUNT ROW (sidebar foot)
+   ========================================================================== */
+.account-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.account-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-xs);
+}
+
+.account-detail {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.account-name {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.account-mail {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.account-out {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+/* ==========================================================================
    TOPBAR
    ========================================================================== */
 .topbar {
@@ -320,6 +378,17 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+}
+
+/* Section locator: 2px of the section's colour, and nothing else in the
+   chrome changes hue. */
+.topbar-tick {
+  width: 2px;
+  height: 1.6rem;
+  flex: none;
+  border-radius: var(--r-full);
+  background: var(--section-color, var(--accent));
+  transition: background var(--t-base);
 }
 
 .topbar-title {
@@ -537,8 +606,15 @@
   .shell.is-collapsed .brand-text,
   .shell.is-collapsed .nav-link-text,
   .shell.is-collapsed .sidebar-label,
+  .shell.is-collapsed .account-detail,
+  .shell.is-collapsed .account-out,
   .shell.is-collapsed .level-card-detail {
     display: revert;
+  }
+
+  .shell.is-collapsed .account-row {
+    justify-content: flex-start;
+    padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);
   }
   .shell.is-collapsed .nav-link {
     justify-content: flex-start;
