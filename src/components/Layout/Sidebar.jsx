@@ -2,6 +2,11 @@ import { useApp } from '../../context/AppContext';
 import { NAV_ITEMS } from '../../constants/nav';
 import { PanelLeftClose, PanelLeftOpen, X, Flame, Trophy } from 'lucide-react';
 
+// Served straight from public/ so the splash in index.html and the sidebar
+// share one cached file. BASE_URL keeps the GitHub Pages sub-path working.
+const BRAND_LOGO = `${import.meta.env.BASE_URL}blooom-logo.png`;
+const BRAND_MARK = `${import.meta.env.BASE_URL}blooom-mark.png`;
+
 /* Compact radial gauge showing progress toward the next level. */
 const LevelRing = ({ percent, level }) => {
   const radius = 16;
@@ -63,13 +68,12 @@ export const Sidebar = () => {
         <button
           className="sidebar-brand"
           onClick={() => setActiveTab('dashboard')}
-          title="StudyHub — về trang Tổng Quan"
+          title="Blooom — về trang Tổng Quan"
         >
-          <span className="brand-mark" aria-hidden="true">
-            S
-          </span>
+          {/* The "B" stands in for the wordmark once the rail collapses. */}
+          <img className="brand-mark" src={BRAND_MARK} alt="" aria-hidden="true" />
           <span className="brand-text">
-            <span className="brand-name">StudyHub</span>
+            <img className="brand-logo" src={BRAND_LOGO} alt="Blooom" />
             <span className="brand-sub">Học nhóm • Tập trung • Tiến bộ</span>
           </span>
         </button>
