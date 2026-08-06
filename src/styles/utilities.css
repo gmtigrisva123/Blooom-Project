@@ -137,6 +137,12 @@
 .t-success {
   color: var(--success);
 }
+.t-warn {
+  color: var(--warning);
+}
+.t-danger {
+  color: var(--danger);
+}
 .t-bold {
   font-weight: 700;
 }
