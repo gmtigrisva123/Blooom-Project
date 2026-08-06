@@ -265,13 +265,8 @@ export const WorkTimer = () => {
               .filter(Boolean)
               .join(' ')}
           >
+            {/* The ring is a single flat accent stroke — see styles/timer.css. */}
             <svg className="ring-svg" viewBox="0 0 256 256">
-              <defs>
-                <linearGradient id="ringGradient" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="var(--accent-2)" />
-                  <stop offset="100%" stopColor="var(--accent)" />
-                </linearGradient>
-              </defs>
               <circle className="ring-track" cx="128" cy="128" r={RING_RADIUS} />
               <circle
                 className="ring-progress"
