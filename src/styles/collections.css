@@ -31,9 +31,9 @@
 }
 
 .group-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--subject-color) 40%, transparent);
-  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--subject-color) 65%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 .group-card.is-member {
