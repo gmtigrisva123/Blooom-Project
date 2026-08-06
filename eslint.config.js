@@ -8,7 +8,15 @@ import prettier from 'eslint-config-prettier';
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '.lighthouseci/**']
+    // `**/` prefixes matter: nested checkouts (e.g. .claude/worktrees/*) carry
+    // their own dist/ and would otherwise be linted as project source.
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      'coverage/**',
+      '.lighthouseci/**',
+      '.claude/**'
+    ]
   },
 
   js.configs.recommended,
