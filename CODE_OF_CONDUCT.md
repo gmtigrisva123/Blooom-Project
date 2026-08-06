@@ -3,7 +3,7 @@
 ## Cam kết
 
 Với tư cách người tham gia và người duy trì dự án, chúng tôi cam kết biến việc tham gia
-StudyHub thành trải nghiệm không có quấy rối cho tất cả mọi người, bất kể tuổi tác, vóc dáng,
+Blooom thành trải nghiệm không có quấy rối cho tất cả mọi người, bất kể tuổi tác, vóc dáng,
 khuyết tật, sắc tộc, giới tính, trình độ kinh nghiệm, quốc tịch, ngoại hình, tôn giáo hay
 xu hướng tính dục.
 
