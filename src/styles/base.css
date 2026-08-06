@@ -1,5 +1,5 @@
 /* ==========================================================================
-   STUDYHUB — BASE / RESET / TYPOGRAPHY
+   BLOOOM — BASE / RESET / TYPOGRAPHY
    ========================================================================== */
 
 *,
@@ -12,6 +12,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -21,23 +22,26 @@ body {
   color: var(--text);
   background: var(--bg-app);
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient aurora that picks up the active section accent. */
+/* Faint engineering grid instead of the old colour wash — it reads as graph
+   paper behind the data rather than competing with it. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(60rem 40rem at 12% -10%, var(--accent-soft), transparent 60%),
-    radial-gradient(50rem 36rem at 100% 0%, rgba(236, 72, 153, 0.08), transparent 55%),
-    radial-gradient(46rem 34rem at 60% 110%, rgba(6, 182, 212, 0.07), transparent 55%);
-  transition: background var(--t-slow);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 5%, transparent 72%);
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 5%, transparent 72%);
+  opacity: 0.75;
 }
 
 h1,
@@ -47,10 +51,12 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.22;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 1.2;
   color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 h1 {
@@ -68,6 +74,16 @@ h4 {
 
 p {
   color: var(--text-soft);
+}
+
+/* Every measured quantity in the product is set in mono with tabular figures,
+   so columns of numbers line up and a value never reflows as it counts down. */
+.num,
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
 }
 
 a {
