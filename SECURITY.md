@@ -2,7 +2,7 @@
 
 ## Phạm vi
 
-StudyHub chạy hoàn toàn trong trình duyệt. Không có máy chủ, không có tài khoản, không có
+Blooom chạy hoàn toàn trong trình duyệt. Không có máy chủ, không có tài khoản, không có
 API. Toàn bộ dữ liệu người dùng nằm trong `localStorage` của chính trình duyệt đó và không
 bao giờ rời khỏi máy.
 
@@ -45,7 +45,7 @@ Nếu lỗ hổng được xác nhận, bạn sẽ được ghi nhận trong ph�
 
 ## Lưu ý cho người dùng
 
-- Dữ liệu StudyHub **không được mã hóa** và **không được sao lưu**. Xóa dữ liệu duyệt web là
+- Dữ liệu Blooom **không được mã hóa** và **không được sao lưu**. Xóa dữ liệu duyệt web là
   mất hết.
 - Đừng lưu thông tin nhạy cảm (mật khẩu, giấy tờ tùy thân) vào phần Ghi Chú.
 - Tệp tải lên được lưu dưới dạng data URL trong `localStorage`, giới hạn khoảng 3 MB mỗi tệp.

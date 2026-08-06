@@ -51,7 +51,7 @@ const AppContent = () => {
 
         <footer className="app-footer">
           <strong>
-            StudyHub v2.0 — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên
+            Blooom v2.0 — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên
           </strong>
           <span>
             Đồ án học tập • React + Vite • Design system CSS thuần • LocalStorage &amp; phân

@@ -41,37 +41,29 @@
   width: 100%;
 }
 
+/* The lone "B": redundant next to the wordmark, so it only shows when the
+   rail is collapsed (see the .shell.is-collapsed block further down). */
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  display: none;
+  width: auto;
+  height: 2.6rem;
   flex: none;
-  font-family: var(--font-display);
-  font-size: var(--fs-lg);
-  font-weight: 800;
-  color: #fff;
-  border-radius: var(--r-sm);
-  background: linear-gradient(135deg, #8b5cf6, #ec4899 45%, #f97316);
-  box-shadow: 0 6px 18px -6px rgba(236, 72, 153, 0.7);
 }
 
 .brand-text {
   display: flex;
   flex-direction: column;
+  gap: 0.3rem;
   line-height: 1.15;
   min-width: 0;
 }
 
-.brand-name {
-  font-family: var(--font-display);
-  font-size: var(--fs-md);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  background: linear-gradient(100deg, #a78bfa, #f472b6 55%, #fb923c);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Sized by width, not height: the wordmark trails off into a long arrow, so
+   matching its height to the tagline would leave the lettering tiny. */
+.brand-logo {
+  width: min(8.75rem, 100%);
+  height: auto;
+  align-self: flex-start;
 }
 
 .brand-sub {
@@ -214,6 +206,9 @@
 .shell.is-collapsed .sidebar-brand {
   justify-content: center;
   padding: 0;
+}
+.shell.is-collapsed .brand-mark {
+  display: block;
 }
 .shell.is-collapsed .level-card {
   padding: var(--sp-2);

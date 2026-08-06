@@ -133,7 +133,7 @@ export const WorkTimer = () => {
       const mins = Math.floor(secondsLeft / 60);
       const secs = secondsLeft % 60;
       const clock = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      document.title = `${mode === 'work' ? '📚' : '☕'} ${clock} — StudyHub`;
+      document.title = `${mode === 'work' ? '📚' : '☕'} ${clock} — Blooom`;
     }
     return () => {
       document.title = original;
@@ -188,7 +188,7 @@ export const WorkTimer = () => {
         eyebrow="Pomodoro tập trung"
         icon={<TimerIcon size={12} />}
         title="Học Sâu Từng Phiên, Nghỉ Đúng Lúc"
-        description="Chọn môn học, đặt thời lượng và để StudyHub ghi lại từng phút tập trung của bạn. Mỗi phút học là 1 điểm XP."
+        description="Chọn môn học, đặt thời lượng và để Blooom ghi lại từng phút tập trung của bạn. Mỗi phút học là 1 điểm XP."
         action={
           <div className="row" style={{ gap: '0.5rem' }}>
             <span className="kbd">Space</span>

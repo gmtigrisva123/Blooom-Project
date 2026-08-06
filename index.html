@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary meta -->
-    <title>StudyHub — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên</title>
+    <title>Blooom — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên</title>
     <meta
       name="description"
       content="Nền tảng nhóm học tập tương tác giúp học sinh kết nối theo môn học, quản lý thời gian Pomodoro, theo dõi hiệu suất và số hóa ghi chú bài học."
@@ -18,24 +18,24 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://gmtigrisva123.github.io/Blooom-Project/" />
 
-    <!-- Icons & PWA -->
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- Icons & PWA — all derived from the Blooom wordmark (see public/blooom-logo.png) -->
     <link rel="icon" href="./favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="./icon-192.png" sizes="192x192" type="image/png" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <link rel="manifest" href="./site.webmanifest" />
     <meta name="theme-color" content="#0a0a14" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f4f4f9" media="(prefers-color-scheme: light)" />
-    <meta name="apple-mobile-web-app-title" content="StudyHub" />
+    <meta name="apple-mobile-web-app-title" content="Blooom" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- Open Graph (Facebook, Zalo, LinkedIn) -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="StudyHub" />
+    <meta property="og:site_name" content="Blooom" />
     <meta property="og:locale" content="vi_VN" />
     <meta
       property="og:title"
-      content="StudyHub — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên"
+      content="Blooom — Nền Tảng Nhóm Học Tập Tương Tác Cho Học Sinh &amp; Sinh Viên"
     />
     <meta
       property="og:description"
@@ -48,11 +48,11 @@
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="StudyHub — Học nhóm, Tập trung, Tiến bộ" />
+    <meta property="og:image:alt" content="Blooom — Học nhóm, Tập trung, Tiến bộ" />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="StudyHub — Nền Tảng Nhóm Học Tập Tương Tác" />
+    <meta name="twitter:title" content="Blooom — Nền Tảng Nhóm Học Tập Tương Tác" />
     <meta
       name="twitter:description"
       content="Kết nối nhóm học theo môn, tập trung với Pomodoro, theo dõi hiệu suất và số hóa ghi chú."
@@ -75,7 +75,7 @@
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "StudyHub",
+        "name": "Blooom",
         "url": "https://gmtigrisva123.github.io/Blooom-Project/",
         "description": "Nền tảng nhóm học tập tương tác giúp học sinh kết nối theo môn học, quản lý thời gian Pomodoro, theo dõi hiệu suất và số hóa ghi chú bài học.",
         "applicationCategory": "EducationalApplication",
@@ -93,11 +93,102 @@
         ]
       }
     </script>
+
+    <!--
+      AppContext only sets data-theme once React mounts, which would flash the
+      dark shell at anyone who picked the light theme. Replaying the stored
+      choice here — same key, before first paint — keeps the splash and the app
+      on the same background.
+    -->
+    <script>
+      try {
+        document.documentElement.setAttribute(
+          'data-theme',
+          localStorage.getItem('studyhub_theme') || 'dark'
+        );
+      } catch (e) {
+        /* Private mode can throw on localStorage; the dark default is fine. */
+      }
+    </script>
+
+    <!--
+      Splash shown between first paint and React mounting. It is plain CSS/HTML
+      so it renders before the app bundle arrives, and it fades itself out via
+      `#root:not(:empty)` — createRoot appends to the container rather than
+      emptying it, so no script is needed to tear the splash down.
+    -->
+    <style>
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        background: #0a0a14;
+        transition:
+          opacity 0.35s ease,
+          visibility 0.35s;
+      }
+      [data-theme='light'] #app-splash {
+        background: #f4f4f9;
+      }
+      #root:not(:empty) + #app-splash {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      #app-splash img {
+        width: min(58vw, 260px);
+        animation: splash-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      #app-splash div {
+        width: 160px;
+        height: 3px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(139, 92, 246, 0.18);
+      }
+      #app-splash div::after {
+        content: '';
+        display: block;
+        width: 45%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #8b5cf6, #ec4899 55%, #f97316);
+        animation: splash-sweep 1.1s ease-in-out infinite;
+      }
+      @keyframes splash-in {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.97);
+        }
+      }
+      @keyframes splash-sweep {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(322%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash img,
+        #app-splash div::after {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="app-splash">
+      <img src="./blooom-logo.png" alt="Blooom" width="459" height="152" />
+      <div role="progressbar" aria-label="Đang tải Blooom"></div>
+    </div>
     <noscript>
-      StudyHub cần JavaScript để hoạt động. Vui lòng bật JavaScript trong trình duyệt của bạn.
+      Blooom cần JavaScript để hoạt động. Vui lòng bật JavaScript trong trình duyệt của bạn.
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
