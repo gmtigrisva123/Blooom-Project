@@ -90,25 +90,77 @@ app_icon(512, 0.42, full_bleed=True).save(f"{OUT}/icon-maskable-512.png")
 # Open Graph card (1200x630) — what Facebook/Zalo/LinkedIn show when shared.
 # ---------------------------------------------------------------------------
 W, H = 1200, 630
-og = backdrop((W, H), full_bleed=True)
+PAD = 88
 
-logo_w = int(W * 0.56)
+
+def mix(base, rgb, amount):
+    return tuple(round(base[i] + (rgb[i] - base[i]) * amount) for i in range(3))
+
+
+def washes(size, spots):
+    """Ink base lit by soft radial washes — `spots` is (cx, cy, radius, rgb)."""
+    w, h = size
+    layer = Image.new("RGBA", (w, h), INK)
+    for cx, cy, radius, rgb in spots:
+        glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(glow)
+        steps = 64
+        for i in range(steps, 0, -1):
+            t = i / steps
+            r = radius * t
+            gd.ellipse(
+                [cx - r, cy - r, cx + r, cy + r], fill=(*rgb, int(30 * (1 - t) ** 1.7))
+            )
+        layer = Image.alpha_composite(layer, glow)
+    return layer
+
+
+og = washes(
+    (W, H),
+    (
+        (150, 60, 760, (139, 92, 246)),  # violet behind the wordmark
+        (1120, 640, 620, (249, 115, 22)),  # warm counterweight, bottom right
+    ),
+)
+
+# The wordmark carries the branding on its own — no lockup text beside it.
+logo_w = 448
 logo = wordmark.resize((logo_w, round(wordmark.height * logo_w / wordmark.width)), Image.LANCZOS)
-og.alpha_composite(logo, ((W - logo.width) // 2, int(H * 0.28) - logo.height // 2))
+og.alpha_composite(logo, (PAD, 52))
 
 d = ImageDraw.Draw(og)
-for text, font, y, fill in (
-    ("Học nhóm • Tập trung • Tiến bộ", ImageFont.truetype(BOLD, 44), 400, (245, 243, 255)),
-    (
-        "Nền tảng nhóm học tập tương tác cho học sinh & sinh viên",
-        ImageFont.truetype(REG, 32),
-        478,
-        (167, 160, 200),
-    ),
+d.text((PAD + 4, 216), "Học nhóm • Tập trung • Tiến bộ", font=ImageFont.truetype(REG, 30),
+       fill=(176, 170, 208))
+d.text((PAD, 300), "Nền tảng nhóm học tập tương tác", font=ImageFont.truetype(BOLD, 56),
+       fill=(255, 255, 255))
+d.text((PAD, 374), "cho học sinh & sinh viên", font=ImageFont.truetype(BOLD, 56),
+       fill=(255, 255, 255))
+
+# Feature pills, tinted with the real section accents from src/constants/nav.js.
+pill_font = ImageFont.truetype(REG, 27)
+PILL_TOP, PILL_BOT = 486, 558
+x = PAD
+for label, accent in (
+    ("Nhóm học tập", (139, 92, 246)),
+    ("Pomodoro", (249, 115, 22)),
+    ("Hiệu suất", (16, 185, 129)),
+    ("Ghi chú", (6, 182, 212)),
 ):
-    # Measure the real glyph box so Vietnamese diacritics stay centred.
-    width = d.textbbox((0, 0), text, font=font)[2]
-    d.text(((W - width) / 2, y), text, font=font, fill=fill)
+    # Measure the real glyph box so Vietnamese diacritics never touch the edge.
+    box = d.textbbox((0, 0), label, font=pill_font)
+    text_w, text_h = box[2] - box[0], box[3] - box[1]
+    width = text_w + 78
+    mid = (PILL_TOP + PILL_BOT) / 2
+    d.rounded_rectangle(
+        [x, PILL_TOP, x + width, PILL_BOT],
+        (PILL_BOT - PILL_TOP) / 2,
+        fill=mix(INK[:3], accent, 0.15),
+        outline=mix(INK[:3], accent, 0.5),
+        width=2,
+    )
+    d.ellipse([x + 26, mid - 6, x + 38, mid + 6], fill=accent)
+    d.text((x + 52 - box[0], mid - text_h / 2 - box[1]), label, font=pill_font, fill=accent)
+    x += width + 16
 
 og.convert("RGB").save(f"{OUT}/og-image.png", optimize=True)
 
