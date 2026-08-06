@@ -12,7 +12,9 @@ import {
   Users,
   FileText,
   Sparkles,
-  Keyboard
+  Keyboard,
+  Layers,
+  LogOut
 } from 'lucide-react';
 
 /* Accent-insensitive matching so "toan" finds "Toán". */
@@ -32,9 +34,12 @@ const CommandPaletteDialog = () => {
     groups,
     notes,
     editorPicks,
+    cards,
     theme,
     toggleTheme,
-    setShortcutsOpen
+    setShortcutsOpen,
+    account,
+    onSignOut
   } = useApp();
 
   const [query, setQuery] = useState('');
@@ -75,9 +80,19 @@ const CommandPaletteDialog = () => {
       group: 'Hành động',
       title: 'Xem tất cả phím tắt',
       subtitle: 'Bảng tra cứu phím tắt',
-      color: '#6366f1',
+      color: '#818cf8',
       icon: <Keyboard size={15} />,
       run: () => setShortcutsOpen(true)
+    });
+
+    items.push({
+      id: 'action-signout',
+      group: 'Hành động',
+      title: account ? 'Đăng xuất' : 'Thoát về trang giới thiệu',
+      subtitle: account ? account.email : 'Đang dùng ở chế độ khách',
+      color: '#fb7185',
+      icon: <LogOut size={15} />,
+      run: () => onSignOut?.()
     });
 
     groups.forEach((group) => {
@@ -111,15 +126,39 @@ const CommandPaletteDialog = () => {
         group: 'Bài viết',
         title: article.title,
         subtitle: `${article.category} • ${article.createdBy}`,
-        color: '#ec4899',
+        color: '#f472b6',
         icon: <Sparkles size={15} />,
         keywords: article.content,
         run: () => setActiveTab('editor')
       });
     });
 
+    cards.forEach((card) => {
+      items.push({
+        id: `card-${card.id}`,
+        group: 'Thẻ ghi nhớ',
+        title: card.front,
+        subtitle: `${card.subject} • khoảng ôn ${card.interval} ngày`,
+        color: subjectColor(card.subject),
+        icon: <Layers size={15} />,
+        keywords: card.back,
+        run: () => setActiveTab('recall')
+      });
+    });
+
     return items;
-  }, [groups, notes, editorPicks, theme, toggleTheme, setActiveTab, setShortcutsOpen]);
+  }, [
+    groups,
+    notes,
+    editorPicks,
+    cards,
+    theme,
+    toggleTheme,
+    setActiveTab,
+    setShortcutsOpen,
+    account,
+    onSignOut
+  ]);
 
   const results = useMemo(() => {
     const q = normalize(query.trim());
