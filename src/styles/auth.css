@@ -1,0 +1,312 @@
+/* ==========================================================================
+   BLOOOM — SIGN IN / SIGN UP
+   Two panes: the form owns the left, and the right is a quiet statement of
+   what the account is for. The right pane is decorative and marked
+   aria-hidden, so a screen reader gets the form and nothing repeated.
+   ========================================================================== */
+
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  min-height: 100vh;
+  background: var(--bg-app);
+}
+
+/* ==========================================================================
+   FORM PANE
+   ========================================================================== */
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-6) var(--sp-10);
+}
+
+.auth-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-10);
+}
+
+.auth-logo {
+  width: 7rem;
+  height: auto;
+  margin-bottom: var(--sp-6);
+}
+
+.auth-title {
+  font-size: var(--fs-xl);
+  margin-bottom: var(--sp-2);
+}
+
+.auth-sub {
+  margin: 0 0 var(--sp-6);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* ---- Mode switch -------------------------------------------------------- */
+.auth-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: var(--sp-6);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.auth-switch-btn {
+  padding: 0.5rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-dim);
+  border-radius: var(--r-xs);
+  transition:
+    color var(--t-fast),
+    background var(--t-fast);
+}
+
+.auth-switch-btn:hover {
+  color: var(--text);
+}
+
+.auth-switch-btn.is-active {
+  color: var(--text);
+  background: var(--bg-raised);
+  box-shadow: var(--sh-xs);
+}
+
+[data-theme='light'] .auth-switch-btn.is-active {
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+/* ---- Form --------------------------------------------------------------- */
+.auth-form .field {
+  margin-bottom: var(--sp-4);
+}
+
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--text);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 34%, transparent);
+  border-radius: var(--r-sm);
+}
+
+.auth-error svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--danger);
+}
+
+/* ---- Password strength meter -------------------------------------------
+   A rough guide only. The label never says "secure" — it says how varied the
+   characters are, which is all a client-side check can honestly report. */
+.pw-meter {
+  margin-top: 0.55rem;
+}
+
+.pw-track {
+  height: 3px;
+  overflow: hidden;
+  background: var(--bg-active);
+  border-radius: var(--r-full);
+}
+
+.pw-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--text-dim);
+  transition:
+    width var(--t-base),
+    background var(--t-base);
+}
+
+.pw-fill-1 {
+  background: var(--danger);
+}
+.pw-fill-2 {
+  background: var(--warning);
+}
+.pw-fill-3 {
+  background: var(--d-5);
+}
+.pw-fill-4 {
+  background: var(--success);
+}
+
+.pw-legend {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: 0.35rem;
+}
+
+.pw-label {
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.pw-label-1 {
+  color: var(--danger);
+}
+.pw-label-2 {
+  color: var(--warning);
+}
+.pw-label-3 {
+  color: var(--d-5);
+}
+.pw-label-4 {
+  color: var(--success);
+}
+
+/* ---- Divider ------------------------------------------------------------ */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ---- Local-account disclosure ------------------------------------------- */
+.auth-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4);
+  font-size: var(--fs-xs);
+  line-height: 1.65;
+  color: var(--text-dim);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.auth-note svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.auth-note b {
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   ASIDE
+   ========================================================================== */
+.auth-aside {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: var(--sp-12);
+  background: var(--bg-canvas);
+  border-left: 1px solid var(--border);
+}
+
+.auth-aside::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(90% 70% at 30% 40%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(90% 70% at 30% 40%, #000, transparent 75%);
+}
+
+.auth-aside-inner {
+  position: relative;
+  max-width: 24rem;
+}
+
+.auth-aside-lede {
+  margin: var(--sp-4) 0 var(--sp-6);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.auth-aside ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  list-style: none;
+}
+
+.auth-aside li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.auth-aside li svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--accent-text);
+}
+
+.auth-aside-eq {
+  display: inline-block;
+  margin-top: var(--sp-8);
+  padding: 0.4rem 0.7rem;
+  font-size: var(--fs-sm);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-xs);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 900px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-aside {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-panel {
+    padding-inline: var(--sp-4);
+  }
+
+  .auth-panel-head {
+    margin-bottom: var(--sp-6);
+  }
+}
