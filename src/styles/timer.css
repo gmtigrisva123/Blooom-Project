@@ -51,8 +51,7 @@
   left: 0.28rem;
   width: calc(50% - 0.28rem);
   border-radius: var(--r-full);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 8px 24px -8px var(--accent-glow);
+  background: var(--accent);
   transition: transform var(--t-spring);
 }
 
@@ -90,11 +89,10 @@
 
 .ring-progress {
   fill: none;
-  stroke: url(#ringGradient);
+  stroke: var(--accent);
   stroke-width: 10;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.9s linear;
-  filter: drop-shadow(0 0 8px var(--accent-glow));
 }
 
 .ring-face {
@@ -107,11 +105,11 @@
 }
 
 .ring-time {
-  font-family: var(--font-display);
-  font-size: 3.4rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 3.2rem;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
@@ -150,7 +148,7 @@
   color: var(--c-rose-2);
 }
 .ring-wrap.is-urgent .ring-progress {
-  filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.75));
+  stroke: var(--c-rose);
 }
 
 /* ==========================================================================
