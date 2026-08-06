@@ -1,0 +1,724 @@
+/* ==========================================================================
+   BLOOOM — SCIENCE SURFACES
+   Recall Lab (SM-2), Experiment Lab (N-of-1) and Insights (cosinor + OLS).
+   Data marks own the colour on these pages; everything around them is
+   greyscale so a chart is always the brightest thing on screen.
+   ========================================================================== */
+
+/* ==========================================================================
+   RECALL — FORGETTING CURVE
+   ========================================================================== */
+.curve-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.curve-line {
+  fill: none;
+  stroke: var(--d-2);
+  stroke-width: 2;
+}
+
+.curve-area {
+  fill: color-mix(in srgb, var(--d-2) 12%, transparent);
+  stroke: none;
+}
+
+.curve-now {
+  stroke: var(--text-dim);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.curve-dot {
+  fill: var(--d-2);
+  stroke: var(--bg-elevated);
+  stroke-width: 2;
+}
+
+/* ==========================================================================
+   RECALL — DUE FORECAST
+   ========================================================================== */
+.forecast {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 9rem;
+}
+
+.forecast-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.forecast-count {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  min-height: 0.9rem;
+}
+
+.forecast-bar-wrap {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  flex: 1;
+}
+
+.forecast-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background: var(--d-1);
+  animation: grow-bar 0.5s var(--ease-out) both;
+  transform-origin: bottom;
+}
+
+.forecast-bar.is-empty {
+  background: var(--border);
+}
+
+.forecast-col.is-today .forecast-bar {
+  background: var(--accent);
+}
+
+.forecast-col.is-today .forecast-day {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.forecast-day {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   RECALL — REVIEW SESSION
+   ========================================================================== */
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.review-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-6);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.review-label {
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.review-front {
+  margin: 0 0 var(--sp-4);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.review-back {
+  margin: 0;
+  font-size: var(--fs-base);
+  line-height: 1.65;
+  color: var(--accent-text);
+}
+
+/* ---- Grading ------------------------------------------------------------ */
+.grade-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+  gap: var(--sp-2);
+}
+
+.grade-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: var(--sp-3);
+  text-align: left;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--grade-color);
+  border-radius: var(--r-sm);
+  background: var(--bg-inset);
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast);
+}
+
+.grade-btn:hover {
+  background: color-mix(in srgb, var(--grade-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--grade-color) 45%, transparent);
+  border-left-color: var(--grade-color);
+}
+
+.grade-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.grade-hint {
+  font-size: var(--fs-2xs);
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.review-result {
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r-sm);
+}
+
+.review-result strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 0.1rem;
+}
+
+.review-result span {
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   RECALL — DECK TABLE
+   ========================================================================== */
+.card-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 2px solid var(--row-color);
+  transition: background var(--t-fast);
+}
+
+.card-row + .card-row {
+  border-top: 1px solid var(--border);
+}
+
+.card-row:hover {
+  background: var(--bg-hover);
+}
+
+.card-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-row-front {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-row-back {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-row-stat {
+  flex: none;
+  width: 3rem;
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+  text-align: right;
+}
+
+/* ==========================================================================
+   EXPERIMENT — PROTOCOL BAR
+   ========================================================================== */
+.protocol-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.protocol-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-xs);
+  color: var(--text-soft);
+  background: var(--bg-elevated);
+}
+
+.protocol-step .mono {
+  color: var(--accent-text);
+}
+
+/* ==========================================================================
+   EXPERIMENT — TEMPLATES
+   ========================================================================== */
+.template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: var(--sp-5);
+  text-align: left;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast);
+}
+
+.template-card:hover {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+.template-card strong {
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+
+.template-hypothesis {
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.template-arms,
+.template-metric {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   EXPERIMENT — CARD
+   ========================================================================== */
+.exp {
+  padding: var(--sp-6);
+}
+
+.exp.is-locked {
+  border-style: dashed;
+}
+
+.exp-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+
+.exp-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.exp-title-row h3 {
+  font-size: var(--fs-lg);
+}
+
+.exp-hypothesis {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+.exp-hypothesis .mono {
+  color: var(--accent-text);
+  margin-right: 0.35rem;
+}
+
+.exp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.exp-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+
+.exp-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+
+/* ---- Arm dot plot ------------------------------------------------------- */
+.arm-plot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.arm-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: 0.4rem;
+}
+
+.arm-tag {
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: none;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  border-radius: var(--r-xs);
+  color: var(--text-on-accent);
+  background: var(--d-1);
+}
+
+.arm-b .arm-tag,
+.arm-tag-b {
+  background: var(--d-2);
+}
+
+.arm-label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.arm-mean {
+  flex: none;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.arm-track {
+  position: relative;
+  height: 1.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.arm-dot {
+  position: absolute;
+  bottom: -3px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: var(--r-full);
+  background: var(--d-1);
+  opacity: 0.75;
+}
+
+.arm-b .arm-dot {
+  background: var(--d-2);
+}
+
+.arm-mean-tick {
+  position: absolute;
+  top: 0.2rem;
+  bottom: -0.3rem;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+}
+
+.arm-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* ---- Trial entry -------------------------------------------------------- */
+.trial-form {
+  padding: var(--sp-5);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.trial-assignment {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.trial-assignment svg {
+  flex: none;
+  color: var(--accent-text);
+}
+
+.trial-assignment-label {
+  display: block;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.trial-assignment strong {
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+/* ---- Conclusion --------------------------------------------------------- */
+.conclusion {
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--text-dim);
+  border-radius: var(--r-sm);
+  background: var(--bg-inset);
+}
+
+.conclusion strong {
+  display: block;
+  font-size: var(--fs-base);
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.conclusion p {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+.conclusion-signal {
+  border-left-color: var(--success);
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+}
+
+.conclusion-null {
+  border-left-color: var(--warning);
+}
+
+/* ---- Trial log ---------------------------------------------------------- */
+.exp-log {
+  margin-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-4);
+}
+
+.exp-log summary {
+  font-size: var(--fs-sm);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.exp-log summary:hover {
+  color: var(--text);
+}
+
+.exp-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: var(--sp-3);
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  overflow: hidden;
+}
+
+.exp-log-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0.4rem 0.6rem;
+  font-size: var(--fs-xs);
+  background: var(--bg-elevated);
+}
+
+.exp-log-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ==========================================================================
+   INSIGHTS — COSINOR
+   ========================================================================== */
+.cosinor-svg,
+.trend-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.cosinor-bar {
+  fill: color-mix(in srgb, var(--d-3) 42%, transparent);
+}
+
+.cosinor-bar.is-empty {
+  fill: var(--bg-active);
+}
+
+.cosinor-mesor {
+  stroke: var(--text-dim);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.cosinor-curve {
+  fill: none;
+  stroke: var(--d-1);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+
+.cosinor-acrophase {
+  stroke: var(--d-1);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  opacity: 0.7;
+}
+
+.cosinor-peak {
+  fill: var(--d-1);
+  stroke: var(--bg-elevated);
+  stroke-width: 2;
+}
+
+/* ==========================================================================
+   INSIGHTS — HEATMAP
+   ========================================================================== */
+.heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-x: auto;
+}
+
+.heatmap-hours,
+.heatmap-row {
+  display: grid;
+  grid-template-columns: 2.1rem repeat(24, minmax(9px, 1fr));
+  gap: 3px;
+  align-items: center;
+  min-width: 22rem;
+}
+
+.heatmap-hours {
+  margin-bottom: 0.2rem;
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.heatmap-label {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  min-height: 9px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--d-1) calc(var(--intensity) * 100%), var(--bg-inset));
+}
+
+/* ==========================================================================
+   INSIGHTS — TREND
+   ========================================================================== */
+.trend-dot {
+  fill: var(--text-dim);
+}
+
+.trend-line {
+  stroke: var(--d-2);
+  stroke-width: 2;
+}
+
+.trend-line-future {
+  stroke-dasharray: 4 4;
+}
+
+.trend-interval {
+  stroke: var(--d-2);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.22;
+}
+
+.trend-forecast {
+  fill: var(--d-2);
+  stroke: var(--bg-elevated);
+  stroke-width: 2;
+}
+
+.trend-forecast-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--d-2);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 560px) {
+  .exp {
+    padding: var(--sp-5);
+  }
+
+  .card-row-stat:nth-of-type(2) {
+    display: none;
+  }
+
+  .forecast {
+    height: 7rem;
+  }
+}
