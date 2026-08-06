@@ -5,13 +5,13 @@
    ========================================================================== */
 
 export const SUBJECTS = [
-  { value: 'Toán', label: 'Toán Học', color: '#3b82f6' },
-  { value: 'Tiếng Anh', label: 'Tiếng Anh', color: '#a855f7' },
-  { value: 'Vật Lý', label: 'Vật Lý', color: '#06b6d4' },
-  { value: 'Hóa Học', label: 'Hóa Học', color: '#10b981' },
-  { value: 'Sinh Học', label: 'Sinh Học', color: '#f43f5e' },
-  { value: 'Ngữ Văn', label: 'Ngữ Văn', color: '#f59e0b' },
-  { value: 'Tin Học', label: 'Tin Học', color: '#6366f1' },
+  { value: 'Toán', label: 'Toán Học', color: '#60a5fa' },
+  { value: 'Tiếng Anh', label: 'Tiếng Anh', color: '#a78bfa' },
+  { value: 'Vật Lý', label: 'Vật Lý', color: '#7dd3fc' },
+  { value: 'Hóa Học', label: 'Hóa Học', color: '#34d399' },
+  { value: 'Sinh Học', label: 'Sinh Học', color: '#fb7185' },
+  { value: 'Ngữ Văn', label: 'Ngữ Văn', color: '#f0a85c' },
+  { value: 'Tin Học', label: 'Tin Học', color: '#818cf8' },
   { value: 'Khác', label: 'Môn Khác', color: '#94a3b8' }
 ];
 
