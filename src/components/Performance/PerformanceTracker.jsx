@@ -109,12 +109,6 @@ export const PerformanceTracker = () => {
       <section className="panel goal-summary">
         <div className="goal-ring">
           <svg viewBox="0 0 140 140">
-            <defs>
-              <linearGradient id="goalGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="var(--accent-2)" />
-                <stop offset="100%" stopColor="var(--accent)" />
-              </linearGradient>
-            </defs>
             <circle className="goal-ring-track" cx="70" cy="70" r={GOAL_RADIUS} />
             <circle
               className="goal-ring-fill"
@@ -172,14 +166,14 @@ export const PerformanceTracker = () => {
           value={(weekMinutes / 60).toFixed(1)}
           unit="giờ"
           note={`${weekMinutes} phút được ghi nhận`}
-          color="#06b6d4"
+          color="var(--d-1)"
         />
         <StatCard
           icon={<CheckCircle2 size={22} />}
           label="Phiên đã hoàn thành"
           value={`${weekSessionCount}/${performanceGoals.targetSessionsPerWeek}`}
           note={`${sessionsPercent}% mục tiêu phiên học`}
-          color="#10b981"
+          color="var(--d-2)"
         />
         <StatCard
           icon={<Flame size={22} />}
@@ -187,7 +181,7 @@ export const PerformanceTracker = () => {
           value={streak.current}
           unit="ngày"
           note={`Kỷ lục cá nhân: ${streak.longest} ngày`}
-          color="#f97316"
+          color="var(--d-3)"
         />
         <StatCard
           icon={<Award size={22} />}
@@ -195,7 +189,7 @@ export const PerformanceTracker = () => {
           value={level.xp}
           unit="XP"
           note={`Còn ${level.xpRemaining} XP để lên cấp ${level.level + 1}`}
-          color="#8b5cf6"
+          color="var(--d-5)"
         />
       </div>
 
@@ -234,19 +228,17 @@ export const PerformanceTracker = () => {
 
           <div className="week-legend">
             <span>Ít</span>
+            {/* Same opacity steps as the intensity rule in styles/performance.css */}
             <span className="week-legend-swatch" style={{ background: 'var(--bg-inset)' }} />
             <span
               className="week-legend-swatch"
-              style={{ background: 'color-mix(in srgb, var(--accent) 26%, transparent)' }}
+              style={{ background: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}
             />
             <span
               className="week-legend-swatch"
-              style={{ background: 'color-mix(in srgb, var(--accent) 44%, transparent)' }}
+              style={{ background: 'color-mix(in srgb, var(--accent) 55%, transparent)' }}
             />
-            <span
-              className="week-legend-swatch"
-              style={{ background: 'color-mix(in srgb, var(--accent) 66%, transparent)' }}
-            />
+            <span className="week-legend-swatch" style={{ background: 'var(--accent)' }} />
             <span>Nhiều</span>
           </div>
         </section>
