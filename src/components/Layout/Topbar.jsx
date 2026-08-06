@@ -27,6 +27,9 @@ export const Topbar = () => {
         <Menu size={20} />
       </button>
 
+      {/* The only place a section's own colour appears in the chrome. */}
+      <span className="topbar-tick" aria-hidden="true" />
+
       <div className="topbar-title">
         <strong>{current.label}</strong>
         <span>{current.subtitle}</span>
