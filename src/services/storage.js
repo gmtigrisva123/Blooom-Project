@@ -1,6 +1,12 @@
 /* ==========================================================================
-   STUDYHUB LOCAL STORAGE & SEED DATA SERVICE
-   Manages state persistence, seed data, CRUD operations for local execution.
+   BLOOOM — LOCAL STORAGE & SEED DATA SERVICE
+   Persistence, seed data and CRUD for a browser-resident app.
+
+   Every key is resolved through `k()`, which prefixes it with the signed-in
+   account's namespace. Two students sharing one laptop therefore keep two
+   completely separate sets of groups, sessions, notes and experiments, while
+   a browser that has never signed in keeps using the original unprefixed keys
+   — so data recorded before accounts existed is not orphaned.
    ========================================================================== */
 
 const STORAGE_KEYS = {
@@ -13,13 +19,30 @@ const STORAGE_KEYS = {
   BOOKMARKS: 'studyhub_bookmarks',
   THEME: 'studyhub_theme',
   SEEN_BADGES: 'studyhub_seen_badges',
-  UI_PREFS: 'studyhub_ui_prefs'
+  UI_PREFS: 'studyhub_ui_prefs',
+  CARDS: 'blooom_flashcards',
+  EXPERIMENTS: 'blooom_experiments'
 };
+
+/* --------------------------------------------------------------------------
+   NAMESPACE
+   -------------------------------------------------------------------------- */
+let namespace = '';
+
+/* Called once, before the provider reads anything, whenever the signed-in
+   account changes. Passing null restores the shared/anonymous namespace. */
+export const setStorageNamespace = (accountId) => {
+  namespace = accountId ? `blooom:${accountId}:` : '';
+};
+
+export const getStorageNamespace = () => namespace;
+
+const k = (key) => `${namespace}${key}`;
 
 /* localStorage can throw (private mode, quota). Never let that break a render. */
 const readJson = (key, fallback) => {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(k(key));
     return raw ? JSON.parse(raw) : fallback;
   } catch {
     return fallback;
@@ -28,10 +51,19 @@ const readJson = (key, fallback) => {
 
 const writeJson = (key, value) => {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    localStorage.setItem(k(key), JSON.stringify(value));
   } catch {
     /* Storage full or unavailable — the in-memory state still works. */
   }
+  return value;
+};
+
+/* Read a collection, writing the seed on first access so the app always has
+   something to show and the seed is only paid for once per namespace. */
+const readSeeded = (key, seed) => {
+  const existing = readJson(key, null);
+  if (existing !== null) return existing;
+  return writeJson(key, seed);
 };
 
 // Seed Data Initialization
@@ -103,9 +135,9 @@ const SEED_EDITOR_PICKS = [
     id: 'art-1',
     title: 'Phương pháp Pomodoro 50/10: Bí quyết giữ tập trung đỉnh cao cho học sinh 12',
     category: 'Mẹo học tập',
-    content: `Khi đối mặt với lượng kiến thức khổng lồ của kì thi THPTQG, việc ngồi học liên tục 3-4 tiếng thường dẫn đến hiện tượng 'quá tải não'. 
+    content: `Khi đối mặt với lượng kiến thức khổng lồ của kì thi THPTQG, việc ngồi học liên tục 3-4 tiếng thường dẫn đến hiện tượng 'quá tải não'.
 
-Phương pháp Pomodoro 50/10 (50 phút học sâu, 10 phút nghỉ ngơi hoàn toàn) giúp duy trì sự tỉnh táo và khả năng ghi nhớ dài hạn. Trong 50 phút này, hãy tắt toàn bộ thông báo điện thoại, đặt chế độ DND (Do Not Disturb) và chỉ tập trung vào một nhiệm vụ duy nhất. 
+Phương pháp Pomodoro 50/10 (50 phút học sâu, 10 phút nghỉ ngơi hoàn toàn) giúp duy trì sự tỉnh táo và khả năng ghi nhớ dài hạn. Trong 50 phút này, hãy tắt toàn bộ thông báo điện thoại, đặt chế độ DND (Do Not Disturb) và chỉ tập trung vào một nhiệm vụ duy nhất.
 
 10 phút nghỉ ngơi nên được dùng để đứng dậy đi dạo, uống nước hoặc duỗi cơ thể chứ không nên tiếp tục lướt mảng xã hội!`,
     imageUrl:
@@ -204,10 +236,53 @@ const SEED_NOTES = [
   }
 ];
 
+/* Four starter cards so the Recall Lab has a live schedule to show before the
+   student has written any of their own. */
+const SEED_CARDS = [
+  {
+    id: 'card-seed-1',
+    front: 'Đạo hàm của hàm số y = ln(x) là gì?',
+    back: "y' = 1/x  (với x > 0)",
+    subject: 'Toán',
+    noteId: 'note-1'
+  },
+  {
+    id: 'card-seed-2',
+    front: 'Công thức tính chu kỳ của con lắc đơn?',
+    back: 'T = 2π·√(l/g) — chỉ phụ thuộc chiều dài l và gia tốc trọng trường g.',
+    subject: 'Vật Lý',
+    noteId: null
+  },
+  {
+    id: 'card-seed-3',
+    front: '"Paraphrase" trong IELTS Writing Task 2 nghĩa là gì?',
+    back: 'Viết lại ý của đề bài bằng từ vựng và cấu trúc của riêng mình, giữ nguyên nghĩa gốc.',
+    subject: 'Tiếng Anh',
+    noteId: 'note-2'
+  },
+  {
+    id: 'card-seed-4',
+    front: 'Liên kết ion được hình thành giữa những nguyên tố nào?',
+    back: 'Giữa kim loại điển hình và phi kim điển hình, do lực hút tĩnh điện giữa các ion trái dấu.',
+    subject: 'Hóa Học',
+    noteId: null
+  }
+].map((card) => ({
+  ...card,
+  easeFactor: 2.5,
+  interval: 0,
+  repetitions: 0,
+  lapses: 0,
+  reviewCount: 0,
+  createdAt: new Date().toISOString(),
+  lastReviewedAt: null,
+  dueAt: new Date().toISOString()
+}));
+
 export const storageService = {
   // User Profile & Role
   getUser: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.USER);
+    const saved = readJson(STORAGE_KEYS.USER, null);
     if (!saved) {
       const defaultUser = {
         id: 'usr-1',
@@ -217,37 +292,28 @@ export const storageService = {
         avatar:
           'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
       };
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(defaultUser));
-      return defaultUser;
+      return writeJson(STORAGE_KEYS.USER, defaultUser);
     }
-    return JSON.parse(saved);
+    return saved;
   },
 
-  setUser: (user) => {
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-  },
+  setUser: (user) => writeJson(STORAGE_KEYS.USER, user),
 
   // Groups Management
-  getGroups: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.GROUPS);
-    if (!saved) {
-      localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(SEED_GROUPS));
-      return SEED_GROUPS;
-    }
-    return JSON.parse(saved);
-  },
+  getGroups: () => readSeeded(STORAGE_KEYS.GROUPS, SEED_GROUPS),
 
   addGroup: (newGroup) => {
     const groups = storageService.getGroups();
+    const user = storageService.getUser();
     const created = {
       ...newGroup,
       id: 'grp-' + Date.now(),
       memberCount: 1,
-      members: ['usr-1'],
+      members: [user.id],
       createdAt: new Date().toISOString().split('T')[0]
     };
     groups.unshift(created);
-    localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(groups));
+    writeJson(STORAGE_KEYS.GROUPS, groups);
     return created;
   },
 
@@ -268,19 +334,11 @@ export const storageService = {
       }
       return g;
     });
-    localStorage.setItem(STORAGE_KEYS.GROUPS, JSON.stringify(updated));
-    return updated;
+    return writeJson(STORAGE_KEYS.GROUPS, updated);
   },
 
   // Timer Sessions
-  getTimerSessions: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.TIMER_SESSIONS);
-    if (!saved) {
-      localStorage.setItem(STORAGE_KEYS.TIMER_SESSIONS, JSON.stringify(SEED_TIMER_SESSIONS));
-      return SEED_TIMER_SESSIONS;
-    }
-    return JSON.parse(saved);
-  },
+  getTimerSessions: () => readSeeded(STORAGE_KEYS.TIMER_SESSIONS, SEED_TIMER_SESSIONS),
 
   saveTimerSession: (sessionData) => {
     const sessions = storageService.getTimerSessions();
@@ -293,34 +351,21 @@ export const storageService = {
       completed: true
     };
     sessions.unshift(newSession);
-    localStorage.setItem(STORAGE_KEYS.TIMER_SESSIONS, JSON.stringify(sessions));
+    writeJson(STORAGE_KEYS.TIMER_SESSIONS, sessions);
     return newSession;
   },
 
   // Performance Goals
-  getPerformanceGoals: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.PERFORMANCE_GOALS);
-    if (!saved) {
-      const defaultGoal = { targetHoursPerWeek: 15, targetSessionsPerWeek: 12 };
-      localStorage.setItem(STORAGE_KEYS.PERFORMANCE_GOALS, JSON.stringify(defaultGoal));
-      return defaultGoal;
-    }
-    return JSON.parse(saved);
-  },
+  getPerformanceGoals: () =>
+    readSeeded(STORAGE_KEYS.PERFORMANCE_GOALS, {
+      targetHoursPerWeek: 15,
+      targetSessionsPerWeek: 12
+    }),
 
-  setPerformanceGoals: (goals) => {
-    localStorage.setItem(STORAGE_KEYS.PERFORMANCE_GOALS, JSON.stringify(goals));
-  },
+  setPerformanceGoals: (goals) => writeJson(STORAGE_KEYS.PERFORMANCE_GOALS, goals),
 
   // Editor's Picks
-  getEditorPicks: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.EDITOR_PICKS);
-    if (!saved) {
-      localStorage.setItem(STORAGE_KEYS.EDITOR_PICKS, JSON.stringify(SEED_EDITOR_PICKS));
-      return SEED_EDITOR_PICKS;
-    }
-    return JSON.parse(saved);
-  },
+  getEditorPicks: () => readSeeded(STORAGE_KEYS.EDITOR_PICKS, SEED_EDITOR_PICKS),
 
   addEditorPick: (article) => {
     const articles = storageService.getEditorPicks();
@@ -331,40 +376,29 @@ export const storageService = {
       likesCount: 0
     };
     articles.unshift(newArticle);
-    localStorage.setItem(STORAGE_KEYS.EDITOR_PICKS, JSON.stringify(articles));
+    writeJson(STORAGE_KEYS.EDITOR_PICKS, articles);
     return newArticle;
   },
 
-  deleteEditorPick: (id) => {
-    const articles = storageService.getEditorPicks().filter((a) => a.id !== id);
-    localStorage.setItem(STORAGE_KEYS.EDITOR_PICKS, JSON.stringify(articles));
-    return articles;
-  },
+  deleteEditorPick: (id) =>
+    writeJson(
+      STORAGE_KEYS.EDITOR_PICKS,
+      storageService.getEditorPicks().filter((a) => a.id !== id)
+    ),
 
-  getBookmarks: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
-    return saved ? JSON.parse(saved) : [];
-  },
+  getBookmarks: () => readJson(STORAGE_KEYS.BOOKMARKS, []),
 
   toggleBookmark: (articleId) => {
     const bookmarks = storageService.getBookmarks();
     const exists = bookmarks.includes(articleId);
-    const updated = exists
-      ? bookmarks.filter((id) => id !== articleId)
-      : [...bookmarks, articleId];
-    localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(updated));
-    return updated;
+    return writeJson(
+      STORAGE_KEYS.BOOKMARKS,
+      exists ? bookmarks.filter((id) => id !== articleId) : [...bookmarks, articleId]
+    );
   },
 
   // Notes Management
-  getNotes: () => {
-    const saved = localStorage.getItem(STORAGE_KEYS.NOTES);
-    if (!saved) {
-      localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(SEED_NOTES));
-      return SEED_NOTES;
-    }
-    return JSON.parse(saved);
-  },
+  getNotes: () => readSeeded(STORAGE_KEYS.NOTES, SEED_NOTES),
 
   addNote: (note) => {
     const notes = storageService.getNotes();
@@ -376,15 +410,69 @@ export const storageService = {
       uploadedAt: new Date().toISOString().split('T')[0]
     };
     notes.unshift(newNote);
-    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
+    writeJson(STORAGE_KEYS.NOTES, notes);
     return newNote;
   },
 
-  deleteNote: (id) => {
-    const notes = storageService.getNotes().filter((n) => n.id !== id);
-    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
-    return notes;
+  deleteNote: (id) =>
+    writeJson(
+      STORAGE_KEYS.NOTES,
+      storageService.getNotes().filter((n) => n.id !== id)
+    ),
+
+  /* ------------------------------------------------------------------------
+     FLASHCARDS — the scheduling state itself is persisted (ease factor,
+     interval, due date), because unlike badges it cannot be recomputed: it
+     depends on grades the student gave at moments that have already passed.
+     ------------------------------------------------------------------------ */
+  getCards: () => readSeeded(STORAGE_KEYS.CARDS, SEED_CARDS),
+
+  setCards: (cards) => writeJson(STORAGE_KEYS.CARDS, cards),
+
+  addCard: (card) => {
+    const cards = storageService.getCards();
+    cards.unshift(card);
+    writeJson(STORAGE_KEYS.CARDS, cards);
+    return card;
   },
+
+  updateCard: (updated) =>
+    writeJson(
+      STORAGE_KEYS.CARDS,
+      storageService.getCards().map((c) => (c.id === updated.id ? updated : c))
+    ),
+
+  deleteCard: (id) =>
+    writeJson(
+      STORAGE_KEYS.CARDS,
+      storageService.getCards().filter((c) => c.id !== id)
+    ),
+
+  /* ------------------------------------------------------------------------
+     N-OF-1 EXPERIMENTS
+     ------------------------------------------------------------------------ */
+  getExperiments: () => readJson(STORAGE_KEYS.EXPERIMENTS, []),
+
+  setExperiments: (experiments) => writeJson(STORAGE_KEYS.EXPERIMENTS, experiments),
+
+  addExperiment: (experiment) => {
+    const experiments = storageService.getExperiments();
+    experiments.unshift(experiment);
+    writeJson(STORAGE_KEYS.EXPERIMENTS, experiments);
+    return experiment;
+  },
+
+  updateExperiment: (updated) =>
+    writeJson(
+      STORAGE_KEYS.EXPERIMENTS,
+      storageService.getExperiments().map((e) => (e.id === updated.id ? updated : e))
+    ),
+
+  deleteExperiment: (id) =>
+    writeJson(
+      STORAGE_KEYS.EXPERIMENTS,
+      storageService.getExperiments().filter((e) => e.id !== id)
+    ),
 
   /* ------------------------------------------------------------------------
      Achievement badges the user has already been shown. Unlocking itself is
@@ -394,18 +482,14 @@ export const storageService = {
      ------------------------------------------------------------------------ */
   getSeenBadges: () => readJson(STORAGE_KEYS.SEEN_BADGES, []),
 
-  markBadgesSeen: (ids) => {
-    const merged = [...new Set([...storageService.getSeenBadges(), ...ids])];
-    writeJson(STORAGE_KEYS.SEEN_BADGES, merged);
-    return merged;
-  },
+  markBadgesSeen: (ids) =>
+    writeJson(STORAGE_KEYS.SEEN_BADGES, [
+      ...new Set([...storageService.getSeenBadges(), ...ids])
+    ]),
 
   /* Interface preferences (sidebar collapsed, ...). */
   getUiPrefs: () => readJson(STORAGE_KEYS.UI_PREFS, { sidebarCollapsed: false }),
 
-  setUiPrefs: (prefs) => {
-    const merged = { ...storageService.getUiPrefs(), ...prefs };
-    writeJson(STORAGE_KEYS.UI_PREFS, merged);
-    return merged;
-  }
+  setUiPrefs: (prefs) =>
+    writeJson(STORAGE_KEYS.UI_PREFS, { ...storageService.getUiPrefs(), ...prefs })
 };

@@ -1,14 +1,19 @@
 {
-  "name": "studyhub",
+  "name": "blooom",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "type": "module",
-  "description": "Nền tảng nhóm học tập tương tác cho học sinh & sinh viên — nhóm học theo môn, Pomodoro, theo dõi hiệu suất và kho ghi chú số hóa.",
+  "description": "Nền tảng học tập dựa trên bằng chứng cho học sinh & sinh viên — nhóm học theo môn, Pomodoro, ôn tập ngắt quãng SM-2, thí nghiệm N-of-1 và phân tích nhịp sinh học.",
   "keywords": [
     "react",
     "vite",
     "pomodoro",
     "study-groups",
+    "spaced-repetition",
+    "sm-2",
+    "n-of-1-trial",
+    "cosinor",
+    "learning-analytics",
     "education",
     "vietnamese"
   ],

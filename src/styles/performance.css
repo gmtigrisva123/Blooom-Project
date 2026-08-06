@@ -30,7 +30,7 @@
 
 .goal-ring-fill {
   fill: none;
-  stroke: url(#goalGradient);
+  stroke: var(--accent);
   stroke-width: 9;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s var(--ease-out);
@@ -42,10 +42,11 @@
 }
 
 .goal-ring-pct {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: var(--fs-2xl);
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
+  letter-spacing: -0.04em;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
@@ -124,25 +125,35 @@
   box-shadow: 0 0 0 1px var(--accent-line);
 }
 
-/* Intensity levels driven by minutes studied */
+/* Intensity levels driven by minutes studied.
+
+   The heat is carried by a filled rule along the bottom of the cell plus a
+   light background wash, rather than by flooding the whole tile with accent.
+   A saturated fill would put mid-tone teal behind 11px labels, where neither
+   light nor dark text can reach 4.5:1 — the readout has to stay readable at
+   every level, so the surface stays a surface. */
 .week-day.lv1 {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .week-day.lv2 {
-  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .week-day.lv3 {
-  background: color-mix(in srgb, var(--accent) 44%, transparent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 78%, transparent);
 }
 .week-day.lv4 {
-  background: color-mix(in srgb, var(--accent) 66%, transparent);
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 19%, transparent);
+  box-shadow: inset 0 -3px 0 var(--accent);
+  border-color: var(--accent-line);
 }
 
 .week-dow {
   font-size: var(--fs-2xs);
-  font-weight: 700;
-  color: var(--text-dim);
+  font-weight: 600;
+  color: var(--text-soft);
 }
 
 .week-day.is-today .week-dow {
@@ -150,9 +161,10 @@
 }
 
 .week-num {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: var(--fs-md);
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.1;
   color: var(--text);
 }
@@ -164,9 +176,10 @@
   white-space: nowrap;
 }
 
+/* An untouched day still has to be readable — dimming it further with opacity
+   pushes it under the contrast floor. */
 .week-mins.is-zero {
   color: var(--text-dim);
-  opacity: 0.55;
 }
 
 .week-legend {

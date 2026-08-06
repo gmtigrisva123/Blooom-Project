@@ -39,12 +39,18 @@ export const EmptyState = ({ icon, title, description, action }) => (
 /* ==========================================================================
    STAT TILE
    ========================================================================== */
+/* Monospace is for measurements. A tile whose value is a word — a subject
+   name, an em dash — gets the display face instead, because mono spacing
+   makes prose look broken. */
+const isMeasurement = (value) =>
+  typeof value === 'number' || /^[\d\s.,:%/+—-]*$/.test(String(value));
+
 export const StatCard = ({ icon, label, value, unit, note, color }) => (
   <div className="card stat" style={color ? { '--tile-color': color } : undefined}>
     <div className="stat-icon">{icon}</div>
     <div className="stat-body">
       <span className="stat-label">{label}</span>
-      <div className="stat-value">
+      <div className={`stat-value ${isMeasurement(value) ? '' : 'is-text'}`}>
         {value}
         {unit && <small> {unit}</small>}
       </div>
