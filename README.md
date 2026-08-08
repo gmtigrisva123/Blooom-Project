@@ -200,12 +200,31 @@ npm run formulas
 ```
 
 Lệnh này đọc danh mục trong [`scripts/render-formulas.mjs`](scripts/render-formulas.mjs) —
-nguồn sự thật duy nhất cho mọi công thức của dự án — và ghi ra `src/generated/formulas.js`.
-Ứng dụng chỉ nhúng chuỗi HTML đó cùng tệp CSS của KaTeX.
+nguồn sự thật duy nhất cho mọi công thức của dự án — và ghi ra hai tệp vào
+`src/generated/`:
+
+| Tệp           | Nội dung                                                 |
+| ------------- | -------------------------------------------------------- |
+| `formulas.js` | HTML + MathML của từng công thức, KaTeX dựng sẵn         |
+| `katex.css`   | CSS của KaTeX đã lọc bỏ `woff` và `ttf`, chỉ giữ `woff2` |
 
 Đổi lại là **76 kB gzip JavaScript không phải tải về**, công thức hiện ngay từ khung hình
 đầu tiên không nhảy layout, và vẫn đọc được cả khi JavaScript hỏng. KaTeX vì thế là
 `devDependency`, không phải `dependency`.
+
+Việc lọc phông là vì Vite phát sinh **mọi** tệp mà CSS trỏ tới. Bản `katex.min.css` gốc
+khai báo mỗi bộ phông bằng ba định dạng, nên bản dựng mang theo 59 tệp phông nặng 1,1 MB
+trong đó khoảng hai phần ba không trình duyệt nào tải về. `woff2` được hỗ trợ từ 2016
+(Chrome 36, Firefox 39, Safari 10, Edge 14) — rộng hơn cả `color-mix()` mà dự án vốn đã
+dùng — nên hai định dạng kia không mua thêm được khả năng tương thích nào.
+
+Chi phí thực tế của toàn bộ tính năng, đo trên cùng một cấu hình build:
+
+|            | Trước         | Sau                  |
+| ---------- | ------------- | -------------------- |
+| JavaScript | 107,9 kB gzip | 113,1 kB gzip        |
+| CSS        | 15,1 kB gzip  | 23,5 kB gzip         |
+| Phông      | —             | 19 tệp woff2, 292 kB |
 
 `npm run verify` chạy `formulas:check` trước tiên, nên một công thức được sửa mà quên sinh
 lại sẽ làm hỏng CI thay vì âm thầm hiển thị bản cũ.

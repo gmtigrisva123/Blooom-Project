@@ -15,18 +15,25 @@
    thì hai nơi sẽ trôi khỏi nhau. Đây là một nguồn sự thật duy nhất cho mọi
    công thức mà ứng dụng trưng ra.
 
+   Script này cũng sinh ra một bản CSS đã lọc của KaTeX — xem phần CSS ở cuối
+   tệp.
+
    Cách dùng:
-     npm run formulas         ghi lại src/generated/formulas.js
+     npm run formulas         ghi lại src/generated/{formulas.js,katex.css}
      npm run formulas:check   báo lỗi nếu tệp đã sinh không khớp danh mục
    =========================================================================== */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import katex from 'katex';
+
+const require = createRequire(import.meta.url);
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'src/generated/formulas.js');
+const OUT_CSS = join(ROOT, 'src/generated/katex.css');
 
 /* ---------------------------------------------------------------------------
    DANH MỤC
@@ -151,23 +158,96 @@ const render = () => {
 };
 
 /* ---------------------------------------------------------------------------
+   CSS ĐÃ LỌC
+
+   Tệp katex.min.css gốc khai báo mỗi bộ phông bằng ba định dạng — woff2, woff
+   và ttf — để còn chạy được trên những trình duyệt rất cũ. Vite phát sinh MỌI
+   tệp mà CSS trỏ tới, nên bản dựng mang theo 59 tệp phông nặng 1,1 MB, trong
+   đó khoảng hai phần ba không trình duyệt nào tải về.
+
+   woff2 được hỗ trợ ở mọi trình duyệt từ 2016 (Chrome 36, Firefox 39, Safari
+   10, Edge 14) — rộng hơn nhiều so với những thứ Blooom vốn đã dùng như
+   `color-mix()`. Giữ lại woff và ttf vì thế không mua thêm được khả năng
+   tương thích nào, chỉ làm phình bản dựng.
+
+   Đường dẫn phông được viết lại thành đường dẫn tương đối tính từ tệp CSS
+   được sinh tới thư mục dist của gói katex, và được TÍNH RA lúc chạy chứ
+   không viết cứng — để nó vẫn đúng khi node_modules nằm ở chỗ khác (pnpm,
+   yarn workspace, monorepo).
+   --------------------------------------------------------------------------- */
+const renderCss = () => {
+  const katexCssPath = require.resolve('katex/dist/katex.min.css');
+  const source = readFileSync(katexCssPath, 'utf8');
+
+  /* Đường dẫn tương đối từ src/generated/ tới katex/dist/. POSIX hoá dấu gạch
+     để CSS sinh trên Windows vẫn dùng được. */
+  const toDist = relative(dirname(OUT_CSS), dirname(katexCssPath)).split('\\').join('/');
+
+  let dropped = 0;
+
+  /* Bỏ mọi mục src không phải woff2. Neo vào `format("woff")` /
+     `format("truetype")` thay vì vào phần mở rộng của tên tệp, vì tên tệp là
+     thứ có thể đổi giữa các phiên bản còn tên định dạng thì không. */
+  let css = source.replace(/,url\([^)]+\)\s*format\("(?:woff|truetype)"\)/g, () => {
+    dropped += 1;
+    return '';
+  });
+
+  /* Trỏ url() về đúng thư mục phông của gói. */
+  css = css.replace(/url\(fonts\//g, `url(${toDist}/fonts/`);
+
+  const kept = (css.match(/url\(/g) || []).length;
+
+  /* Lưới an toàn: nếu KaTeX đổi cách viết @font-face ở một phiên bản sau và
+     biểu thức chính quy không còn khớp, ta phải biết ngay lúc build chứ không
+     phải khi công thức hiện ra bằng phông dự phòng trên máy người dùng. */
+  if (dropped === 0 || kept === 0) {
+    throw new Error(
+      `Lọc phông KaTeX thất bại (bỏ ${dropped}, giữ ${kept}). ` +
+        'Có thể katex.min.css đã đổi định dạng — hãy kiểm tra lại biểu thức lọc.'
+    );
+  }
+
+  return {
+    css:
+      '/* TỆP ĐƯỢC SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.\n' +
+      '   Nguồn: katex/dist/katex.min.css, đã lọc bỏ woff và ttf.\n' +
+      '   Sinh lại bằng `npm run formulas`. */\n' +
+      css.trim() +
+      '\n',
+    dropped,
+    kept
+  };
+};
+
+/* ---------------------------------------------------------------------------
    CHẠY
    --------------------------------------------------------------------------- */
 const output = render();
+const { css, dropped, kept } = renderCss();
 const checkOnly = process.argv.includes('--check');
 
+const outputs = [
+  { path: OUT, content: output, label: `${Object.keys(FORMULAS).length} công thức` },
+  { path: OUT_CSS, content: css, label: `${kept} phông woff2, đã bỏ ${dropped} tệp woff/ttf` }
+];
+
 if (checkOnly) {
-  const current = existsSync(OUT) ? readFileSync(OUT, 'utf8') : '';
-  if (current !== output) {
-    console.error(
-      'src/generated/formulas.js đã cũ so với scripts/render-formulas.mjs.\n' +
-        'Chạy `npm run formulas` rồi commit lại tệp được sinh.'
-    );
-    process.exit(1);
+  for (const { path, content } of outputs) {
+    const current = existsSync(path) ? readFileSync(path, 'utf8') : '';
+    if (current !== content) {
+      console.error(
+        `${relative(ROOT, path)} đã cũ so với scripts/render-formulas.mjs.\n` +
+          'Chạy `npm run formulas` rồi commit lại tệp được sinh.'
+      );
+      process.exit(1);
+    }
   }
-  console.log(`Công thức đã khớp (${Object.keys(FORMULAS).length} mục).`);
+  console.log(`Đã khớp: ${outputs.map((o) => o.label).join(' · ')}.`);
 } else {
   mkdirSync(dirname(OUT), { recursive: true });
-  writeFileSync(OUT, output);
-  console.log(`Đã ghi ${OUT} (${Object.keys(FORMULAS).length} công thức).`);
+  for (const { path, content, label } of outputs) {
+    writeFileSync(path, content);
+    console.log(`Đã ghi ${relative(ROOT, path)} (${label}).`);
+  }
 }
