@@ -29,10 +29,18 @@ export const supabase = isSupabaseConfigured
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        /* Phiên đăng nhập được khôi phục từ localStorage khi tải lại trang,
-           nhưng KHÔNG đọc từ URL: Blooom không dùng luồng OAuth chuyển hướng,
-           nên bật detectSessionInUrl chỉ mở thêm bề mặt tấn công. */
-        detectSessionInUrl: false
+        /* BẮT BUỘC phải bật khi dự án Supabase có xác nhận email.
+           Liên kết trong thư xác nhận đưa người dùng trở lại trang với token
+           nằm trong phần hash của URL; tắt tùy chọn này thì thư viện sẽ không
+           đọc token đó, và người vừa bấm xác nhận sẽ quay lại đúng màn hình
+           đăng nhập như chưa có gì xảy ra — một ngõ cụt không có lối thoát. */
+        detectSessionInUrl: true,
+        /* Luồng ẩn (token nằm trong hash) là mặc định của supabase-js v2 và là
+           thứ hợp với Blooom: không có máy chủ backend nào để giữ code
+           verifier của luồng PKCE. Ghi rõ ra đây thay vì dựa vào mặc định, để
+           một lần nâng cấp thư viện đổi mặc định không âm thầm làm hỏng liên
+           kết xác nhận email. */
+        flowType: 'implicit'
       },
       db: { schema: 'public' },
       global: {

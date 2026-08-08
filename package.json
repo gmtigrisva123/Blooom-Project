@@ -39,7 +39,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "assets": "python3 scripts/generate-assets.py",
-    "verify": "npm run lint && npm run format:check && npm run build"
+    "verify": "npm run formulas:check && npm run lint && npm run format:check && npm run build",
+    "formulas": "node scripts/render-formulas.mjs",
+    "formulas:check": "node scripts/render-formulas.mjs --check"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",
@@ -62,6 +64,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.8.0",
+    "katex": "^0.18.1",
     "prettier": "^3.9.6",
     "vite": "^8.1.5"
   }

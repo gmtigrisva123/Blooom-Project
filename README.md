@@ -144,6 +144,7 @@ Mở http://localhost:3000. Nếu chưa cấu hình xong, ứng dụng sẽ hi�
 | `npm run format`   | Định dạng toàn bộ mã bằng Prettier                             |
 | `npm run verify`   | Chạy cả lint + format:check + build (giống hệt CI)             |
 | `npm run assets`   | Tạo lại icon và ảnh Open Graph từ `scripts/generate-assets.py` |
+| `npm run formulas` | Sắp chữ lại các công thức Toán bằng KaTeX (xem bên dưới)       |
 
 ## Cấu trúc dự án
 
@@ -186,6 +187,28 @@ src/
 │   └── storage.js        Chỉ tùy chọn giao diện theo thiết bị
 └── styles/               Design system CSS thuần, tách theo vai trò
 ```
+
+### Công thức Toán
+
+Mọi công thức trong ứng dụng được sắp chữ bằng **KaTeX**, nhưng KaTeX **không** nằm trong
+bundle gửi tới trình duyệt. Các công thức đều tĩnh — chúng là mô hình mà ứng dụng thực sự
+đánh giá, không phải thứ người dùng nhập — nên chúng được dựng sẵn thành HTML một lần lúc
+phát triển:
+
+```bash
+npm run formulas
+```
+
+Lệnh này đọc danh mục trong [`scripts/render-formulas.mjs`](scripts/render-formulas.mjs) —
+nguồn sự thật duy nhất cho mọi công thức của dự án — và ghi ra `src/generated/formulas.js`.
+Ứng dụng chỉ nhúng chuỗi HTML đó cùng tệp CSS của KaTeX.
+
+Đổi lại là **76 kB gzip JavaScript không phải tải về**, công thức hiện ngay từ khung hình
+đầu tiên không nhảy layout, và vẫn đọc được cả khi JavaScript hỏng. KaTeX vì thế là
+`devDependency`, không phải `dependency`.
+
+`npm run verify` chạy `formulas:check` trước tiên, nên một công thức được sửa mà quên sinh
+lại sẽ làm hỏng CI thay vì âm thầm hiển thị bản cũ.
 
 ### Tầng dữ liệu
 
@@ -251,6 +274,7 @@ dùng chuyển tab.
 - [React 18](https://react.dev) — thư viện giao diện
 - [Vite](https://vite.dev) — công cụ build
 - [Supabase](https://supabase.com) — PostgreSQL, xác thực và lưu trữ tệp
+- [KaTeX](https://katex.org) — sắp chữ công thức Toán (chỉ chạy lúc build)
 - [lucide-react](https://lucide.dev) — bộ icon
 - [canvas-confetti](https://github.com/catdad/canvas-confetti) — hiệu ứng khi hoàn thành phiên học
 - CSS thuần với biến CSS — không dùng framework CSS

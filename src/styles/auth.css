@@ -293,6 +293,138 @@
   background: var(--bg-canvas);
 }
 
+/* ==========================================================================
+   MÀN HÌNH "ĐÃ GỬI THƯ XÁC NHẬN"
+
+   Thay chỗ biểu mẫu sau khi đăng ký thành công ở dự án có bật xác nhận email.
+   Cố ý dùng ngôn ngữ hình ảnh của trạng thái THÀNH CÔNG — vòng tròn xanh, thư
+   có dấu tích — chứ không phải khung đỏ cảnh báo mà mọi lỗi khác dùng.
+   ========================================================================== */
+.mail-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mail-notice-art {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: var(--sp-5);
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  border-radius: var(--r-full);
+}
+
+.mail-notice .auth-title,
+.mail-notice .auth-sub {
+  text-align: center;
+}
+
+.mail-notice-address {
+  width: 100%;
+  margin: var(--sp-4) 0 var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  /* Địa chỉ có thể dài hơn khung; xuống dòng theo ký tự chứ không đẩy ngang
+     cả trang. */
+  overflow-wrap: anywhere;
+  font-size: var(--fs-sm);
+  color: var(--text-main);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.auth-success {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: 100%;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  font-size: var(--fs-sm);
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 28%, transparent);
+  border-radius: var(--r-sm);
+}
+
+.auth-success svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.mail-notice-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.mail-notice-tips {
+  width: 100%;
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4);
+  list-style: none;
+  text-align: left;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.mail-notice-tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.mail-notice-tips li + li {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+
+.mail-notice-tips svg {
+  flex: none;
+  margin-top: 0.2rem;
+}
+
+.mail-notice-tips b {
+  color: var(--text-soft);
+}
+
+/* Nút dạng liên kết nằm giữa một câu văn — phải ăn theo dòng chữ xung quanh
+   thay vì đứng thành một khối riêng.
+
+   Khác với .link-btn đứng độc lập (nơi vị trí và biểu tượng mũi tên đã đủ báo
+   hiệu bấm được), một nút nằm lọt giữa câu không có tín hiệu nào cả: nếu chỉ
+   đổi màu khi rê chuột thì trên màn hình cảm ứng nó là chữ thường. Vì vậy nó
+   mang màu nhấn và gạch chân ngay từ đầu. */
+.link-btn.is-inline {
+  display: inline;
+  padding: 0;
+  font-size: inherit;
+  vertical-align: baseline;
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-btn.is-inline:hover {
+  text-decoration-thickness: 2px;
+}
+
+.mail-notice-back {
+  margin-top: var(--sp-6);
+}
+
 /* ---- Disclosure về nơi lưu dữ liệu -------------------------------------- */
 .auth-note {
   display: flex;

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useNow } from '../../hooks/useNow';
 import { Modal } from '../common/Modal';
 import { Hero, EmptyState, StatCard, SubjectBadge } from '../common/ui';
+import { MathInline } from '../common/Math';
 import { NOTE_SUBJECTS, subjectColor } from '../../constants/subjects';
 import {
   REVIEW_GRADES,
@@ -432,9 +433,9 @@ export const RecallLab = () => {
         <p className="method-note">
           <Info size={14} aria-hidden="true" />
           <span>
-            Xác suất nhớ lại là ước lượng của mô hình R(t) = e^(−t/S), trong đó S suy ra từ
-            khoảng ôn hiện tại. Đây là dự đoán của mô hình, không phải kết quả đo trí nhớ thật
-            của bạn.
+            Xác suất nhớ lại là ước lượng của mô hình <MathInline id="forgettingShort" />, trong
+            đó S suy ra từ khoảng ôn hiện tại. Đây là dự đoán của mô hình, không phải kết quả đo
+            trí nhớ thật của bạn.
           </span>
         </p>
       </section>

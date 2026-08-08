@@ -204,19 +204,41 @@ export const authService = {
       throw toFriendlyError(error, 'Không tạo được tài khoản.');
     }
 
+    /* Dự án Supabase có bật xác nhận email thì signUp trả về user nhưng KHÔNG
+       trả về session: tài khoản đã được tạo, chỉ là chưa dùng được cho tới khi
+       người dùng bấm liên kết trong thư.
+
+       Trường hợp này trả về một trạng thái, KHÔNG ném lỗi. Bản trước ném lỗi,
+       và hệ quả là một lần đăng ký thành công lại hiện ra trong khung đỏ có
+       biểu tượng cảnh báo — đúng chỗ mà mọi thất bại khác hiện ra. Người dùng
+       không có cách nào biết mình vừa thành công hay vừa hỏng việc. */
     if (!data.session) {
-      throw Object.assign(
-        new Error(
-          `Đã gửi liên kết xác nhận tới ${cleanEmail}. Hãy mở hộp thư và bấm xác nhận, rồi quay lại đăng nhập.`
-        ),
-        { code: 'EMAIL_CONFIRMATION_REQUIRED' }
-      );
+      return { status: 'confirmation_required', email: cleanEmail, account: null };
     }
 
     /* Ghi nhật ký TRƯỚC khi dựng đối tượng tài khoản, để sign_in_count hiển
        thị đúng ngay từ lần đầu thay vì lệch một đơn vị tới lần tải trang sau. */
     await recordAuthEvent('sign_up');
-    return buildAccount(data.user);
+    return { status: 'active', email: cleanEmail, account: await buildAccount(data.user) };
+  },
+
+  /* Gửi lại thư xác nhận. Thư đầu tiên rơi vào hộp thư rác hay bị bỏ lỡ là
+     chuyện thường; không có nút này thì người dùng mắc kẹt vĩnh viễn và cũng
+     không đăng ký lại được, vì email đã tồn tại trong hệ thống. */
+  resendConfirmation: async (email) => {
+    const client = requireClient();
+    const cleanEmail = normaliseEmail(email);
+
+    const { error } = await client.auth.resend({ type: 'signup', email: cleanEmail });
+
+    if (error) {
+      /* Supabase giới hạn tần suất gửi thư. Thông báo mặc định là tiếng Anh và
+         nói về "rate limit", nên dịch sang thứ người dùng làm được gì đó. */
+      if (error.message?.toLowerCase().includes('rate limit') || error.status === 429) {
+        throw new Error('Bạn vừa yêu cầu gửi thư. Hãy đợi khoảng một phút rồi thử lại.');
+      }
+      throw toFriendlyError(error, 'Không gửi lại được thư xác nhận.');
+    }
   },
 
   login: async ({ email, password }) => {

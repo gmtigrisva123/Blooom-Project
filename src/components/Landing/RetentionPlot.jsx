@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { applyReview, createCard, stabilityOf, TARGET_RETENTION } from '../../services/srs';
+import { MathInline } from '../common/Math';
 
 /* ==========================================================================
    RETENTION PLOT
@@ -95,7 +96,7 @@ export const RetentionPlot = () => {
       <div className="plot-frame">
         <div className="plot-head">
           <span className="plot-title">Xác suất nhớ lại theo thời gian</span>
-          <span className="plot-eq mono">R(t) = e^(−t/S)</span>
+          <MathInline id="forgettingShort" className="plot-eq" />
         </div>
 
         <svg

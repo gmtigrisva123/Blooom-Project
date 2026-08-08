@@ -3,6 +3,11 @@
    Import order matters: tokens define the variables everything else consumes.
    ========================================================================== */
 
+/* Chỉ tệp CSS của KaTeX, không kèm JavaScript: công thức được dựng sẵn thành
+   HTML lúc build (xem scripts/render-formulas.mjs), nên trình duyệt chỉ cần
+   phần định kiểu và bộ phông toán. */
+@import 'katex/dist/katex.min.css';
+
 @import './styles/tokens.css';
 @import './styles/base.css';
 @import './styles/utilities.css';
@@ -16,3 +21,4 @@
 @import './styles/performance.css';
 @import './styles/science.css';
 @import './styles/command-palette.css';
+@import './styles/math.css';

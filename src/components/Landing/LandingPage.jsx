@@ -1,4 +1,5 @@
 import { RetentionPlot } from './RetentionPlot';
+import { MathBlock } from '../common/Math';
 import {
   ArrowRight,
   Sun,
@@ -22,8 +23,9 @@ const BRAND_LOGO = `${import.meta.env.BASE_URL}blooom-logo.png`;
 
 /* ==========================================================================
    THE FOUR INSTRUMENTS
-   Each card names the method, the formula the app actually evaluates, and the
-   source the method comes from. Nothing here is a performance claim — a
+   Each card names the method, the id of the formula the app actually
+   evaluates (typeset from the catalogue in scripts/render-formulas.mjs), and
+   the source the method comes from. Nothing here is a performance claim — a
    claim about how well students do would need data we have not collected.
    ========================================================================== */
 const INSTRUMENTS = [
@@ -32,7 +34,7 @@ const INSTRUMENTS = [
     icon: Layers,
     tag: 'Trí nhớ',
     title: 'Ôn tập ngắt quãng SM-2',
-    formula: 'EF′ = EF + 0,1 − (5−q)(0,08 + 0,02(5−q))',
+    formula: 'easeFactor',
     body: 'Mỗi thẻ giữ một hệ số dễ riêng. Sau mỗi lần bạn tự chấm, thuật toán điều chỉnh hệ số đó rồi tính ra ngày ôn kế tiếp — thẻ khó quay lại sớm, thẻ dễ giãn ra dần.',
     source: 'Wozniak & Gorzelanczyk, 1994'
   },
@@ -41,7 +43,7 @@ const INSTRUMENTS = [
     icon: TrendingUp,
     tag: 'Trí nhớ',
     title: 'Đường cong quên Ebbinghaus',
-    formula: 'R(t) = e^(−t/S),  S = interval / −ln 0,9',
+    formula: 'forgetting',
     body: 'Xác suất bạn còn nhớ một thẻ được ước lượng liên tục theo thời gian kể từ lần ôn cuối, thay vì chỉ hiện “đến hạn / chưa đến hạn”.',
     source: 'Ebbinghaus, 1885'
   },
@@ -50,7 +52,7 @@ const INSTRUMENTS = [
     icon: FlaskConical,
     tag: 'Thực nghiệm',
     title: 'Thí nghiệm N-of-1 có đối chứng',
-    formula: 't = (x̄₁ − x̄₂) / √(s₁²/n₁ + s₂²/n₂)',
+    formula: 'welchT',
     body: 'Bạn khai báo giả thuyết trước, ứng dụng bốc ngẫu nhiên điều kiện cho từng phiên theo khối, rồi kiểm định Welch kèm Cohen’s d và khoảng tin cậy 95%.',
     source: 'Welch, 1947 · thiết kế N-of-1'
   },
@@ -59,7 +61,7 @@ const INSTRUMENTS = [
     icon: Waves,
     tag: 'Nhịp sinh học',
     title: 'Phân tích cosinor 24 giờ',
-    formula: 'y(h) = M + A·cos(2π(h − φ)/24)',
+    formula: 'cosinor',
     body: 'Khớp một sóng cosin chu kỳ 24 giờ vào lịch sử phiên học để ước lượng mesor, biên độ và acrophase — giờ đỉnh tập trung của riêng bạn.',
     source: 'Halberg, 1969'
   }
@@ -190,7 +192,7 @@ export const LandingPage = ({ theme, onToggleTheme, onSignIn, onSignUp, onGuest 
                   <span className="tag mono">{item.tag}</span>
                 </div>
                 <h3>{item.title}</h3>
-                <code className="instrument-formula mono">{item.formula}</code>
+                <MathBlock id={item.formula} />
                 <p>{item.body}</p>
                 <span className="instrument-source mono">{item.source}</span>
               </article>

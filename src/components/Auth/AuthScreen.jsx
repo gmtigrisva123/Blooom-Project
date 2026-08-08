@@ -6,6 +6,8 @@ import {
   validateEmail,
   PASSWORD_MIN_LENGTH
 } from '../../services/auth';
+import { EmailSentNotice } from './EmailSentNotice';
+import { MathInline } from '../common/Math';
 import {
   ArrowLeft,
   ArrowRight,
@@ -57,6 +59,11 @@ export const AuthScreen = ({
   const [formError, setFormError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  /* Địa chỉ đã gửi thư xác nhận tới, hoặc null. Khi có giá trị, màn hình đổi
+     hẳn sang thông báo "kiểm tra hộp thư" thay vì hiện biểu mẫu kèm một dòng
+     chữ nhỏ — vì lúc đó không còn việc gì để làm trên biểu mẫu nữa. */
+  const [pendingEmail, setPendingEmail] = useState(null);
+
   const strength = passwordStrength(password);
   const pwIssues = passwordIssues(password);
 
@@ -84,16 +91,48 @@ export const AuthScreen = ({
 
     setBusy(true);
     try {
-      const account = isSignup
-        ? await authService.register({ name, email, password })
-        : await authService.login({ email, password });
+      if (!isSignup) {
+        onAuthenticated(await authService.login({ email, password }));
+        return;
+      }
 
-      onAuthenticated(account);
+      const result = await authService.register({ name, email, password });
+
+      /* Dự án có bật xác nhận email: tài khoản đã tạo nhưng chưa có phiên.
+         Đây là thành công, nên nó đi sang màn hình thông báo riêng chứ không
+         rơi vào khung lỗi. */
+      if (result.status === 'confirmation_required') {
+        setPassword('');
+        setPendingEmail(result.email);
+        setBusy(false);
+        return;
+      }
+
+      onAuthenticated(result.account);
     } catch (error) {
       setFormError(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
       setBusy(false);
     }
   };
+
+  /* Quay lại biểu mẫu để đăng ký bằng địa chỉ khác — dành cho người gõ nhầm
+     email và giờ đang chờ một lá thư không bao giờ tới. */
+  const restartSignup = useCallback(() => {
+    setPendingEmail(null);
+    setEmail('');
+    setPassword('');
+    setTouched({});
+    setFormError('');
+    onModeChange('signup');
+  }, [onModeChange]);
+
+  const backToSignIn = useCallback(() => {
+    setPendingEmail(null);
+    setPassword('');
+    setTouched({});
+    setFormError('');
+    onModeChange('login');
+  }, [onModeChange]);
 
   /* Chế độ khách tạo một tài khoản ẩn danh thật trong Supabase, nên dữ liệu
      dùng thử vẫn nằm trong cùng cơ sở dữ liệu và chịu cùng chính sách bảo mật
@@ -140,176 +179,196 @@ export const AuthScreen = ({
 
         <img className="auth-logo" src={BRAND_LOGO} alt="Blooom" width="459" height="152" />
 
-        <h1 className="auth-title">
-          {isSignup ? 'Tạo hồ sơ học tập của bạn' : 'Đăng nhập vào Blooom'}
-        </h1>
-        <p className="auth-sub">
-          {isSignup
-            ? 'Hồ sơ học tập của bạn được lưu an toàn trên máy chủ, truy cập được từ mọi thiết bị.'
-            : 'Đăng nhập để tiếp tục với dữ liệu học tập đã lưu của bạn.'}
-        </p>
+        {pendingEmail ? (
+          <EmailSentNotice
+            email={pendingEmail}
+            onBackToSignIn={backToSignIn}
+            onChangeEmail={restartSignup}
+          />
+        ) : (
+          <>
+            <h1 className="auth-title">
+              {isSignup ? 'Tạo hồ sơ học tập của bạn' : 'Đăng nhập vào Blooom'}
+            </h1>
+            <p className="auth-sub">
+              {isSignup
+                ? 'Hồ sơ học tập của bạn được lưu an toàn trên máy chủ, truy cập được từ mọi thiết bị.'
+                : 'Đăng nhập để tiếp tục với dữ liệu học tập đã lưu của bạn.'}
+            </p>
 
-        <div className="auth-switch" role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={!isSignup}
-            className={`auth-switch-btn ${!isSignup ? 'is-active' : ''}`}
-            onClick={() => switchMode('login')}
-          >
-            Đăng nhập
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={isSignup}
-            className={`auth-switch-btn ${isSignup ? 'is-active' : ''}`}
-            onClick={() => switchMode('signup')}
-          >
-            Đăng ký
-          </button>
-        </div>
-
-        <form className="auth-form" onSubmit={submit} noValidate>
-          {formError && (
-            <div className="auth-error" role="alert">
-              <TriangleAlert size={16} aria-hidden="true" />
-              <span>{formError}</span>
-            </div>
-          )}
-
-          {isSignup && (
-            <div className="field">
-              <label htmlFor="authName">Họ và tên</label>
-              <div className="input-wrap">
-                <UserRound size={15} aria-hidden="true" />
-                <input
-                  id="authName"
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Nguyễn Văn An"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={() => markTouched('name')}
-                  aria-invalid={nameInvalid || undefined}
-                  aria-describedby={nameInvalid ? 'authNameError' : undefined}
-                  required
-                />
-              </div>
-              {nameInvalid && (
-                <span className="field-error" id="authNameError">
-                  Họ tên cần ít nhất 2 ký tự.
-                </span>
-              )}
-            </div>
-          )}
-
-          <div className="field">
-            <label htmlFor="authEmail">Email</label>
-            <div className="input-wrap">
-              <Mail size={15} aria-hidden="true" />
-              <input
-                id="authEmail"
-                type="email"
-                autoComplete={isSignup ? 'email' : 'username'}
-                placeholder="ten@truong.edu.vn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => markTouched('email')}
-                aria-invalid={emailInvalid || undefined}
-                aria-describedby={emailInvalid ? 'authEmailError' : undefined}
-                required
-              />
-            </div>
-            {emailInvalid && (
-              <span className="field-error" id="authEmailError">
-                Địa chỉ email chưa đúng định dạng.
-              </span>
-            )}
-          </div>
-
-          <div className="field">
-            <label htmlFor="authPassword">Mật khẩu</label>
-            <div className="input-wrap">
-              <Lock size={15} aria-hidden="true" />
-              <input
-                id="authPassword"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete={isSignup ? 'new-password' : 'current-password'}
-                placeholder={isSignup ? `Tối thiểu ${PASSWORD_MIN_LENGTH} ký tự` : '••••••••'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onBlur={() => markTouched('password')}
-                aria-invalid={passwordInvalid || undefined}
-                aria-describedby={isSignup ? 'authPasswordHint' : undefined}
-                required
-              />
+            <div
+              className="auth-switch"
+              role="tablist"
+              aria-label="Chọn đăng nhập hoặc đăng ký"
+            >
               <button
                 type="button"
-                className="input-affix"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                role="tab"
+                aria-selected={!isSignup}
+                className={`auth-switch-btn ${!isSignup ? 'is-active' : ''}`}
+                onClick={() => switchMode('login')}
               >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                Đăng nhập
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={isSignup}
+                className={`auth-switch-btn ${isSignup ? 'is-active' : ''}`}
+                onClick={() => switchMode('signup')}
+              >
+                Đăng ký
               </button>
             </div>
 
-            {isSignup && (
-              <div className="pw-meter" id="authPasswordHint">
-                <div className="pw-track" aria-hidden="true">
-                  <div
-                    className={`pw-fill pw-fill-${strength.score}`}
-                    style={{ width: `${strength.percent}%` }}
+            <form className="auth-form" onSubmit={submit} noValidate>
+              {formError && (
+                <div className="auth-error" role="alert">
+                  <TriangleAlert size={16} aria-hidden="true" />
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              {isSignup && (
+                <div className="field">
+                  <label htmlFor="authName">Họ và tên</label>
+                  <div className="input-wrap">
+                    <UserRound size={15} aria-hidden="true" />
+                    <input
+                      id="authName"
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Nguyễn Văn An"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      onBlur={() => markTouched('name')}
+                      aria-invalid={nameInvalid || undefined}
+                      aria-describedby={nameInvalid ? 'authNameError' : undefined}
+                      required
+                    />
+                  </div>
+                  {nameInvalid && (
+                    <span className="field-error" id="authNameError">
+                      Họ tên cần ít nhất 2 ký tự.
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="field">
+                <label htmlFor="authEmail">Email</label>
+                <div className="input-wrap">
+                  <Mail size={15} aria-hidden="true" />
+                  <input
+                    id="authEmail"
+                    type="email"
+                    autoComplete={isSignup ? 'email' : 'username'}
+                    placeholder="ten@truong.edu.vn"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onBlur={() => markTouched('email')}
+                    aria-invalid={emailInvalid || undefined}
+                    aria-describedby={emailInvalid ? 'authEmailError' : undefined}
+                    required
                   />
                 </div>
-                <div className="pw-legend">
-                  <span className="t-xs t-dim">
-                    Cần: {PASSWORD_MIN_LENGTH}+ ký tự, có chữ và số
+                {emailInvalid && (
+                  <span className="field-error" id="authEmailError">
+                    Địa chỉ email chưa đúng định dạng.
                   </span>
-                  <span className={`t-xs pw-label pw-label-${strength.score}`}>
-                    {strength.label}
-                  </span>
-                </div>
+                )}
               </div>
-            )}
-          </div>
 
-          <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={busy}>
-            {busy ? (
-              <>
-                <span className="spinner" aria-hidden="true" />
-                {isSignup ? 'Đang tạo hồ sơ…' : 'Đang kiểm tra…'}
-              </>
-            ) : (
-              <>
-                {isSignup ? 'Tạo tài khoản' : 'Đăng nhập'} <ArrowRight size={16} />
-              </>
-            )}
-          </button>
-        </form>
+              <div className="field">
+                <label htmlFor="authPassword">Mật khẩu</label>
+                <div className="input-wrap">
+                  <Lock size={15} aria-hidden="true" />
+                  <input
+                    id="authPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={isSignup ? 'new-password' : 'current-password'}
+                    placeholder={
+                      isSignup ? `Tối thiểu ${PASSWORD_MIN_LENGTH} ký tự` : '••••••••'
+                    }
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onBlur={() => markTouched('password')}
+                    aria-invalid={passwordInvalid || undefined}
+                    aria-describedby={isSignup ? 'authPasswordHint' : undefined}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="input-affix"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
 
-        <div className="auth-divider">
-          <span>hoặc</span>
-        </div>
+                {isSignup && (
+                  <div className="pw-meter" id="authPasswordHint">
+                    <div className="pw-track" aria-hidden="true">
+                      <div
+                        className={`pw-fill pw-fill-${strength.score}`}
+                        style={{ width: `${strength.percent}%` }}
+                      />
+                    </div>
+                    <div className="pw-legend">
+                      <span className="t-xs t-dim">
+                        Cần: {PASSWORD_MIN_LENGTH}+ ký tự, có chữ và số
+                      </span>
+                      <span className={`t-xs pw-label pw-label-${strength.score}`}>
+                        {strength.label}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-        <button
-          type="button"
-          className="btn btn-secondary btn-block"
-          onClick={enterAsGuest}
-          disabled={busy}
-        >
-          Dùng thử không cần tài khoản
-        </button>
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg btn-block"
+                disabled={busy}
+              >
+                {busy ? (
+                  <>
+                    <span className="spinner" aria-hidden="true" />
+                    {isSignup ? 'Đang tạo hồ sơ…' : 'Đang kiểm tra…'}
+                  </>
+                ) : (
+                  <>
+                    {isSignup ? 'Tạo tài khoản' : 'Đăng nhập'} <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
 
-        <p className="auth-note">
-          <ShieldCheck size={14} aria-hidden="true" />
-          <span>
-            Mật khẩu được gửi qua kết nối mã hóa TLS và băm bằng bcrypt trên máy chủ Supabase —
-            ứng dụng không bao giờ đọc được mật khẩu của bạn. Mỗi hàng dữ liệu chỉ chính chủ tài
-            khoản truy cập được, cưỡng chế bằng Row Level Security ở tầng cơ sở dữ liệu.{' '}
-            <b>Dù vậy, đừng dùng lại mật khẩu của email hay ngân hàng.</b>
-          </span>
-        </p>
+            <div className="auth-divider">
+              <span>hoặc</span>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-secondary btn-block"
+              onClick={enterAsGuest}
+              disabled={busy}
+            >
+              Dùng thử không cần tài khoản
+            </button>
+
+            <p className="auth-note">
+              <ShieldCheck size={14} aria-hidden="true" />
+              <span>
+                Mật khẩu được gửi qua kết nối mã hóa TLS và băm bằng bcrypt trên máy chủ
+                Supabase — ứng dụng không bao giờ đọc được mật khẩu của bạn. Mỗi hàng dữ liệu
+                chỉ chính chủ tài khoản truy cập được, cưỡng chế bằng Row Level Security ở tầng
+                cơ sở dữ liệu. <b>Dù vậy, đừng dùng lại mật khẩu của email hay ngân hàng.</b>
+              </span>
+            </p>
+          </>
+        )}
       </div>
 
       <aside className="auth-aside" aria-hidden="true">
@@ -329,7 +388,7 @@ export const AuthScreen = ({
               );
             })}
           </ul>
-          <code className="auth-aside-eq mono">R(t) = e^(−t/S)</code>
+          <MathInline id="forgettingShort" className="auth-aside-eq" />
         </div>
       </aside>
     </div>
