@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   authService,
   passwordIssues,
@@ -30,7 +30,7 @@ const ASIDE_POINTS = [
   { icon: Layers, text: 'Lịch ôn tập ngắt quãng SM-2 cho từng thẻ ghi nhớ' },
   { icon: FlaskConical, text: 'Thí nghiệm N-of-1 ngẫu nhiên hóa với kiểm định Welch' },
   { icon: Waves, text: 'Phân tích cosinor tìm khung giờ tập trung của riêng bạn' },
-  { icon: Database, text: 'Mọi dữ liệu nằm trong trình duyệt này, không gửi lên máy chủ' }
+  { icon: Database, text: 'Dữ liệu đồng bộ qua mọi thiết bị, xuất ra JSON bất cứ lúc nào' }
 ];
 
 /* ==========================================================================
@@ -44,7 +44,6 @@ export const AuthScreen = ({
   onModeChange,
   onAuthenticated,
   onBack,
-  onGuest,
   theme,
   onToggleTheme
 }) => {
@@ -96,6 +95,32 @@ export const AuthScreen = ({
     }
   };
 
+  /* Chế độ khách tạo một tài khoản ẩn danh thật trong Supabase, nên dữ liệu
+     dùng thử vẫn nằm trong cùng cơ sở dữ liệu và chịu cùng chính sách bảo mật
+     — và sau này gắn email vào là thành tài khoản đầy đủ, không mất gì. */
+  const enterAsGuest = useCallback(async () => {
+    setFormError('');
+    setBusy(true);
+    try {
+      onAuthenticated(await authService.loginAsGuest());
+    } catch (error) {
+      setFormError(error.message || 'Không vào được chế độ dùng thử.');
+      setBusy(false);
+    }
+  }, [onAuthenticated]);
+
+  /* Nút "Dùng thử ngay" ở trang giới thiệu mở màn hình này với mode='guest'
+     và đăng nhập luôn, nên người dùng vẫn chỉ mất một cú bấm. Nếu chế độ ẩn
+     danh chưa được bật trong Supabase thì họ dừng lại ở đây với thông báo
+     nói rõ cần bật gì, thay vì một màn hình trắng. */
+  const guestAttempted = useRef(false);
+
+  useEffect(() => {
+    if (mode !== 'guest' || guestAttempted.current) return;
+    guestAttempted.current = true;
+    enterAsGuest();
+  }, [mode, enterAsGuest]);
+
   return (
     <div className="auth">
       <div className="auth-panel">
@@ -120,8 +145,8 @@ export const AuthScreen = ({
         </h1>
         <p className="auth-sub">
           {isSignup
-            ? 'Hồ sơ được tạo ngay trên thiết bị này để tách dữ liệu học của bạn khỏi người dùng khác.'
-            : 'Nhập tài khoản bạn đã tạo trên chính trình duyệt này.'}
+            ? 'Hồ sơ học tập của bạn được lưu an toàn trên máy chủ, truy cập được từ mọi thiết bị.'
+            : 'Đăng nhập để tiếp tục với dữ liệu học tập đã lưu của bạn.'}
         </p>
 
         <div className="auth-switch" role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
@@ -267,16 +292,22 @@ export const AuthScreen = ({
           <span>hoặc</span>
         </div>
 
-        <button type="button" className="btn btn-secondary btn-block" onClick={onGuest}>
+        <button
+          type="button"
+          className="btn btn-secondary btn-block"
+          onClick={enterAsGuest}
+          disabled={busy}
+        >
           Dùng thử không cần tài khoản
         </button>
 
         <p className="auth-note">
           <ShieldCheck size={14} aria-hidden="true" />
           <span>
-            Đây là tài khoản cục bộ: Blooom không có máy chủ và không gửi thông tin của bạn đi
-            đâu. Mật khẩu được băm bằng PBKDF2-SHA-256 210 000 vòng ngay trong trình duyệt.{' '}
-            <b>Đừng dùng lại mật khẩu của email hay ngân hàng.</b>
+            Mật khẩu được gửi qua kết nối mã hóa TLS và băm bằng bcrypt trên máy chủ Supabase —
+            ứng dụng không bao giờ đọc được mật khẩu của bạn. Mỗi hàng dữ liệu chỉ chính chủ tài
+            khoản truy cập được, cưỡng chế bằng Row Level Security ở tầng cơ sở dữ liệu.{' '}
+            <b>Dù vậy, đừng dùng lại mật khẩu của email hay ngân hàng.</b>
           </span>
         </p>
       </div>

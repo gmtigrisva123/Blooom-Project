@@ -156,8 +156,8 @@ export const LandingPage = ({ theme, onToggleTheme, onSignIn, onSignUp, onGuest 
           </div>
 
           <p className="landing-fineprint">
-            Không máy chủ, không theo dõi, không quảng cáo. Toàn bộ dữ liệu nằm trong trình
-            duyệt này.
+            Không theo dõi, không quảng cáo, không bán dữ liệu. Dữ liệu học của bạn thuộc về bạn
+            và xuất ra JSON được bất cứ lúc nào.
           </p>
         </div>
 
@@ -259,10 +259,11 @@ export const LandingPage = ({ theme, onToggleTheme, onSignIn, onSignUp, onGuest 
             <span className="disclosure-icon">
               <Database size={16} />
             </span>
-            <h3>Lưu cục bộ, không gửi đi đâu cả</h3>
+            <h3>PostgreSQL, và chỉ bạn đọc được</h3>
             <p>
-              Blooom chạy hoàn toàn trong trình duyệt. Phiên học, ghi chú, thẻ ghi nhớ và thí
-              nghiệm đều nằm trong localStorage của máy bạn.
+              Phiên học, ghi chú, thẻ ghi nhớ và thí nghiệm nằm trong một cơ sở dữ liệu quan hệ
+              có ràng buộc toàn vẹn. Mỗi hàng gắn với đúng một tài khoản, cưỡng chế bằng Row
+              Level Security ở tầng cơ sở dữ liệu chứ không phải ở giao diện.
             </p>
           </article>
 
@@ -270,10 +271,11 @@ export const LandingPage = ({ theme, onToggleTheme, onSignIn, onSignUp, onGuest 
             <span className="disclosure-icon">
               <ShieldCheck size={16} />
             </span>
-            <h3>Tài khoản là hồ sơ cục bộ</h3>
+            <h3>Dữ liệu là của bạn, mang đi được</h3>
             <p>
-              Đăng ký giúp tách dữ liệu khi nhiều người dùng chung một máy. Mật khẩu được băm
-              bằng PBKDF2-SHA-256 210 000 vòng và không bao giờ được lưu ở dạng gốc.
+              Mật khẩu băm bằng bcrypt phía máy chủ, ứng dụng không bao giờ đọc được. Toàn bộ dữ
+              liệu thô — kể cả từng lần chấm thẻ và từng phiên thí nghiệm — xuất ra JSON bằng
+              một cú bấm, để bất kỳ ai cũng kiểm chứng lại được kết quả phân tích.
             </p>
           </article>
 
@@ -316,7 +318,7 @@ export const LandingPage = ({ theme, onToggleTheme, onSignIn, onSignUp, onGuest 
         <p>Nền tảng nhóm học tập tương tác cho học sinh &amp; sinh viên.</p>
       </div>
       <div className="landing-footer-meta mono">
-        <span>React + Vite · CSS thuần · LocalStorage</span>
+        <span>React + Vite · CSS thuần · PostgreSQL</span>
         <span>Đồ án học tập · giấy phép MIT</span>
       </div>
     </footer>

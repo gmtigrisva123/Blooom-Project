@@ -345,12 +345,18 @@ export const ExperimentLab = () => {
     setIsOpen(true);
   };
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    handleCreateExperiment({
+
+    const created = await handleCreateExperiment({
       ...design,
       targetPerArm: Math.max(MIN_TRIALS_PER_ARM, Number(design.targetPerArm))
     });
+
+    /* Thiết kế bị khóa lại ngay khi phiên đầu tiên được ghi, nên biểu mẫu chỉ
+       được xóa khi thí nghiệm đã thực sự tồn tại trong cơ sở dữ liệu. */
+    if (!created) return;
+
     setIsOpen(false);
     setDesign({
       title: '',

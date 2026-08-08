@@ -1,6 +1,14 @@
 import { useApp } from '../../context/AppContext';
 import { NAV_GROUPS, navItemsInGroup } from '../../constants/nav';
-import { PanelLeftClose, PanelLeftOpen, X, Flame, Trophy, LogOut } from 'lucide-react';
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  X,
+  Flame,
+  Trophy,
+  LogOut,
+  Download
+} from 'lucide-react';
 
 // Served straight from public/ so the splash in index.html and the sidebar
 // share one cached file. BASE_URL keeps the GitHub Pages sub-path working.
@@ -51,9 +59,12 @@ export const Sidebar = () => {
     toggleSidebarCollapsed,
     gamification,
     newBadgeIds,
-    account,
+    /* `user` là hồ sơ đọc từ bảng profiles và tự cập nhật khi người dùng sửa
+       tên hay vai trò; `account` chỉ là ảnh chụp lúc đăng nhập, nên hiển thị
+       nó ở đây sẽ khiến tên cũ đứng yên sau khi đổi. */
     user,
-    onSignOut
+    onSignOut,
+    handleExportData
   } = useApp();
 
   const { level, streak, unlockedCount, badges } = gamification;
@@ -157,19 +168,32 @@ export const Sidebar = () => {
 
         <div className="account-row">
           <span className="account-avatar" aria-hidden="true">
-            {(account?.name || user.name || '?').trim().charAt(0).toUpperCase()}
+            {(user?.name || '?').trim().charAt(0).toUpperCase() || '?'}
           </span>
           <div className="account-detail">
-            <span className="account-name truncate">{account?.name || user.name}</span>
+            <span className="account-name truncate">{user?.name || 'Khách'}</span>
             <span className="account-mail truncate mono">
-              {account ? account.email : 'Chế độ khách'}
+              {user?.email || 'Tài khoản dùng thử'}
             </span>
           </div>
+
+          {/* Học sinh sở hữu dữ liệu của mình và phải lấy ra được ở dạng máy
+              đọc được — cả vì lý do đạo đức, và vì một kết quả phân tích chỉ
+              đáng tin khi người khác chạy lại được trên dữ liệu thô. */}
+          <button
+            className="icon-btn"
+            onClick={handleExportData}
+            title="Tải toàn bộ dữ liệu của bạn về dạng JSON"
+            aria-label="Tải toàn bộ dữ liệu của bạn về dạng JSON"
+          >
+            <Download size={16} />
+          </button>
+
           <button
             className="icon-btn account-out"
             onClick={onSignOut}
-            title={account ? 'Đăng xuất' : 'Thoát về trang giới thiệu'}
-            aria-label={account ? 'Đăng xuất' : 'Thoát về trang giới thiệu'}
+            title="Đăng xuất"
+            aria-label="Đăng xuất"
           >
             <LogOut size={16} />
           </button>

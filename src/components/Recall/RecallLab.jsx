@@ -142,9 +142,15 @@ export const RecallLab = () => {
 
   const current = queue[0] || null;
 
-  const grade = (quality) => {
+  /* Kết quả chỉ hiện sau khi máy chủ đã xác nhận lịch mới. Hiện trước rồi ghi
+     sau sẽ có lúc báo "ôn lại sau 6 ngày" trong khi lần chấm đó chưa hề được
+     lưu — và lần mở tiếp theo thẻ vẫn nằm nguyên trong hàng đợi. */
+  const grade = async (quality) => {
     if (!current) return;
-    const updated = handleReviewCard(current, quality);
+
+    const updated = await handleReviewCard(current, quality);
+    if (!updated) return;
+
     setLastResult({
       front: current.front,
       interval: updated.interval,
@@ -154,13 +160,16 @@ export const RecallLab = () => {
     setRevealed(false);
   };
 
-  const submitCard = (event) => {
+  const submitCard = async (event) => {
     event.preventDefault();
     if (!draft.front.trim() || !draft.back.trim()) {
       showToast('Cần nhập cả mặt hỏi và mặt trả lời.', 'error');
       return;
     }
-    handleAddCard(draft);
+
+    const created = await handleAddCard(draft);
+    if (!created) return;
+
     setDraft({ front: '', back: '', subject: draft.subject });
     setIsAddOpen(false);
   };

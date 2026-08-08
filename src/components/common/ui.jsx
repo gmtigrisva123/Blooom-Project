@@ -132,7 +132,7 @@ export const ProgressBar = ({ percent, color, size = '' }) => (
 );
 
 /* ==========================================================================
-   SKELETONS — shown while the app hydrates from localStorage
+   SKELETONS — shown while the first query round-trip is in flight
    ========================================================================== */
 export const SkeletonCards = ({ count = 6, media = true }) => (
   <div className="grid grid-3">

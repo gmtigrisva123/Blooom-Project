@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { UploadNoteModal } from './UploadNoteModal';
 import { Modal } from '../common/Modal';
 import { NOTE_SUBJECTS, subjectColor } from '../../constants/subjects';
+import { formatDate } from '../../services/gamification';
 import {
   Hero,
   EmptyState,
@@ -25,13 +26,12 @@ import {
 
 const ALL = 'All';
 
-/* Data-URL images and remote images are previewable; anything else is treated
-   as a document and gets a styled placeholder instead of a broken <img>. */
+/* Tệp ảnh xem trước được; mọi thứ khác (PDF chẳng hạn) hiện khung thay thế có
+   định dạng, thay vì một thẻ <img> hỏng. Kiểu MIME do Storage ghi lại là căn
+   cứ chính; phần mở rộng chỉ là phương án dự phòng. */
 const isPreviewableImage = (note) =>
   note.fileType?.startsWith('image/') ||
-  note.fileUrl?.startsWith('data:image') ||
-  /\.(png|jpe?g|gif|webp|avif)$/i.test(note.fileUrl || '') ||
-  (note.fileUrl || '').includes('unsplash');
+  /\.(png|jpe?g|gif|webp|avif)$/i.test(note.fileUrl || '');
 
 export const NotesManager = () => {
   const { notes, groups, handleDeleteNote, isBooting } = useApp();
@@ -151,7 +151,7 @@ export const NotesManager = () => {
                     </span>
                   )}
 
-                  <span className="t-xs t-dim">Tải lên: {note.uploadedAt}</span>
+                  <span className="t-xs t-dim">Tải lên: {formatDate(note.uploadedAt)}</span>
 
                   <div className="card-foot">
                     <button
@@ -213,7 +213,9 @@ export const NotesManager = () => {
           <div className="modal-body">
             <div className="row row-wrap mb-4" style={{ justifyContent: 'center' }}>
               <SubjectBadge subject={previewNote.subject} />
-              <span className="t-xs t-dim">Tải lên ngày {previewNote.uploadedAt}</span>
+              <span className="t-xs t-dim">
+                Tải lên ngày {formatDate(previewNote.uploadedAt)}
+              </span>
               {previewNote.fileName && (
                 <span className="t-xs t-dim truncate">{previewNote.fileName}</span>
               )}

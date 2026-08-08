@@ -9,17 +9,24 @@ const EMPTY = { name: '', subject: 'Toán', description: '', isPrivate: false };
 export const CreateGroupModal = ({ isOpen, onClose }) => {
   const { handleAddGroup } = useApp();
   const [form, setForm] = useState(EMPTY);
+  const [busy, setBusy] = useState(false);
 
   const update = (field) => (event) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!form.name.trim()) return;
+    if (!form.name.trim() || busy) return;
 
-    handleAddGroup(form);
+    setBusy(true);
+    const created = await handleAddGroup(form);
+    setBusy(false);
+
+    /* Giữ nguyên biểu mẫu nếu lưu thất bại, để người dùng không phải gõ lại. */
+    if (!created) return;
+
     setForm(EMPTY);
     onClose();
   };

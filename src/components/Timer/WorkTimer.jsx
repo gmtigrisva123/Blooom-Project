@@ -43,6 +43,13 @@ export const WorkTimer = () => {
      countdown interval never has to be torn down and restarted mid-session. */
   const completeRef = useRef(null);
 
+  /* Thời điểm học sinh bấm chạy phiên này lần đầu. Ghi lại vì phân tích nhịp
+     sinh học đặt câu hỏi "phiên này bắt đầu lúc mấy giờ?", và suy ngược từ
+     lúc kết thúc trừ đi thời lượng sẽ sai mỗi khi phiên bị tạm dừng — một
+     phiên 50 phút bắt đầu lúc 20g00 nhưng nghỉ giữa chừng 20 phút sẽ bị ghi
+     nhầm thành phiên lúc 20g20. */
+  const sessionStartRef = useRef(null);
+
   const totalSeconds = (mode === 'work' ? workMinutes : breakMinutes) * 60;
   const progressPercent = totalSeconds
     ? Math.min(100, Math.max(0, ((totalSeconds - secondsLeft) / totalSeconds) * 100))
@@ -92,7 +99,13 @@ export const WorkTimer = () => {
         /* Confetti is decorative — never let it break the session save. */
       }
 
-      handleSaveTimerSession({ subject, durationMinutes: workMinutes });
+      handleSaveTimerSession({
+        subject,
+        durationMinutes: workMinutes,
+        startedAt: sessionStartRef.current
+      });
+
+      sessionStartRef.current = null;
       setMode('break');
       setSecondsLeft(breakMinutes * 60);
     } else {
@@ -140,10 +153,20 @@ export const WorkTimer = () => {
     };
   }, [isRunning, secondsLeft, mode]);
 
-  const toggleTimer = useCallback(() => setIsRunning((r) => !r), []);
+  const toggleTimer = useCallback(() => {
+    setIsRunning((running) => {
+      /* Đánh dấu thời điểm bắt đầu ở lần bấm chạy đầu tiên của phiên; những
+         lần tiếp tục sau khi tạm dừng không được ghi đè lên nó. */
+      if (!running && mode === 'work' && sessionStartRef.current === null) {
+        sessionStartRef.current = new Date().toISOString();
+      }
+      return !running;
+    });
+  }, [mode]);
 
   const resetTimer = useCallback(() => {
     setIsRunning(false);
+    sessionStartRef.current = null;
     setSecondsLeft(mode === 'work' ? workMinutes * 60 : breakMinutes * 60);
   }, [mode, workMinutes, breakMinutes]);
 
@@ -158,11 +181,13 @@ export const WorkTimer = () => {
   const switchMode = (next) => {
     setMode(next);
     setIsRunning(false);
+    sessionStartRef.current = null;
     setSecondsLeft((next === 'work' ? workMinutes : breakMinutes) * 60);
   };
 
   const applyPreset = (preset) => {
     setIsRunning(false);
+    sessionStartRef.current = null;
     setWorkMinutes(preset.work);
     setBreakMinutes(preset.rest);
     setMode('work');

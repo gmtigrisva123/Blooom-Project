@@ -291,7 +291,9 @@ export const Dashboard = () => {
           icon={<Target size={22} />}
           label="Mục tiêu tuần"
           value={`${goalPercent}%`}
-          note={`${(weekMinutes / 60).toFixed(1)}/${performanceGoals.targetHoursPerWeek} giờ`}
+          note={`${(weekMinutes / 60).toFixed(1)}/${performanceGoals.targetHoursPerWeek} giờ${
+            performanceGoals.isDefault ? ' (mức gợi ý)' : ''
+          }`}
           color="var(--d-1)"
         />
         <StatCard

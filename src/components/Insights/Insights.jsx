@@ -497,11 +497,19 @@ export const Insights = () => {
           note={model.valid ? formatP(model.p) : 'Chưa đủ dữ liệu'}
           color="var(--d-2)"
         />
+        {/* Không có phiên nào thì hệ số biến thiên bằng 0 về mặt số học, và
+            hiển thị nó cạnh chú thích "càng thấp càng đều" sẽ đọc thành "lịch
+            học của bạn hoàn hảo" — một kết luận rút ra từ chỗ không có dữ
+            liệu. Trường hợp đó phải hiện gạch ngang. */}
         <StatCard
           icon={<Sigma size={20} />}
           label="Hệ số biến thiên"
-          value={formatNumber(cv, 2)}
-          note="Càng thấp, lịch học càng đều"
+          value={timerSessions.length === 0 ? '—' : formatNumber(cv, 2)}
+          note={
+            timerSessions.length === 0
+              ? 'Chưa có phiên học nào để đo'
+              : 'Càng thấp, lịch học càng đều'
+          }
           color="var(--d-5)"
         />
       </div>

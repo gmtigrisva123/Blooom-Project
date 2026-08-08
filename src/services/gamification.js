@@ -326,6 +326,21 @@ export const relativeTime = (value) => {
   return then.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
 };
 
+/* Ngày tháng dạng đầy đủ, cho những chỗ mà thời điểm chính xác quan trọng hơn
+   khoảng cách tương đối (ngày đăng bài, ngày tải ghi chú). Cơ sở dữ liệu trả
+   về timestamptz chuẩn ISO; hiển thị thẳng chuỗi đó ra màn hình sẽ cho người
+   đọc thấy "2026-08-07T14:32:09.481Z". */
+export const formatDate = (value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
 export const formatMinutes = (mins) => {
   if (!mins) return '0 phút';
   const h = Math.floor(mins / 60);

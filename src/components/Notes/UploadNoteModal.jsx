@@ -2,63 +2,60 @@ import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../common/Modal';
 import { NOTE_SUBJECTS, subjectLabel } from '../../constants/subjects';
-import { Upload, Image as ImageIcon, CheckCircle2, FileText } from 'lucide-react';
+import { Upload, CheckCircle2, FileText } from 'lucide-react';
 
-const SAMPLE = {
-  fileName: 'ghi-chu-mau-chat-luong-cao.jpg',
-  fileUrl:
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80'
-};
+/* Giới hạn của bucket `notes` trong Supabase Storage (xem migration). Kiểm ở
+   client chỉ để báo lỗi sớm và tử tế; ràng buộc thật nằm ở phía máy chủ. */
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
-/* Data URLs are stored in localStorage, which caps out around 5 MB. */
-const MAX_FILE_BYTES = 3 * 1024 * 1024;
-
-const EMPTY = { title: '', subject: 'Toán', groupId: '', fileUrl: '', fileName: '' };
+const EMPTY = { title: '', subject: 'Toán', groupId: '', file: null };
 
 export const UploadNoteModal = ({ isOpen, onClose }) => {
   const { handleAddNote, groups, showToast } = useApp();
   const [form, setForm] = useState(EMPTY);
+  const [busy, setBusy] = useState(false);
 
   const update = (field) => (event) =>
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
+  /* Tệp được giữ nguyên dạng File và tải thẳng lên Storage. Bản trước đọc nó
+     thành data-URL để nhét vào localStorage — cách đó chạm trần dung lượng ở
+     khoảng 5 MB và làm phình mỗi hàng lên gấp rưỡi vì mã hóa base64. */
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (file.size > MAX_FILE_BYTES) {
-      showToast('Tệp quá lớn (tối đa 3 MB). Hãy chọn ảnh nhẹ hơn nhé!', 'error');
+      showToast('Tệp quá lớn (tối đa 10 MB). Hãy chọn tệp nhẹ hơn nhé!', 'error');
       event.target.value = '';
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () =>
-      setForm((prev) => ({ ...prev, fileUrl: reader.result, fileName: file.name }));
-    reader.onerror = () => showToast('Không đọc được tệp này. Thử tệp khác nhé!', 'error');
-    reader.readAsDataURL(file);
+    setForm((prev) => ({ ...prev, file }));
   };
 
-  const useSample = () => setForm((prev) => ({ ...prev, ...SAMPLE }));
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!form.title.trim() || !form.fileUrl) return;
+    if (!form.title.trim() || !form.file || busy) return;
 
-    handleAddNote({
+    setBusy(true);
+    const created = await handleAddNote({
       title: form.title,
       subject: form.subject,
       groupId: form.groupId || null,
-      fileUrl: form.fileUrl,
-      fileName: form.fileName || 'tai-lieu-ghi-chu.jpg',
-      fileType: form.fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
+      file: form.file
     });
+    setBusy(false);
+
+    /* Chỉ đóng khi máy chủ đã xác nhận. Đóng ngay sẽ khiến một lần tải lên
+       thất bại trông y hệt một lần thành công. */
+    if (!created) return;
 
     setForm(EMPTY);
     onClose();
   };
 
-  const isPdf = form.fileName.toLowerCase().endsWith('.pdf');
+  const isPdf = (form.file?.name || '').toLowerCase().endsWith('.pdf');
 
   return (
     <Modal
@@ -125,18 +122,18 @@ export const UploadNoteModal = ({ isOpen, onClose }) => {
 
             <label
               htmlFor="noteFileInput"
-              className={`dropzone ${form.fileUrl ? 'is-filled' : ''}`}
+              className={`dropzone ${form.file ? 'is-filled' : ''}`}
             >
-              {form.fileUrl ? (
+              {form.file ? (
                 <>
                   {isPdf ? (
                     <FileText size={30} className="dropzone-icon" />
                   ) : (
                     <CheckCircle2 size={30} className="dropzone-icon" color="var(--success)" />
                   )}
-                  <strong className="t-main">{form.fileName}</strong>
+                  <strong className="t-main">{form.file.name}</strong>
                   <span className="field-hint" style={{ display: 'block' }}>
-                    Đã sẵn sàng tải lên — bấm để chọn tệp khác
+                    {(form.file.size / 1024 / 1024).toFixed(1)} MB — bấm để chọn tệp khác
                   </span>
                 </>
               ) : (
@@ -144,35 +141,30 @@ export const UploadNoteModal = ({ isOpen, onClose }) => {
                   <Upload size={30} className="dropzone-icon" />
                   <strong className="t-main">Bấm để chọn tệp từ máy tính</strong>
                   <span className="field-hint" style={{ display: 'block' }}>
-                    Hỗ trợ JPG, PNG, PDF — tối đa 3 MB
+                    Hỗ trợ JPG, PNG, WebP, PDF — tối đa 10 MB
                   </span>
                 </>
               )}
             </label>
-
-            {!form.fileUrl && (
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm btn-block"
-                style={{ marginTop: 'var(--sp-3)' }}
-                onClick={useSample}
-              >
-                <ImageIcon size={14} /> Dùng ảnh mẫu để thử nhanh
-              </button>
-            )}
           </div>
         </div>
 
         <div className="modal-footer">
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy}>
             Hủy
           </button>
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={!form.fileUrl || !form.title.trim()}
+            disabled={!form.file || !form.title.trim() || busy}
           >
-            Tải Lên Ghi Chú
+            {busy ? (
+              <>
+                <span className="spinner" aria-hidden="true" /> Đang tải lên…
+              </>
+            ) : (
+              'Tải Lên Ghi Chú'
+            )}
           </button>
         </div>
       </form>

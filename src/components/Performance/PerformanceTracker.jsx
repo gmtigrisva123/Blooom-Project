@@ -78,9 +78,9 @@ export const PerformanceTracker = () => {
       .sort((a, b) => b.minutes - a.minutes);
   }, [weekSessions, weekMinutes]);
 
-  const submitGoals = (event) => {
+  const submitGoals = async (event) => {
     event.preventDefault();
-    handleUpdateGoals({
+    await handleUpdateGoals({
       targetHoursPerWeek: Number(targetHours),
       targetSessionsPerWeek: Number(targetSessions)
     });
@@ -102,6 +102,22 @@ export const PerformanceTracker = () => {
           </button>
         }
       />
+
+      {/* Trước khi học sinh tự đặt mục tiêu, con số hiển thị là giá trị gợi ý
+          chứ không phải lựa chọn của họ — và nó phải được nói rõ như vậy, chứ
+          không trình bày như một mục tiêu đã cam kết. */}
+      {performanceGoals.isDefault && (
+        <div className="panel panel-pad row-between" style={{ gap: 'var(--sp-4)' }}>
+          <span className="t-sm t-dim">
+            Bạn chưa đặt mục tiêu tuần. Các con số bên dưới đang dùng mức gợi ý mặc định{' '}
+            <b>{performanceGoals.targetHoursPerWeek} giờ</b> và{' '}
+            <b>{performanceGoals.targetSessionsPerWeek} phiên</b>.
+          </span>
+          <button className="btn btn-primary btn-sm" onClick={openGoalDialog}>
+            Đặt mục tiêu của tôi
+          </button>
+        </div>
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* Goal gauge                                                          */}

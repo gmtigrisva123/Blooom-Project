@@ -12,6 +12,17 @@
   background: var(--bg-app);
 }
 
+/* Màn hình cấu hình không có khung bên phải, nên nó chiếm trọn bề ngang thay
+   vì để lại một nửa màn hình trống. */
+.auth-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.auth-solo .auth-panel {
+  max-width: 34rem;
+  padding-top: var(--sp-12);
+}
+
 /* ==========================================================================
    FORM PANE
    ========================================================================== */
@@ -192,7 +203,97 @@
   background: var(--border);
 }
 
-/* ---- Local-account disclosure ------------------------------------------- */
+/* ==========================================================================
+   MÀN HÌNH CẤU HÌNH & KHỞI ĐỘNG
+
+   Hai khung hình chỉ xuất hiện trước khi ứng dụng chạy được: hướng dẫn cấu
+   hình cơ sở dữ liệu, và lúc chờ khôi phục phiên đăng nhập. Cả hai dùng lại
+   khung .auth-panel nên không cần một bố cục riêng.
+   ========================================================================== */
+.setup-steps {
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: setup;
+}
+
+.setup-steps li {
+  position: relative;
+  counter-increment: setup;
+  padding: 0 0 var(--sp-5) var(--sp-8);
+  border-left: 1px solid var(--border);
+}
+
+.setup-steps li:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+
+.setup-steps li::before {
+  content: counter(setup);
+  position: absolute;
+  left: calc(var(--sp-3) * -1);
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+
+.setup-steps strong {
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-sm);
+  color: var(--text-main);
+}
+
+.setup-steps p {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.setup-steps code {
+  padding: 0.1em 0.35em;
+  font-size: 0.92em;
+  color: var(--text-soft);
+  background: var(--bg-inset);
+  border-radius: var(--r-xs, 4px);
+}
+
+.setup-code {
+  overflow-x: auto;
+  margin: var(--sp-2) 0;
+  padding: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-soft);
+  white-space: pre;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.boot-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 100vh;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  background: var(--bg-canvas);
+}
+
+/* ---- Disclosure về nơi lưu dữ liệu -------------------------------------- */
 .auth-note {
   display: flex;
   align-items: flex-start;
