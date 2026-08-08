@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { ArticleModal } from './ArticleModal';
 import { Modal } from '../common/Modal';
 import { Hero, EmptyState, ChipRow, SearchInput, SkeletonCards } from '../common/ui';
+import { formatDate } from '../../services/gamification';
 import {
   Sparkles,
   Heart,
@@ -17,14 +18,17 @@ import {
 const ALL = 'All';
 const SAVED = 'Saved';
 const CATEGORIES = ['Mẹo học tập', 'Kỹ năng ghi nhớ', 'Năng suất'];
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80';
 
+/* Bài viết không có ảnh thì hiện khung chữ đầu đề, chứ không mượn một tấm ảnh
+   kho nào đó. Ảnh minh họa vay mượn làm bài viết trông chỉn chu hơn thực tế
+   và gây hiểu nhầm về nguồn gốc của nội dung. */
 const EMPTY_FORM = {
   title: '',
   category: CATEGORIES[0],
   content: '',
-  imageUrl: ''
+  imageUrl: '',
+  sourceUrl: '',
+  sourceLabel: ''
 };
 
 export const EditorPicks = () => {
@@ -78,15 +82,22 @@ export const EditorPicks = () => {
   const updateForm = (field) => (event) =>
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
-  const handlePublish = (event) => {
+  const handlePublish = async (event) => {
     event.preventDefault();
     if (!form.title.trim() || !form.content.trim()) return;
 
-    handleAddEditorPick({
-      ...form,
-      imageUrl: form.imageUrl.trim() || FALLBACK_IMAGE,
-      createdBy: user.name || 'Biên Tập Viên Admin'
+    /* Tác giả là tài khoản đang đăng nhập, do máy chủ gán từ auth.uid() —
+       không phải một chuỗi do biểu mẫu gửi lên, nên không thể mạo danh. */
+    const created = await handleAddEditorPick({
+      title: form.title,
+      category: form.category,
+      content: form.content,
+      imageUrl: form.imageUrl.trim() || null,
+      sourceUrl: form.sourceUrl.trim() || null,
+      sourceLabel: form.sourceLabel.trim() || null
     });
+
+    if (!created) return;
 
     setForm(EMPTY_FORM);
     setIsPublishOpen(false);
@@ -145,7 +156,7 @@ export const EditorPicks = () => {
                 <p className="t-sm clamp-3">{featured.content}</p>
                 <div className="row-between" style={{ marginTop: 'var(--sp-5)' }}>
                   <span className="btn btn-primary btn-sm">Đọc Chi Tiết →</span>
-                  <span className="t-xs t-dim">{featured.createdAt}</span>
+                  <span className="t-xs t-dim">{formatDate(featured.createdAt)}</span>
                 </div>
               </div>
 
@@ -302,10 +313,13 @@ export const EditorPicks = () => {
                 <input
                   id="articleImage"
                   type="url"
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Đường dẫn tới ảnh bạn có quyền sử dụng"
                   value={form.imageUrl}
                   onChange={updateForm('imageUrl')}
                 />
+                <span className="field-hint">
+                  Để trống thì bài viết hiện khung không ảnh — hệ thống không tự gán ảnh nào.
+                </span>
               </div>
             </div>
 
@@ -319,9 +333,33 @@ export const EditorPicks = () => {
                 onChange={updateForm('content')}
                 required
               />
-              <span className="field-hint">
-                Để trống ô ảnh và hệ thống sẽ tự dùng ảnh minh họa mặc định.
-              </span>
+            </div>
+
+            {/* Bài viết trình bày phương pháp học nên dẫn được về nguồn gốc của
+                nó. Trường này không bắt buộc, nhưng có mặt để một khẳng định về
+                hiệu quả học tập luôn truy nguyên được. */}
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="articleSourceLabel">Nguồn tham khảo</label>
+                <input
+                  id="articleSourceLabel"
+                  type="text"
+                  placeholder="Ví dụ: Dunlosky et al., 2013"
+                  value={form.sourceLabel}
+                  onChange={updateForm('sourceLabel')}
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="articleSourceUrl">Liên kết tới nguồn</label>
+                <input
+                  id="articleSourceUrl"
+                  type="url"
+                  placeholder="https://doi.org/..."
+                  value={form.sourceUrl}
+                  onChange={updateForm('sourceUrl')}
+                />
+              </div>
             </div>
           </div>
 

@@ -12,6 +12,17 @@
   background: var(--bg-app);
 }
 
+/* Màn hình cấu hình không có khung bên phải, nên nó chiếm trọn bề ngang thay
+   vì để lại một nửa màn hình trống. */
+.auth-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.auth-solo .auth-panel {
+  max-width: 34rem;
+  padding-top: var(--sp-12);
+}
+
 /* ==========================================================================
    FORM PANE
    ========================================================================== */
@@ -192,7 +203,229 @@
   background: var(--border);
 }
 
-/* ---- Local-account disclosure ------------------------------------------- */
+/* ==========================================================================
+   MÀN HÌNH CẤU HÌNH & KHỞI ĐỘNG
+
+   Hai khung hình chỉ xuất hiện trước khi ứng dụng chạy được: hướng dẫn cấu
+   hình cơ sở dữ liệu, và lúc chờ khôi phục phiên đăng nhập. Cả hai dùng lại
+   khung .auth-panel nên không cần một bố cục riêng.
+   ========================================================================== */
+.setup-steps {
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: setup;
+}
+
+.setup-steps li {
+  position: relative;
+  counter-increment: setup;
+  padding: 0 0 var(--sp-5) var(--sp-8);
+  border-left: 1px solid var(--border);
+}
+
+.setup-steps li:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+
+.setup-steps li::before {
+  content: counter(setup);
+  position: absolute;
+  left: calc(var(--sp-3) * -1);
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+
+.setup-steps strong {
+  display: block;
+  margin-bottom: var(--sp-1);
+  font-size: var(--fs-sm);
+  color: var(--text-main);
+}
+
+.setup-steps p {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.setup-steps code {
+  padding: 0.1em 0.35em;
+  font-size: 0.92em;
+  color: var(--text-soft);
+  background: var(--bg-inset);
+  border-radius: var(--r-xs, 4px);
+}
+
+.setup-code {
+  overflow-x: auto;
+  margin: var(--sp-2) 0;
+  padding: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-soft);
+  white-space: pre;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.boot-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 100vh;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  background: var(--bg-canvas);
+}
+
+/* ==========================================================================
+   MÀN HÌNH "ĐÃ GỬI THƯ XÁC NHẬN"
+
+   Thay chỗ biểu mẫu sau khi đăng ký thành công ở dự án có bật xác nhận email.
+   Cố ý dùng ngôn ngữ hình ảnh của trạng thái THÀNH CÔNG — vòng tròn xanh, thư
+   có dấu tích — chứ không phải khung đỏ cảnh báo mà mọi lỗi khác dùng.
+   ========================================================================== */
+.mail-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mail-notice-art {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: var(--sp-5);
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  border-radius: var(--r-full);
+}
+
+.mail-notice .auth-title,
+.mail-notice .auth-sub {
+  text-align: center;
+}
+
+.mail-notice-address {
+  width: 100%;
+  margin: var(--sp-4) 0 var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  /* Địa chỉ có thể dài hơn khung; xuống dòng theo ký tự chứ không đẩy ngang
+     cả trang. */
+  overflow-wrap: anywhere;
+  font-size: var(--fs-sm);
+  color: var(--text-main);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.auth-success {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: 100%;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  font-size: var(--fs-sm);
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 28%, transparent);
+  border-radius: var(--r-sm);
+}
+
+.auth-success svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.mail-notice-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+}
+
+.mail-notice-tips {
+  width: 100%;
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4);
+  list-style: none;
+  text-align: left;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.mail-notice-tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.mail-notice-tips li + li {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+
+.mail-notice-tips svg {
+  flex: none;
+  margin-top: 0.2rem;
+}
+
+.mail-notice-tips b {
+  color: var(--text-soft);
+}
+
+/* Nút dạng liên kết nằm giữa một câu văn — phải ăn theo dòng chữ xung quanh
+   thay vì đứng thành một khối riêng.
+
+   Khác với .link-btn đứng độc lập (nơi vị trí và biểu tượng mũi tên đã đủ báo
+   hiệu bấm được), một nút nằm lọt giữa câu không có tín hiệu nào cả: nếu chỉ
+   đổi màu khi rê chuột thì trên màn hình cảm ứng nó là chữ thường. Vì vậy nó
+   mang màu nhấn và gạch chân ngay từ đầu. */
+.link-btn.is-inline {
+  display: inline;
+  padding: 0;
+  font-size: inherit;
+  vertical-align: baseline;
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-btn.is-inline:hover {
+  text-decoration-thickness: 2px;
+}
+
+.mail-notice-back {
+  margin-top: var(--sp-6);
+}
+
+/* ---- Disclosure về nơi lưu dữ liệu -------------------------------------- */
 .auth-note {
   display: flex;
   align-items: flex-start;

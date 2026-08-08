@@ -5,3 +5,8 @@ package-lock.json
 public/*.png
 public/*.svg
 .lighthouseci/
+
+# Sinh bởi scripts/render-formulas.mjs. Định dạng của nó do chính bộ sinh
+# quyết định; để Prettier sửa lại sẽ làm `npm run formulas:check` báo lệch ở
+# mọi lần chạy, vì tệp trên đĩa không còn khớp với thứ bộ sinh tạo ra.
+src/generated/

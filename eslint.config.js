@@ -63,11 +63,16 @@ export default [
     }
   },
 
-  // Node-flavoured config files.
+  // Node-flavoured config files and build scripts. `scripts/` runs under Node,
+  // never in a browser, so it gets Node globals and is allowed to log — a build
+  // script that cannot report what it did is not much use.
   {
-    files: ['vite.config.js', 'eslint.config.js'],
+    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.{js,mjs}'],
     languageOptions: {
       globals: { ...globals.node }
+    },
+    rules: {
+      'no-console': 'off'
     }
   },
 

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useNow } from '../../hooks/useNow';
 import { Modal } from '../common/Modal';
 import { Hero, EmptyState, StatCard, SubjectBadge } from '../common/ui';
+import { MathInline } from '../common/Math';
 import { NOTE_SUBJECTS, subjectColor } from '../../constants/subjects';
 import {
   REVIEW_GRADES,
@@ -142,9 +143,15 @@ export const RecallLab = () => {
 
   const current = queue[0] || null;
 
-  const grade = (quality) => {
+  /* Kết quả chỉ hiện sau khi máy chủ đã xác nhận lịch mới. Hiện trước rồi ghi
+     sau sẽ có lúc báo "ôn lại sau 6 ngày" trong khi lần chấm đó chưa hề được
+     lưu — và lần mở tiếp theo thẻ vẫn nằm nguyên trong hàng đợi. */
+  const grade = async (quality) => {
     if (!current) return;
-    const updated = handleReviewCard(current, quality);
+
+    const updated = await handleReviewCard(current, quality);
+    if (!updated) return;
+
     setLastResult({
       front: current.front,
       interval: updated.interval,
@@ -154,13 +161,16 @@ export const RecallLab = () => {
     setRevealed(false);
   };
 
-  const submitCard = (event) => {
+  const submitCard = async (event) => {
     event.preventDefault();
     if (!draft.front.trim() || !draft.back.trim()) {
       showToast('Cần nhập cả mặt hỏi và mặt trả lời.', 'error');
       return;
     }
-    handleAddCard(draft);
+
+    const created = await handleAddCard(draft);
+    if (!created) return;
+
     setDraft({ front: '', back: '', subject: draft.subject });
     setIsAddOpen(false);
   };
@@ -423,9 +433,9 @@ export const RecallLab = () => {
         <p className="method-note">
           <Info size={14} aria-hidden="true" />
           <span>
-            Xác suất nhớ lại là ước lượng của mô hình R(t) = e^(−t/S), trong đó S suy ra từ
-            khoảng ôn hiện tại. Đây là dự đoán của mô hình, không phải kết quả đo trí nhớ thật
-            của bạn.
+            Xác suất nhớ lại là ước lượng của mô hình <MathInline id="forgettingShort" />, trong
+            đó S suy ra từ khoảng ôn hiện tại. Đây là dự đoán của mô hình, không phải kết quả đo
+            trí nhớ thật của bạn.
           </span>
         </p>
       </section>

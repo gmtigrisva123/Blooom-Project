@@ -1,0 +1,134 @@
+/* ==========================================================================
+   BLOOOM — CÔNG THỨC TOÁN
+
+   KaTeX mang sẵn phần định kiểu của riêng nó (nhập ở index.css). Tệp này chỉ
+   làm ba việc mà KaTeX cố ý không làm: gắn công thức vào hệ thống màu của
+   Blooom, xử lý công thức rộng hơn khung chứa, và bố trí khối công thức kèm
+   lời giải thích.
+   ========================================================================== */
+
+/* KaTeX đặt màu cứng là `inherit`, nên chỉ cần cha đúng màu là xong. Ở đây
+   dùng màu chữ chính vì công thức là nội dung, không phải chú thích. */
+.math-block,
+.math-inline {
+  color: var(--text-main);
+}
+
+/* --------------------------------------------------------------------------
+   CÔNG THỨC ĐỨNG RIÊNG
+
+   Phân số lồng nhau (kiểm định Welch, bậc tự do Welch–Satterthwaite) rộng hơn
+   thẻ chứa trên màn hình hẹp. Cho phép cuộn ngang TRONG khối, để trang không
+   bao giờ bị đẩy ngang theo — một công thức tràn không được phép làm vỡ bố
+   cục của cả trang.
+   -------------------------------------------------------------------------- */
+.math-block {
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Chừa chỗ cho thanh cuộn để nó không che mất chân phân số. */
+  padding: var(--sp-1) 0 var(--sp-2);
+}
+
+.math-block .katex-display {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   CÔNG THỨC CHEN GIỮA DÒNG VĂN
+   -------------------------------------------------------------------------- */
+.math-inline {
+  /* KaTeX mặc định 1.21em để công thức cân với văn bản in. Trong giao diện
+     này chữ đã nhỏ sẵn, nên thu về gần cỡ chữ xung quanh cho khỏi nhảy dòng. */
+  font-size: 1.05em;
+  white-space: nowrap;
+}
+
+.math-inline .katex {
+  font-size: 1em;
+}
+
+/* --------------------------------------------------------------------------
+   CÔNG THỨC TRÊN THẺ "BỐN CÔNG CỤ" Ở TRANG GIỚI THIỆU
+
+   Thay cho .instrument-formula cũ vốn là một khối <code>. Giữ nguyên khung
+   nền và viền để nhịp thị giác của thẻ không đổi.
+   -------------------------------------------------------------------------- */
+.instrument .math-block {
+  display: flex;
+  align-items: center;
+  min-height: 4.25rem;
+  margin: var(--sp-3) 0 var(--sp-4);
+  padding: var(--sp-3);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.instrument .math-block .katex-display {
+  width: 100%;
+}
+
+/* KaTeX dựng công thức khối ở 1,21em để cân với văn bản in. Thẻ "bốn công cụ"
+   rộng khoảng 350px ở mọi điểm ngắt, và ở cỡ đó công thức SM-2 tràn ra ngoài
+   — không phải chỉ trên màn hình hẹp mà ở mọi bề rộng, vì nó đơn giản là dài
+   hơn thẻ. Thu về 1em cho cả bốn thẻ: chúng là một bộ, nên để một thẻ nhỏ chữ
+   hơn ba thẻ kia sẽ lộ ra ngay. */
+.instrument .math-block .katex {
+  font-size: 1em;
+}
+
+/* Công thức trong tiêu đề khu vực — nhỏ và mờ hơn, vì ở đó nó là chú thích
+   cho tiêu đề chứ không phải nội dung chính. */
+.section-head .math-inline {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* Công thức trong chú thích phương pháp — cùng cỡ với dòng chữ quanh nó. */
+.method-note .math-inline {
+  font-size: 1em;
+  color: var(--text-soft);
+}
+
+/* --------------------------------------------------------------------------
+   CÔNG THỨC KÈM LỜI GIẢI THÍCH
+
+   Dùng ở Phòng Thí Nghiệm: mỗi công thức đi cùng một câu nói rõ nó trả lời
+   câu hỏi gì. Một phương trình không có lời dẫn chỉ để trang trí.
+   -------------------------------------------------------------------------- */
+.formula-pair {
+  display: grid;
+  gap: var(--sp-5);
+  grid-template-columns: 1fr;
+}
+
+.formula-pair figure {
+  margin: 0;
+  padding: var(--sp-4);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.formula-pair figcaption {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 900px) {
+  .formula-pair {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  /* Trên màn hình hẹp, công thức chen dòng được phép xuống hàng ở ranh giới
+     toán tử thay vì kéo dài ra ngoài màn hình. */
+  .math-inline {
+    white-space: normal;
+  }
+}

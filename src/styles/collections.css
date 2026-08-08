@@ -330,6 +330,21 @@
   white-space: pre-line;
 }
 
+/* Nguồn tham khảo của bài viết — tách khỏi phần nội dung bằng một đường kẻ,
+   để không bị đọc nhầm thành câu cuối của bài. */
+.reader-source {
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin: var(--sp-6) 0 0;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.reader-source svg {
+  flex: none;
+  margin-top: 0.2rem;
+}
+
 /* ==========================================================================
    NOTE CARDS
    ========================================================================== */

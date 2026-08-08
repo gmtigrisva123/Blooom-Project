@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../common/Modal';
 import { Hero, EmptyState, ProgressBar } from '../common/ui';
+import { MathBlock } from '../common/Math';
 import {
   METRICS,
   TEMPLATES,
@@ -345,12 +346,18 @@ export const ExperimentLab = () => {
     setIsOpen(true);
   };
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    handleCreateExperiment({
+
+    const created = await handleCreateExperiment({
       ...design,
       targetPerArm: Math.max(MIN_TRIALS_PER_ARM, Number(design.targetPerArm))
     });
+
+    /* Thiết kế bị khóa lại ngay khi phiên đầu tiên được ghi, nên biểu mẫu chỉ
+       được xóa khi thí nghiệm đã thực sự tồn tại trong cơ sở dữ liệu. */
+    if (!created) return;
+
     setIsOpen(false);
     setDesign({
       title: '',
@@ -444,6 +451,46 @@ export const ExperimentLab = () => {
           ))}
         </>
       )}
+
+      {/* Hai công thức mà bảng kết quả phía trên thực sự đánh giá. Trưng chúng
+          ra để một người đọc báo cáo kiểm chứng lại được con số, thay vì phải
+          tin rằng ứng dụng đã tính đúng. */}
+      <section className="panel panel-pad">
+        <div className="section-head">
+          <span className="section-head-icon">
+            <Sigma size={16} />
+          </span>
+          <h3 className="grow">Hai công thức đứng sau bảng kết quả</h3>
+        </div>
+
+        <div className="formula-pair">
+          <figure>
+            <MathBlock id="welchT" />
+            <figcaption>
+              Thống kê t của Welch cho hai nhóm có phương sai không bằng nhau. Khác kiểm định t
+              gộp ở chỗ nó không giả định hai điều kiện dao động như nhau — điều gần như không
+              đúng với dữ liệu học tập.
+            </figcaption>
+          </figure>
+
+          <figure>
+            <MathBlock id="welchDf" />
+            <figcaption>
+              Bậc tự do Welch–Satterthwaite. Đây là lý do &ldquo;bậc tự do&rdquo; trong bảng
+              trên thường là số thập phân chứ không phải số nguyên.
+            </figcaption>
+          </figure>
+
+          <figure>
+            <MathBlock id="hedgesG" />
+            <figcaption>
+              Cỡ tác động Hedges&rsquo; g: Cohen&rsquo;s d đã hiệu chỉnh độ chệch của mẫu nhỏ.
+              Nó trả lời câu hỏi khác với giá trị p — không phải &ldquo;có khác biệt
+              không&rdquo; mà &ldquo;khác biệt lớn cỡ nào&rdquo;.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
 
       <p className="method-note">
         <Info size={14} aria-hidden="true" />

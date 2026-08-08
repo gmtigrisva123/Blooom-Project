@@ -1,6 +1,7 @@
 import { useApp } from '../../context/AppContext';
 import { Modal } from '../common/Modal';
-import { Sparkles, Heart, Trash2, User, Calendar } from 'lucide-react';
+import { formatDate } from '../../services/gamification';
+import { Sparkles, Heart, Trash2, User, Calendar, Link2 } from 'lucide-react';
 
 export const ArticleModal = ({ article, isOpen, onClose }) => {
   const { user, bookmarks, handleToggleBookmark, handleDeleteEditorPick } = useApp();
@@ -63,16 +64,34 @@ export const ArticleModal = ({ article, isOpen, onClose }) => {
             <User size={13} /> {article.createdBy}
           </span>
           <span className="row" style={{ gap: '0.3rem' }}>
-            <Calendar size={13} /> {article.createdAt}
+            <Calendar size={13} /> {formatDate(article.createdAt)}
           </span>
-          {article.likesCount != null && (
+          {article.likesCount > 0 && (
             <span className="row" style={{ gap: '0.3rem' }}>
-              <Heart size={13} /> {article.likesCount} lượt thích
+              <Heart size={13} /> {article.likesCount} lượt lưu
             </span>
           )}
         </div>
 
         <div className="reader-body">{article.content}</div>
+
+        {/* Nguồn hiện ngay dưới bài, không giấu trong chú thích: một khẳng
+            định về phương pháp học chỉ đáng tin khi truy nguyên được. */}
+        {(article.sourceLabel || article.sourceUrl) && (
+          <p className="reader-source t-xs t-dim row" style={{ gap: '0.35rem' }}>
+            <Link2 size={13} aria-hidden="true" />
+            <span>
+              Nguồn:{' '}
+              {article.sourceUrl ? (
+                <a href={article.sourceUrl} target="_blank" rel="noreferrer noopener">
+                  {article.sourceLabel || article.sourceUrl}
+                </a>
+              ) : (
+                article.sourceLabel
+              )}
+            </span>
+          </p>
+        )}
       </div>
     </Modal>
   );

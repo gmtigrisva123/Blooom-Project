@@ -239,7 +239,12 @@
    ========================================================================== */
 .instrument-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  /* 22rem chứ không phải 17rem: từ khi các thẻ này trưng công thức được sắp
+     chữ thật (phân số lồng, căn bậc hai), 17rem cho ra bốn cột trên màn hình
+     1280px và mỗi cột chỉ còn ~232px bề rộng dùng được — hẹp hơn cả công thức
+     SM-2. Nới điểm ngắt xuống còn hai cột ở cỡ đó, để công thức có chỗ thở
+     thay vì phải thu nhỏ tới mức khó đọc. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -275,18 +280,6 @@
 .instrument h3 {
   font-size: var(--fs-md);
   margin: 0;
-}
-
-.instrument-formula {
-  display: block;
-  padding: 0.5rem 0.65rem;
-  font-size: var(--fs-xs);
-  line-height: 1.5;
-  color: var(--accent-text);
-  background: var(--bg-inset);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xs);
-  overflow-x: auto;
 }
 
 .instrument p {

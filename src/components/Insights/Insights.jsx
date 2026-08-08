@@ -17,6 +17,7 @@ import {
   linearRegression
 } from '../../services/statistics';
 import { Waves, Sigma, TrendingUp, Clock, Activity, Info, ChartSpline } from 'lucide-react';
+import { MathInline } from '../common/Math';
 
 /* Days of history the trend model reads. Three weeks is long enough for a
    slope to mean something and short enough to still describe "now". */
@@ -288,7 +289,7 @@ export const Insights = () => {
           </span>
           <div className="grow">
             <h3>Phân Tích Cosinor 24 Giờ</h3>
-            <span className="t-xs t-dim mono">y(h) = M + A·cos(2π(h − φ)/24)</span>
+            <MathInline id="cosinorShort" />
           </div>
         </div>
 
@@ -388,7 +389,9 @@ export const Insights = () => {
           </span>
           <div className="grow">
             <h3>Xu Hướng &amp; Dự Báo Tuần Tới</h3>
-            <span className="t-xs t-dim mono">OLS trên {TREND_DAYS} ngày · ŷ = a + b·t</span>
+            <span className="t-xs t-dim">
+              OLS trên {TREND_DAYS} ngày · <MathInline id="ols" />
+            </span>
           </div>
         </div>
 
@@ -464,6 +467,8 @@ export const Insights = () => {
             Hồi quy tuyến tính giả định xu hướng là đường thẳng và các ngày độc lập nhau — điều
             này không đúng với lịch thi hay kỳ nghỉ. Dự báo chỉ có ý nghĩa khi thói quen sắp tới
             giống {TREND_DAYS} ngày vừa qua, và khoảng tin cậy 95% cho thấy độ bất định còn lại.
+            Hệ số biến thiên <MathInline id="cv" /> đo độ đều của lịch học: càng thấp thì số
+            phút mỗi ngày càng ít dao động quanh mức trung bình.
           </span>
         </p>
       </section>
@@ -497,11 +502,19 @@ export const Insights = () => {
           note={model.valid ? formatP(model.p) : 'Chưa đủ dữ liệu'}
           color="var(--d-2)"
         />
+        {/* Không có phiên nào thì hệ số biến thiên bằng 0 về mặt số học, và
+            hiển thị nó cạnh chú thích "càng thấp càng đều" sẽ đọc thành "lịch
+            học của bạn hoàn hảo" — một kết luận rút ra từ chỗ không có dữ
+            liệu. Trường hợp đó phải hiện gạch ngang. */}
         <StatCard
           icon={<Sigma size={20} />}
           label="Hệ số biến thiên"
-          value={formatNumber(cv, 2)}
-          note="Càng thấp, lịch học càng đều"
+          value={timerSessions.length === 0 ? '—' : formatNumber(cv, 2)}
+          note={
+            timerSessions.length === 0
+              ? 'Chưa có phiên học nào để đo'
+              : 'Càng thấp, lịch học càng đều'
+          }
           color="var(--d-5)"
         />
       </div>
