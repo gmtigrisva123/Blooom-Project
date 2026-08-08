@@ -49,6 +49,16 @@ jobs:
         env:
           # Comes from actions/configure-pages, e.g. "/Blooom-Project/".
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Khóa Supabase phải có mặt LÚC BUILD: Vite thay thế mọi biến VITE_*
+          # thành hằng số ngay trong bundle, nên đặt chúng ở đâu đó lúc chạy là
+          # quá muộn. Thiếu hai biến này thì bản deploy chỉ hiện màn hình hướng
+          # dẫn cấu hình.
+          #
+          # Khai báo ở Settings › Secrets and variables › Actions. Dùng khóa
+          # `anon public`; khóa `service_role` bỏ qua toàn bộ Row Level Security
+          # và sẽ bị nhúng thẳng vào JavaScript gửi tới trình duyệt.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Add SPA fallback
         # GitHub Pages has no server-side routing. Serving index.html for 404s
