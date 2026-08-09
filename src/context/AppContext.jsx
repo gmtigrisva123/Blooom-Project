@@ -154,16 +154,45 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  /* ---- Vai trò ---------------------------------------------------------- */
-  const toggleRole = useCallback(async () => {
-    const role = user?.role === 'student' ? 'admin' : 'student';
+  /* ---- Vai trò ----------------------------------------------------------
+     Ai được làm Biên Tập Viên là quyết định của MÁY CHỦ, không phải của giao
+     diện: hàm claim_admin_role so mã và tự tay đổi cột role, còn cột đó thì bị
+     trigger khóa với mọi lệnh ghi khác. Hai hàm dưới đây chỉ chuyển tiếp câu
+     trả lời của máy chủ. */
+
+  /* Trả về nguyên kết quả cho hộp thoại thay vì chỉ hiện toast: mã sai cần
+     hiện NGAY BÊN CẠNH ô nhập, ở nơi người dùng đang nhìn. Một mẩu thông báo
+     trôi ở góc màn hình, cùng chỗ với mọi thông báo khác của ứng dụng, không
+     nói được rằng lần gõ vừa rồi đã sai. */
+  const claimAdminRole = useCallback(
+    async (code) => {
+      try {
+        const result = await authService.claimAdminRole(code);
+        if (result.ok && result.account) {
+          setUser(result.account);
+          showToast('Đã mở quyền Biên Tập Viên / Admin.', 'success');
+        }
+        return result;
+      } catch (error) {
+        return {
+          ok: false,
+          reason: 'error',
+          message: error.message || 'Không xác minh được mã truy cập.'
+        };
+      }
+    },
+    [showToast]
+  );
+
+  const releaseAdminRole = useCallback(async () => {
     const updated = await run(
-      () => authService.updateProfile({ role }),
-      `Đã chuyển sang vai trò: ${role === 'admin' ? 'Biên Tập Viên / Admin' : 'Học Sinh'}`,
+      () => authService.releaseAdminRole(),
+      'Đã quay lại vai trò Học Sinh.',
       'info'
     );
     if (updated) setUser(updated);
-  }, [run, user?.role]);
+    return updated;
+  }, [run]);
 
   const updateProfile = useCallback(
     async (patch) => {
@@ -497,7 +526,8 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
     setUser,
     updateProfile,
     onSignOut,
-    toggleRole,
+    claimAdminRole,
+    releaseAdminRole,
     // data
     groups,
     handleAddGroup,

@@ -1049,6 +1049,45 @@ textarea[aria-invalid='true'] {
   border-color: var(--danger);
 }
 
+/* ---- Ô nhập mã truy cập -------------------------------------------------
+   Mặt chữ đơn cách và khoảng cách chữ rộng hơn bình thường, vì thứ gõ vào đây
+   là một mã chứ không phải một câu: người dùng cần đọc lại được từng ký tự
+   một để soát lỗi gõ. Riêng chuỗi gợi ý thì trả về mặt chữ thường — nó là một
+   câu tiếng Việt, và giãn nó ra chỉ làm khó đọc. */
+.code-input {
+  font-family: var(--font-mono);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.code-input::placeholder {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.code-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.code-count {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* Đủ ký tự thì đổi màu — dấu hiệu duy nhất cho biết nút gửi đã bật. */
+.code-count.is-complete {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 /* ---- Method / limitation note ------------------------------------------
    Every model in the app is followed by one of these. They are deliberately
    quiet but never hidden behind a toggle — a stated limitation the reader

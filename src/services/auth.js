@@ -27,6 +27,12 @@ import { supabase, requireClient, deviceTimezone, toFriendlyError } from './supa
 /* Supabase từ chối mật khẩu dưới 6 ký tự; Blooom đặt sàn cao hơn. */
 export const PASSWORD_MIN_LENGTH = 8;
 
+/* Độ dài mã truy cập vai trò Biên Tập Viên / Admin. Giao diện dùng số này để
+   giới hạn ô nhập và bật/tắt nút gửi; hàm claim_admin_role trong
+   supabase/migrations/0002_admin_access_code.sql kiểm tra lại đúng con số đó ở
+   phía máy chủ. Đổi mã sang độ dài khác thì phải sửa cả hai chỗ. */
+export const ADMIN_CODE_LENGTH = 6;
+
 const normaliseEmail = (email) =>
   String(email || '')
     .trim()
@@ -162,6 +168,34 @@ const recordAuthEvent = async (eventType) => {
   } catch (error) {
     console.warn('[blooom] không ghi được nhật ký đăng nhập:', error.message);
   }
+};
+
+/* --------------------------------------------------------------------------
+   CỔNG MÃ TRUY CẬP ADMIN
+
+   Việc so mã nằm TRỌN VẸN ở phía máy chủ (hàm claim_admin_role). Tệp này chỉ
+   gửi chuỗi người dùng gõ đi và hiển thị câu trả lời — nó không biết mã đúng
+   là gì, và điều đó là cố ý: mọi hằng số trong thư mục src/ đều được đóng gói
+   vào tệp JavaScript mà bất kỳ ai mở trang cũng tải về được.
+   -------------------------------------------------------------------------- */
+
+/* Hai RPC này chỉ tồn tại sau khi migration 0002 được chạy. Nếu chưa, PostgREST
+   trả về PGRST202 ("Could not find the function") — một thông báo tiếng Anh về
+   bộ định tuyến API, vô nghĩa với người đang đứng trước ô nhập mã. */
+const toAdminGateError = (error) => {
+  const notInstalled =
+    error?.code === 'PGRST202' || error?.message?.includes('Could not find the function');
+
+  if (notInstalled) {
+    return Object.assign(
+      new Error(
+        'Máy chủ chưa cài cổng mã truy cập. Hãy chạy supabase/migrations/0002_admin_access_code.sql trong SQL Editor.'
+      ),
+      { cause: error }
+    );
+  }
+
+  return toFriendlyError(error, 'Không xác minh được mã truy cập.');
 };
 
 /* --------------------------------------------------------------------------
@@ -380,7 +414,10 @@ export const authService = {
     if (patch.name !== undefined) row.full_name = String(patch.name).trim();
     if (patch.avatar !== undefined) row.avatar_url = patch.avatar;
     if (patch.gradeLevel !== undefined) row.grade_level = patch.gradeLevel;
-    if (patch.role !== undefined) row.role = patch.role;
+    /* `role` cố ý KHÔNG có trong danh sách này. Vai trò chỉ đổi được qua
+       claimAdminRole / releaseAdminRole, và cột đó cũng đã bị trigger
+       profiles_guard_role khóa ở phía cơ sở dữ liệu — thêm nó vào đây sẽ chỉ
+       tạo ra một lệnh ghi luôn luôn bị máy chủ từ chối. */
 
     if (Object.keys(row).length === 0) return null;
 
@@ -395,6 +432,63 @@ export const authService = {
 
     const { data: userData } = await client.auth.getUser();
     return toAccount(data, userData.user, await fetchActivity(userId));
+  },
+
+  /* Nâng tài khoản hiện tại lên vai trò Biên Tập Viên / Admin bằng mã truy cập.
+     Trả về { ok, reason, message, remaining, account }:
+
+       ok = false KHÔNG phải là lỗi hệ thống — mã sai là một câu trả lời hợp lệ
+       của máy chủ, nên nó đi về theo đường giá trị trả về chứ không ném ngoại
+       lệ. Chỉ những thứ thật sự hỏng (mất mạng, chưa chạy migration) mới ném. */
+  claimAdminRole: async (code) => {
+    const client = requireClient();
+    const cleanCode = String(code || '').trim();
+
+    /* Chặn sẵn ở client cho nhanh, nhưng KHÔNG coi đây là kiểm tra: hàm phía
+       máy chủ kiểm tra lại đúng điều kiện này, và đó mới là chỗ tính. */
+    if (cleanCode.length !== ADMIN_CODE_LENGTH) {
+      return {
+        ok: false,
+        reason: 'length',
+        message: `Mã truy cập gồm đúng ${ADMIN_CODE_LENGTH} ký tự.`,
+        account: null
+      };
+    }
+
+    const { data, error } = await client.rpc('claim_admin_role', { p_code: cleanCode });
+    if (error) throw toAdminGateError(error);
+
+    if (!data?.ok) {
+      return {
+        ok: false,
+        reason: data?.reason || 'wrong_code',
+        message: data?.message || 'Mã truy cập không đúng.',
+        remaining: data?.remaining,
+        account: null
+      };
+    }
+
+    /* Máy chủ trả về chính hàng profiles sau khi cập nhật, nên đối tượng tài
+       khoản dựng ở đây là trạng thái đã lưu — không phải phỏng đoán lạc quan. */
+    const { data: userData } = await client.auth.getUser();
+    const account = toAccount(
+      data.profile,
+      userData.user,
+      await fetchActivity(userData.user.id)
+    );
+
+    return { ok: true, reason: 'granted', message: null, account };
+  },
+
+  /* Quay lại vai trò Học Sinh. Không cần mã — xem ghi chú trong migration. */
+  releaseAdminRole: async () => {
+    const client = requireClient();
+
+    const { data, error } = await client.rpc('release_admin_role');
+    if (error) throw toAdminGateError(error);
+
+    const { data: userData } = await client.auth.getUser();
+    return toAccount(data.profile, userData.user, await fetchActivity(userData.user.id));
   },
 
   /* Lịch sử đăng nhập của chính người dùng — dùng cho trang tài khoản và cho
