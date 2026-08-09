@@ -76,7 +76,7 @@ const AppContent = () => {
         </main>
 
         <footer className="app-footer">
-          <strong>Blooom v3.0 — Nền tảng học tập dựa trên bằng chứng</strong>
+          <strong>Blooom — Nền tảng học tập dựa trên bằng chứng</strong>
           <span>React + Vite • Design system CSS thuần • Dữ liệu lưu trên PostgreSQL</span>
         </footer>
       </div>
