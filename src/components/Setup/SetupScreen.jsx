@@ -67,7 +67,9 @@ export const SetupScreen = () => {
             <p>
               Mở <em>SQL Editor</em>, dán toàn bộ nội dung tệp{' '}
               <code className="mono">supabase/migrations/0001_init.sql</code> trong mã nguồn rồi
-              bấm <em>Run</em>.
+              bấm <em>Run</em>. Làm tiếp đúng như vậy với{' '}
+              <code className="mono">supabase/migrations/0002_admin_access_code.sql</code> — tệp
+              này khóa cột vai trò và dựng cổng mã truy cập cho tài khoản Admin.
             </p>
           </li>
 
