@@ -7,8 +7,61 @@
    ========================================================================== */
 
 .landing {
+  position: relative;
   min-height: 100vh;
+  overflow: hidden;
   background: var(--bg-app);
+}
+
+/* Giấy kẻ ô phía sau toàn trang, mờ dần về phía chân trang bằng một mặt nạ
+   hình tròn: nó định vị trang trong cùng hệ hình với các bề mặt đo bên trong
+   ứng dụng, nhưng không được phép cạnh tranh với chữ. */
+.landing-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.75;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(120% 80% at 50% 0%, #000 5%, transparent 70%);
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, #000 5%, transparent 70%);
+}
+
+.landing > *:not(.landing-grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   DẢI CHẠY — môn học và mô hình
+   Trang trí, nên nó mang aria-hidden và không chứa thông tin nào không có ở
+   chỗ khác. Dừng lại khi người dùng đã yêu cầu giảm chuyển động.
+   ========================================================================== */
+.landing-marquee {
+  overflow: hidden;
+  padding: 0.875rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.landing-marquee-track {
+  display: flex;
+  gap: 2.75rem;
+  width: max-content;
+  animation: marquee 26s linear infinite;
+}
+
+.landing-marquee-track span {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -126,6 +179,32 @@
   margin: var(--sp-4) 0 0;
   font-size: var(--fs-xs);
   color: var(--text-dim);
+}
+
+/* Câu mở đầu dựng lên theo trình tự đọc — chỉ ở lần tải đầu, và chỉ ở khối
+   hero: phần còn lại của trang do useReveal điều khiển khi cuộn tới. */
+.landing-hero-copy .tag-line {
+  animation: rise-in 0.7s var(--ease-out) both;
+}
+
+.landing-hero-copy h1 {
+  animation: rise-in 0.8s var(--ease-out) 0.08s both;
+}
+
+.landing-hero-copy .landing-lede {
+  animation: rise-in 0.8s var(--ease-out) 0.16s both;
+}
+
+.landing-hero-copy .landing-cta {
+  animation: rise-in 0.8s var(--ease-out) 0.24s both;
+}
+
+.landing-hero-copy .landing-fineprint {
+  animation: rise-in 0.8s var(--ease-out) 0.32s both;
+}
+
+.landing-hero-figure {
+  animation: pop-in 0.9s var(--ease-out) 0.2s both;
 }
 
 /* ==========================================================================
@@ -428,6 +507,12 @@
 
 .landing-close .landing-cta {
   justify-content: center;
+}
+
+/* Nút cuối trang thở nhẹ — nó là lối ra duy nhất ở đây, nên nó được phép là
+   thứ động duy nhất. */
+.btn.is-beckon {
+  animation: pulse-ring 3s ease-in-out infinite;
 }
 
 .landing-footer {

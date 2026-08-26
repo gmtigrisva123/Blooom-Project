@@ -3,14 +3,13 @@ import { useApp } from '../../context/AppContext';
 import confetti from 'canvas-confetti';
 import { SUBJECTS, subjectColor } from '../../constants/subjects';
 import { formatMinutes, dayKey } from '../../services/gamification';
-import { Hero, EmptyState, SubjectBadge } from '../common/ui';
+import { EmptyState, SubjectBadge } from '../common/ui';
 import {
   Play,
   Pause,
   RotateCcw,
   Volume2,
   VolumeX,
-  Timer as TimerIcon,
   CheckCircle2,
   BookOpen,
   History,
@@ -28,13 +27,22 @@ const RING_RADIUS = 116;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 export const WorkTimer = () => {
-  const { handleSaveTimerSession, timerSessions, timerControlsRef, showToast } = useApp();
+  const {
+    handleSaveTimerSession,
+    timerSessions,
+    timerControlsRef,
+    timerPrefs,
+    setTimerPrefs,
+    showToast
+  } = useApp();
+
+  /* Độ dài phiên sống trong context: trang Tổng Quan đọc nó để nói đúng con
+     số trên nút "Bắt đầu N phút" ngay cả khi Bộ Đếm Giờ chưa được gắn. */
+  const { workMinutes, breakMinutes } = timerPrefs;
 
   const [mode, setMode] = useState('work');
-  const [workMinutes, setWorkMinutes] = useState(25);
-  const [breakMinutes, setBreakMinutes] = useState(5);
   const [subject, setSubject] = useState('Toán');
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  const [secondsLeft, setSecondsLeft] = useState(timerPrefs.workMinutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -188,8 +196,7 @@ export const WorkTimer = () => {
   const applyPreset = (preset) => {
     setIsRunning(false);
     sessionStartRef.current = null;
-    setWorkMinutes(preset.work);
-    setBreakMinutes(preset.rest);
+    setTimerPrefs({ workMinutes: preset.work, breakMinutes: preset.rest });
     setMode('work');
     setSecondsLeft(preset.work * 60);
   };
@@ -208,219 +215,202 @@ export const WorkTimer = () => {
   const activePreset = PRESETS.find((p) => p.work === workMinutes);
 
   return (
-    <div className="stack-5">
-      <Hero
-        eyebrow="Pomodoro tập trung"
-        icon={<TimerIcon size={12} />}
-        title="Học Sâu Từng Phiên, Nghỉ Đúng Lúc"
-        description="Chọn môn học, đặt thời lượng và để Blooom ghi lại từng phút tập trung của bạn. Mỗi phút học là 1 điểm XP."
-        action={
-          <div className="row" style={{ gap: '0.5rem' }}>
-            <span className="kbd">Space</span>
-            <span className="t-xs t-dim">chạy/dừng</span>
-            <span className="kbd">R</span>
-            <span className="t-xs t-dim">đặt lại</span>
-          </div>
-        }
-      />
+    <div className="split timer-split">
+      {/* ---------------------------------------------------------------- */}
+      {/* Timer                                                             */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="panel timer-panel">
+        <div className="row-between" style={{ width: '100%' }}>
+          <span className="badge badge-accent badge-eyebrow">
+            {mode === 'work' ? <GraduationCap size={12} /> : <Coffee size={12} />}
+            {mode === 'work' ? 'Phiên học tập' : 'Thời gian nghỉ'}
+          </span>
 
-      <div className="split">
-        {/* ---------------------------------------------------------------- */}
-        {/* Timer                                                             */}
-        {/* ---------------------------------------------------------------- */}
-        <section className="panel timer-panel">
-          <div className="row-between" style={{ width: '100%' }}>
-            <span className="badge badge-accent badge-eyebrow">
-              {mode === 'work' ? <GraduationCap size={12} /> : <Coffee size={12} />}
-              {mode === 'work' ? 'Phiên học tập' : 'Thời gian nghỉ'}
-            </span>
-
-            <button
-              className={`icon-btn ${soundEnabled ? 'is-active' : ''}`}
-              onClick={() => setSoundEnabled((s) => !s)}
-              title={soundEnabled ? 'Đang bật âm báo' : 'Đã tắt âm báo'}
-              aria-label="Bật/tắt âm báo khi hết giờ"
-            >
-              {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-            </button>
-          </div>
-
-          <div className="mode-switch" style={{ marginTop: 'var(--sp-5)' }}>
-            <span
-              className={`mode-thumb ${mode === 'break' ? 'at-break' : ''}`}
-              aria-hidden="true"
-            />
-            <button
-              className={`mode-btn ${mode === 'work' ? 'is-active' : ''}`}
-              onClick={() => switchMode('work')}
-            >
-              Học {workMinutes}′
-            </button>
-            <button
-              className={`mode-btn ${mode === 'break' ? 'is-active' : ''}`}
-              onClick={() => switchMode('break')}
-            >
-              Nghỉ {breakMinutes}′
-            </button>
-          </div>
-
-          {mode === 'work' && (
-            <div className="field" style={{ maxWidth: '17rem', width: '100%' }}>
-              <label htmlFor="timerSubject" className="t-xs t-dim">
-                Môn học đang rèn luyện
-              </label>
-              <select
-                id="timerSubject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                disabled={isRunning}
-              >
-                {SUBJECTS.filter((s) => s.value !== 'Khác').map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* ---- Countdown ring ---- */}
-          <div
-            className={['ring-wrap', isRunning ? 'is-running' : '', isUrgent ? 'is-urgent' : '']
-              .filter(Boolean)
-              .join(' ')}
+          <button
+            className={`icon-btn ${soundEnabled ? 'is-active' : ''}`}
+            onClick={() => setSoundEnabled((s) => !s)}
+            title={soundEnabled ? 'Đang bật âm báo' : 'Đã tắt âm báo'}
+            aria-label="Bật/tắt âm báo khi hết giờ"
           >
-            {/* The ring is a single flat accent stroke — see styles/timer.css. */}
-            <svg className="ring-svg" viewBox="0 0 256 256">
-              <circle className="ring-track" cx="128" cy="128" r={RING_RADIUS} />
-              <circle
-                className="ring-progress"
-                cx="128"
-                cy="128"
-                r={RING_RADIUS}
-                strokeDasharray={RING_CIRCUMFERENCE}
-                strokeDashoffset={RING_CIRCUMFERENCE * (1 - progressPercent / 100)}
-              />
-            </svg>
+            {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          </button>
+        </div>
 
-            <div className="ring-face">
-              <span className="ring-time">{formatClock(secondsLeft)}</span>
-              <span className="ring-caption">
-                {mode === 'work' ? (
-                  <>
-                    <BookOpen size={13} /> {subject}
-                  </>
-                ) : (
-                  <>
-                    <Coffee size={13} /> Thư giãn nào
-                  </>
-                )}
-              </span>
-              <span className="ring-pct">{Math.round(progressPercent)}% hoàn thành</span>
-            </div>
-          </div>
+        <div className="mode-switch" style={{ marginTop: 'var(--sp-5)' }}>
+          <span
+            className={`mode-thumb ${mode === 'break' ? 'at-break' : ''}`}
+            aria-hidden="true"
+          />
+          <button
+            className={`mode-btn ${mode === 'work' ? 'is-active' : ''}`}
+            onClick={() => switchMode('work')}
+          >
+            Học {workMinutes}′
+          </button>
+          <button
+            className={`mode-btn ${mode === 'break' ? 'is-active' : ''}`}
+            onClick={() => switchMode('break')}
+          >
+            Nghỉ {breakMinutes}′
+          </button>
+        </div>
 
-          <div className="timer-controls">
-            <button
-              className={`btn btn-lg ${isRunning ? 'btn-secondary' : 'btn-primary'}`}
-              onClick={toggleTimer}
+        {mode === 'work' && (
+          <div className="field" style={{ maxWidth: '17rem', width: '100%' }}>
+            <label htmlFor="timerSubject" className="t-xs t-dim">
+              Môn học đang rèn luyện
+            </label>
+            <select
+              id="timerSubject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              disabled={isRunning}
             >
-              {isRunning ? (
+              {SUBJECTS.filter((s) => s.value !== 'Khác').map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* ---- Countdown ring ---- */}
+        <div
+          className={['ring-wrap', isRunning ? 'is-running' : '', isUrgent ? 'is-urgent' : '']
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {/* The ring is a single flat accent stroke — see styles/timer.css. */}
+          <svg className="ring-svg" viewBox="0 0 256 256">
+            <circle className="ring-track" cx="128" cy="128" r={RING_RADIUS} />
+            <circle
+              className="ring-progress"
+              cx="128"
+              cy="128"
+              r={RING_RADIUS}
+              strokeDasharray={RING_CIRCUMFERENCE}
+              strokeDashoffset={RING_CIRCUMFERENCE * (1 - progressPercent / 100)}
+            />
+          </svg>
+
+          <div className="ring-face">
+            <span className="ring-time">{formatClock(secondsLeft)}</span>
+            <span className="ring-caption">
+              {mode === 'work' ? (
                 <>
-                  <Pause size={18} /> Tạm Dừng
+                  <BookOpen size={13} /> {subject}
                 </>
               ) : (
                 <>
-                  <Play size={18} fill="currentColor" />
-                  {secondsLeft === totalSeconds ? 'Bắt Đầu Học' : 'Tiếp Tục'}
+                  <Coffee size={13} /> Thư giãn nào
                 </>
               )}
-            </button>
-            <button
-              className="btn btn-secondary btn-lg"
-              onClick={resetTimer}
-              title="Đặt lại bộ đếm (R)"
-              aria-label="Đặt lại bộ đếm"
-            >
-              <RotateCcw size={18} />
-            </button>
-          </div>
-
-          <div className="preset-row">
-            {PRESETS.map((preset) => (
-              <button
-                key={preset.work}
-                className={`preset ${activePreset?.work === preset.work ? 'is-active' : ''}`}
-                onClick={() => applyPreset(preset)}
-                disabled={isRunning}
-              >
-                <span className="preset-time">
-                  {preset.work}′ / {preset.rest}′
-                </span>
-                <span className="preset-name">{preset.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* ---------------------------------------------------------------- */}
-        {/* Session log                                                       */}
-        {/* ---------------------------------------------------------------- */}
-        <section className="panel log-panel">
-          <div className="section-head">
-            <span className="section-head-icon">
-              <History size={16} />
             </span>
-            <div className="grow">
-              <h3>Nhật Ký Phiên Học</h3>
-              <span className="t-xs t-dim">{timerSessions.length} phiên đã hoàn thành</span>
-            </div>
+            <span className="ring-pct">{Math.round(progressPercent)}% hoàn thành</span>
           </div>
+        </div>
 
-          {timerSessions.length === 0 ? (
-            <EmptyState
-              icon={<CheckCircle2 size={30} />}
-              title="Chưa có phiên học nào"
-              description="Hoàn thành phiên Pomodoro đầu tiên và nó sẽ xuất hiện ngay tại đây, kèm điểm XP."
-            />
-          ) : (
-            <>
-              <div className="log-list scroll-y">
-                {timerSessions.map((session) => (
-                  <div
-                    className="list-row"
-                    key={session.id}
-                    style={{ '--row-color': subjectColor(session.subject) }}
-                  >
-                    <span className="list-row-icon">
-                      <BookOpen size={16} />
-                    </span>
-                    <div className="list-row-body">
-                      <div className="list-row-title">{session.subject}</div>
-                      <div className="list-row-meta">
-                        {new Date(session.startedAt).toLocaleString('vi-VN', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          day: '2-digit',
-                          month: '2-digit'
-                        })}
-                      </div>
+        <div className="timer-controls">
+          <button
+            className={`btn btn-lg ${isRunning ? 'btn-secondary' : 'btn-primary'}`}
+            onClick={toggleTimer}
+          >
+            {isRunning ? (
+              <>
+                <Pause size={18} /> Tạm Dừng
+              </>
+            ) : (
+              <>
+                <Play size={18} fill="currentColor" />
+                {secondsLeft === totalSeconds ? 'Bắt Đầu Học' : 'Tiếp Tục'}
+              </>
+            )}
+          </button>
+          <button
+            className="btn btn-secondary btn-lg"
+            onClick={resetTimer}
+            title="Đặt lại bộ đếm (R)"
+            aria-label="Đặt lại bộ đếm"
+          >
+            <RotateCcw size={18} />
+          </button>
+        </div>
+
+        <div className="preset-row">
+          {PRESETS.map((preset) => (
+            <button
+              key={preset.work}
+              className={`preset ${activePreset?.work === preset.work ? 'is-active' : ''}`}
+              onClick={() => applyPreset(preset)}
+              disabled={isRunning}
+            >
+              <span className="preset-time">
+                {preset.work}′ / {preset.rest}′
+              </span>
+              <span className="preset-name">{preset.name}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Session log                                                       */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="panel log-panel">
+        <div className="section-head">
+          <span className="section-head-icon">
+            <History size={16} />
+          </span>
+          <div className="grow">
+            <h3>Nhật Ký Phiên Học</h3>
+            <span className="t-xs t-dim">{timerSessions.length} phiên đã hoàn thành</span>
+          </div>
+        </div>
+
+        {timerSessions.length === 0 ? (
+          <EmptyState
+            icon={<CheckCircle2 size={30} />}
+            title="Chưa có phiên học nào"
+            description="Hoàn thành phiên Pomodoro đầu tiên và nó sẽ xuất hiện ngay tại đây, kèm điểm XP."
+          />
+        ) : (
+          <>
+            <div className="log-list scroll-y">
+              {timerSessions.map((session) => (
+                <div
+                  className="list-row"
+                  key={session.id}
+                  style={{ '--row-color': subjectColor(session.subject) }}
+                >
+                  <span className="list-row-icon">
+                    <BookOpen size={16} />
+                  </span>
+                  <div className="list-row-body">
+                    <div className="list-row-title">{session.subject}</div>
+                    <div className="list-row-meta">
+                      {new Date(session.startedAt).toLocaleString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        day: '2-digit',
+                        month: '2-digit'
+                      })}
                     </div>
-                    <SubjectBadge subject={session.subject}>
-                      +{session.durationMinutes}′
-                    </SubjectBadge>
                   </div>
-                ))}
-              </div>
+                  <SubjectBadge subject={session.subject}>
+                    +{session.durationMinutes}′
+                  </SubjectBadge>
+                </div>
+              ))}
+            </div>
 
-              <div className="log-total">
-                <span className="t-sm t-soft">Tổng thời gian học hôm nay</span>
-                <span className="log-total-value">{formatMinutes(todayTotal)}</span>
-              </div>
-            </>
-          )}
-        </section>
-      </div>
+            <div className="log-total">
+              <span className="t-sm t-soft">Tổng thời gian học hôm nay</span>
+              <span className="log-total-value">{formatMinutes(todayTotal)}</span>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 };

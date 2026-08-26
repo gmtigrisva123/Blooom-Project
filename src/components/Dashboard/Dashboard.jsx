@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import { NAV_ITEMS } from '../../constants/nav';
 import { subjectColor } from '../../constants/subjects';
 import {
   buildDailyBuckets,
@@ -8,33 +7,23 @@ import {
   relativeTime,
   formatMinutes
 } from '../../services/gamification';
-import { StatCard, SkeletonPanel, SkeletonRows } from '../common/ui';
+import { SkeletonRows } from '../common/ui';
 import {
-  Flame,
   Play,
-  Trophy,
-  Clock,
-  Target,
+  Check,
   BarChart3,
   Activity,
   BookOpen,
   Users,
   FileText,
   Sparkles,
-  ChevronRight,
+  Trophy,
+  Waves,
   Award
 } from 'lucide-react';
 
-const greeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 11) return 'Chào buổi sáng';
-  if (hour < 14) return 'Chào buổi trưa';
-  if (hour < 18) return 'Chào buổi chiều';
-  return 'Chào buổi tối';
-};
-
 /* ==========================================================================
-   7-DAY BAR CHART
+   7-DAY BAR CHART — bare on the page, no panel around it
    ========================================================================== */
 const WeekChart = ({ buckets }) => {
   const peak = Math.max(...buckets.map((b) => b.minutes), 1);
@@ -148,14 +137,22 @@ const buildActivity = ({ sessions, notes, groups, articles, userId }) => {
 
 /* ==========================================================================
    DASHBOARD
+
+   Đọc như một trang giấy, không như một bảng đồng hồ: một câu dẫn ở cột
+   trái, một ô đo ở cột phải, rồi các khối bằng chứng xếp phẳng bên dưới.
+   Khối nào chưa có dữ liệu thì không dựng một biểu đồ rỗng — nó lùi xuống
+   danh sách "sẽ hiện ở đây khi có dữ liệu", kèm đúng số quan sát còn thiếu.
    ========================================================================== */
 export const Dashboard = () => {
   const {
     user,
     setActiveTab,
     timerSessions,
+    timerPrefs,
+    timerControlsRef,
     notes,
     groups,
+    cards,
     editorPicks,
     performanceGoals,
     gamification,
@@ -164,7 +161,7 @@ export const Dashboard = () => {
     isBooting
   } = useApp();
 
-  const { level, streak, stats, badges } = gamification;
+  const { level, streak, badges, unlockedCount } = gamification;
 
   /* New badges are flagged for this render, then marked as seen. */
   useEffect(() => {
@@ -174,23 +171,10 @@ export const Dashboard = () => {
   }, [newBadgeIds, acknowledgeBadges]);
 
   const buckets = useMemo(() => buildDailyBuckets(timerSessions, 7), [timerSessions]);
-
   const weekSessions = useMemo(() => sessionsInWindow(timerSessions, 7), [timerSessions]);
 
   const weekMinutes = weekSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
-  const goalMinutes = Math.max(1, performanceGoals.targetHoursPerWeek * 60);
-  const goalPercent = Math.min(100, Math.round((weekMinutes / goalMinutes) * 100));
-
   const todayMinutes = buckets[buckets.length - 1]?.minutes || 0;
-
-  const topSubject = useMemo(() => {
-    const totals = {};
-    weekSessions.forEach((s) => {
-      totals[s.subject] = (totals[s.subject] || 0) + s.durationMinutes;
-    });
-    const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-    return entries[0] ? { subject: entries[0][0], minutes: entries[0][1] } : null;
-  }, [weekSessions]);
 
   const activity = useMemo(
     () =>
@@ -204,165 +188,194 @@ export const Dashboard = () => {
     [timerSessions, notes, groups, editorPicks, user.id]
   );
 
-  const quickTiles = NAV_ITEMS.filter((item) => item.id !== 'dashboard');
-  const firstName = user.name?.split(' ').slice(-1)[0] || 'bạn';
+  const hasSessions = timerSessions.length > 0;
+
+  /* ---- Câu dẫn ---------------------------------------------------------
+     Ba trạng thái thật, không nội suy: đã học hôm nay, đã từng học nhưng
+     hôm nay chưa, và chưa có gì cả. */
+  const kicker = hasSessions ? 'Hôm nay' : 'Phiên đầu tiên';
+  let headline;
+  if (todayMinutes > 0) {
+    headline = `Bạn đã học ${formatMinutes(todayMinutes)} hôm nay. Giữ đà nhé.`;
+  } else if (hasSessions) {
+    headline = 'Hôm nay chưa có phiên nào. Một phiên là đủ để giữ chuỗi.';
+  } else {
+    headline = 'Blooom chưa biết gì về bạn. Hai mươi lăm phút là đủ để bắt đầu.';
+  }
+  const lede = hasSessions
+    ? 'Mỗi phút học là 1 XP. Biểu đồ tuần, chuỗi ngày và các mô hình khoa học đều đã bắt đầu đọc dữ liệu của bạn.'
+    : 'Mọi con số trong ứng dụng đều tính từ dữ liệu thật của bạn — không có dữ liệu mẫu. Bấm bắt đầu, chọn môn, và biểu đồ đầu tiên xuất hiện ngay khi phiên kết thúc.';
+
+  /* Bấm ở đây thì Bộ Đếm Giờ phải tự chạy — nếu không, "Bắt đầu" chỉ là một
+     nút điều hướng. Bộ điều khiển chỉ tồn tại sau khi trang kia gắn vào cây,
+     nên lệnh chạy đợi một nhịp render. */
+  const startSession = () => {
+    setActiveTab('timer');
+    setTimeout(() => timerControlsRef.current?.toggle(), 80);
+  };
+
+  const clockText = `${String(timerPrefs.workMinutes).padStart(2, '0')}:00`;
+
+  /* ---- Ba bước để ứng dụng có ích -------------------------------------- */
+  const onboarding = [
+    {
+      n: '01',
+      title: 'Học một phiên',
+      body: 'Một phiên Pomodoro là đơn vị quan sát của cả nền tảng. Có nó, XP, chuỗi ngày và biểu đồ tuần đều bắt đầu chạy.',
+      cta: 'Mở Bộ Đếm Giờ',
+      done: hasSessions,
+      go: () => setActiveTab('timer')
+    },
+    {
+      n: '02',
+      title: 'Tạo 10 thẻ ghi nhớ',
+      body: 'SM-2 cần thẻ để lên lịch. Mười thẻ đủ để đường cong quên Ebbinghaus có hình dạng thật.',
+      cta: 'Mở Ôn Ngắt Quãng',
+      done: cards.length >= 10,
+      go: () => setActiveTab('recall')
+    },
+    {
+      n: '03',
+      title: 'Đặt mục tiêu tuần',
+      body: 'Mặc định 10 giờ chỉ là mức gợi ý. Đặt số của bạn thì vòng đo Hiệu Suất mới nói được điều gì.',
+      cta: 'Mở Hiệu Suất',
+      done: !performanceGoals.isDefault,
+      go: () => setActiveTab('performance')
+    }
+  ];
+  const onboardDone = onboarding.filter((o) => o.done).length;
+
+  /* ---- Những gì còn đang chờ dữ liệu ------------------------------------
+     Mỗi dòng nói rõ còn thiếu bao nhiêu quan sát, để chỗ trống là một con số
+     chứ không phải một lời hứa. */
+  const waiting = [
+    {
+      icon: <BarChart3 size={15} />,
+      label: 'Biểu đồ giờ học 7 ngày',
+      ok: hasSessions,
+      meta: 'cần 1 phiên'
+    },
+    {
+      icon: <Activity size={15} />,
+      label: 'Dòng hoạt động',
+      ok: activity.length > 0,
+      meta: 'cần 1 hành động'
+    },
+    {
+      icon: <Waves size={15} />,
+      label: 'Giờ đỉnh tập trung (cosinor 24h)',
+      ok: timerSessions.length >= 12,
+      meta: `${timerSessions.length} / 12 phiên`
+    },
+    {
+      icon: <Trophy size={15} />,
+      label: `Huy hiệu — ${badges.length} chiếc, chiếc đầu mở sau phiên đầu tiên`,
+      ok: unlockedCount > 0,
+      meta: `${unlockedCount} / ${badges.length}`
+    }
+  ].filter((w) => !w.ok);
 
   return (
-    <div className="stack-5">
+    <div className="dash">
       {/* ---------------------------------------------------------------- */}
-      {/* Greeting + streak + XP                                            */}
+      {/* Câu dẫn + ô đo                                                    */}
       {/* ---------------------------------------------------------------- */}
-      <section className="dash-hero">
+      <section className="dash-lede-row">
         <div>
-          <span className="dash-hello">
-            {greeting()}, {firstName} 👋
-          </span>
-          <h1>
-            {streak.studiedToday
-              ? 'Hôm nay bạn đã học rồi — giữ đà nhé!'
-              : 'Sẵn sàng cho phiên học đầu tiên hôm nay?'}
-          </h1>
-          <p>
-            {todayMinutes > 0
-              ? `Bạn đã học ${formatMinutes(todayMinutes)} hôm nay và ${formatMinutes(
-                  weekMinutes
-                )} trong 7 ngày qua.`
-              : 'Bắt đầu một phiên Pomodoro 25 phút để khởi động ngày học của bạn.'}
-          </p>
+          <div className="dash-kicker mono">{kicker}</div>
+          <h1 className="dash-headline">{headline}</h1>
+          <p className="dash-lede">{lede}</p>
 
-          <div className="dash-hero-cta">
-            <button className="btn btn-primary" onClick={() => setActiveTab('timer')}>
-              <Play size={16} fill="currentColor" /> Bắt Đầu Học Ngay
+          <div className="dash-actions">
+            <button className="btn btn-primary" onClick={startSession}>
+              <Play size={15} fill="currentColor" /> Bắt đầu {timerPrefs.workMinutes} phút
             </button>
             <button className="btn btn-secondary" onClick={() => setActiveTab('performance')}>
-              <BarChart3 size={16} /> Xem Tiến Độ
+              Xem tiến độ
             </button>
           </div>
         </div>
 
-        <div className="gamify-block">
-          <div className={`streak-badge ${streak.current === 0 ? 'is-cold' : ''}`}>
-            <div className="streak-flame">
-              <Flame size={22} fill="currentColor" />
+        <div className="dash-clock">
+          <div className="dash-clock-label mono">Đồng hồ chờ</div>
+          <div className="dash-clock-time mono">{clockText}</div>
+          <div className="dash-clock-rule" />
+          <dl className="dash-clock-rows mono">
+            <div>
+              <dt>Hôm nay</dt>
+              <dd>{formatMinutes(todayMinutes)}</dd>
             </div>
-            <span className="streak-num">{streak.current}</span>
-            <span className="streak-cap">
-              ngày liên tiếp
-              {streak.longest > streak.current && (
-                <>
-                  <br />
-                  Kỷ lục: {streak.longest}
-                </>
-              )}
-            </span>
-          </div>
-
-          <div className="xp-block">
-            <div className="xp-head">
-              <span className="xp-level">Cấp {level.level}</span>
-              <span className="xp-title">{level.title}</span>
+            <div>
+              <dt>Tuần này</dt>
+              <dd>
+                {(weekMinutes / 60).toFixed(1)} / {performanceGoals.targetHoursPerWeek} giờ
+              </dd>
             </div>
-            <div className="bar">
-              <div className="bar-fill xp-bar-fill" style={{ width: `${level.percent}%` }} />
+            <div>
+              <dt>Chuỗi</dt>
+              <dd>{streak.current} ngày</dd>
             </div>
-            <div className="xp-foot">
-              <span>{level.xp} XP tích lũy</span>
-              <span>
-                Còn {level.xpRemaining} XP → Cấp {level.level + 1}
-              </span>
-            </div>
-          </div>
+          </dl>
         </div>
       </section>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Quick numbers                                                     */}
+      {/* Ba bước                                                           */}
       {/* ---------------------------------------------------------------- */}
-      <div className="grid grid-4 stagger">
-        <StatCard
-          icon={<Clock size={22} />}
-          label="Học hôm nay"
-          value={todayMinutes}
-          unit="phút"
-          note={`${buckets[buckets.length - 1]?.sessions || 0} phiên đã hoàn thành`}
-          color="var(--d-2)"
-        />
-        <StatCard
-          icon={<Target size={22} />}
-          label="Mục tiêu tuần"
-          value={`${goalPercent}%`}
-          note={`${(weekMinutes / 60).toFixed(1)}/${performanceGoals.targetHoursPerWeek} giờ${
-            performanceGoals.isDefault ? ' (mức gợi ý)' : ''
-          }`}
-          color="var(--d-1)"
-        />
-        <StatCard
-          icon={<BookOpen size={22} />}
-          label="Môn học nhiều nhất"
-          value={topSubject ? topSubject.subject : '—'}
-          note={topSubject ? formatMinutes(topSubject.minutes) : 'Chưa có dữ liệu tuần này'}
-          color={topSubject ? subjectColor(topSubject.subject) : '#94a3b8'}
-        />
-        <StatCard
-          icon={<Trophy size={22} />}
-          label="Huy hiệu đã mở"
-          value={`${gamification.unlockedCount}/${badges.length}`}
-          note={
-            newBadgeIds.length > 0
-              ? `🎉 ${newBadgeIds.length} huy hiệu mới!`
-              : `Tổng ${stats.totalSessions} phiên học`
-          }
-          color="var(--d-3)"
-        />
-      </div>
+      <section>
+        <div className="dash-block-head">
+          <h2>Ba bước để ứng dụng có ích</h2>
+          <span className="mono">
+            {onboardDone} / {onboarding.length} hoàn thành
+          </span>
+        </div>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* Chart + activity                                                  */}
-      {/* ---------------------------------------------------------------- */}
-      <div className="split">
-        {isBooting ? (
-          <SkeletonPanel height="11rem" />
-        ) : (
-          <section className="panel panel-pad">
-            <div className="section-head">
-              <span className="section-head-icon">
-                <BarChart3 size={16} />
-              </span>
-              <div className="grow">
-                <h3>Giờ Học 7 Ngày Gần Nhất</h3>
-                <span className="t-xs t-dim">
-                  Tổng {formatMinutes(weekMinutes)} • trung bình {Math.round(weekMinutes / 7)}{' '}
-                  phút/ngày
+        <ol className="onboard-grid">
+          {onboarding.map((step) => (
+            <li className={`onboard ${step.done ? 'is-done' : ''}`} key={step.n}>
+              <div className="onboard-top">
+                <span className="onboard-n mono">{step.n}</span>
+                <span className="onboard-check" aria-hidden="true">
+                  <Check size={11} />
                 </span>
               </div>
-            </div>
+              <div className="onboard-title">{step.title}</div>
+              <p>{step.body}</p>
+              <button className="onboard-cta" onClick={step.go}>
+                {step.cta}
+              </button>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-            {weekMinutes === 0 ? (
-              <div className="t-center t-dim t-sm" style={{ padding: '3rem 1rem' }}>
-                Chưa có phiên học nào trong 7 ngày qua.
-                <br />
-                Hoàn thành một phiên Pomodoro để biểu đồ bắt đầu có dữ liệu!
-              </div>
-            ) : (
-              <WeekChart buckets={buckets} />
-            )}
-          </section>
-        )}
-
-        <section className="panel panel-pad">
-          <div className="section-head">
-            <span className="section-head-icon">
-              <Activity size={16} />
+      {/* ---------------------------------------------------------------- */}
+      {/* Giờ học 7 ngày                                                    */}
+      {/* ---------------------------------------------------------------- */}
+      {hasSessions && (
+        <section>
+          <div className="dash-block-head is-plain">
+            <h2>Giờ học 7 ngày gần nhất</h2>
+            <span className="mono">
+              Tổng {formatMinutes(weekMinutes)} · trung bình {Math.round(weekMinutes / 7)}{' '}
+              phút/ngày
             </span>
-            <h3 className="grow">Hoạt Động Gần Đây</h3>
+          </div>
+          <WeekChart buckets={buckets} />
+        </section>
+      )}
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Dòng hoạt động                                                    */}
+      {/* ---------------------------------------------------------------- */}
+      {(isBooting || activity.length > 0) && (
+        <section>
+          <div className="dash-block-head is-plain">
+            <h2>Hoạt động gần đây</h2>
           </div>
 
           {isBooting ? (
             <SkeletonRows count={4} />
-          ) : activity.length === 0 ? (
-            <p className="t-sm t-dim t-center" style={{ padding: '2rem 0' }}>
-              Chưa có hoạt động nào được ghi nhận.
-            </p>
           ) : (
             <div className="feed">
               {activity.map((event) => (
@@ -381,80 +394,70 @@ export const Dashboard = () => {
             </div>
           )}
         </section>
-      </div>
+      )}
 
       {/* ---------------------------------------------------------------- */}
-      {/* Quick access tiles                                                */}
+      {/* Huy hiệu — chỉ khi đã mở được ít nhất một chiếc                    */}
       {/* ---------------------------------------------------------------- */}
-      <section>
-        <div className="section-head">
-          <span className="section-head-icon">
-            <ChevronRight size={16} />
-          </span>
-          <h3>Truy Cập Nhanh</h3>
-        </div>
-
-        <div className="grid grid-3 stagger">
-          {quickTiles.map((tile) => {
-            const Icon = tile.icon;
-            return (
-              <button
-                key={tile.id}
-                className="quick-tile"
-                style={{ '--tile-color': tile.color }}
-                onClick={() => setActiveTab(tile.id)}
-              >
-                <span className="quick-tile-icon">
-                  <Icon size={18} />
-                </span>
-                <span className="quick-tile-name">{tile.label}</span>
-                <span className="quick-tile-desc">{tile.subtitle}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Achievements                                                      */}
-      {/* ---------------------------------------------------------------- */}
-      <section className="panel panel-pad">
-        <div className="section-head">
-          <span className="section-head-icon">
-            <Award size={16} />
-          </span>
-          <div className="grow">
-            <h3>Bộ Sưu Tập Huy Hiệu</h3>
-            <span className="t-xs t-dim">
-              Đã mở khóa {gamification.unlockedCount}/{badges.length} huy hiệu
+      {unlockedCount > 0 && (
+        <section>
+          <div className="dash-block-head">
+            <h2>
+              <Award size={15} aria-hidden="true" /> Bộ sưu tập huy hiệu
+            </h2>
+            <span className="mono">
+              {unlockedCount}/{badges.length} · {level.title}
             </span>
           </div>
-          <span className="badge badge-accent">{level.title}</span>
-        </div>
 
-        <div className="badge-grid">
-          {badges.map((badge) => (
-            <div
-              key={badge.id}
-              className={[
-                'achv',
-                badge.unlocked ? 'is-unlocked' : '',
-                newBadgeIds.includes(badge.id) ? 'is-new' : ''
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              style={{ '--achv-color': badge.color }}
-              title={`${badge.name} — ${badge.requirement}`}
-            >
-              <span className="achv-medal" aria-hidden="true">
-                {badge.icon}
-              </span>
-              <span className="achv-name">{badge.name}</span>
-              <span className="achv-req">{badge.requirement}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+          <div className="badge-grid">
+            {badges.map((badge) => (
+              <div
+                key={badge.id}
+                className={[
+                  'achv',
+                  badge.unlocked ? 'is-unlocked' : '',
+                  newBadgeIds.includes(badge.id) ? 'is-new' : ''
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                style={{ '--achv-color': badge.color }}
+                title={`${badge.name} — ${badge.requirement}`}
+              >
+                <span className="achv-medal" aria-hidden="true">
+                  {badge.icon}
+                </span>
+                <span className="achv-name">{badge.name}</span>
+                <span className="achv-req">{badge.requirement}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Chờ dữ liệu                                                       */}
+      {/* ---------------------------------------------------------------- */}
+      {waiting.length > 0 && (
+        <section>
+          <div className="dash-block-head is-plain">
+            <h2>Sẽ hiện ở đây khi có dữ liệu</h2>
+            <span className="mono">{waiting.length} mục đang chờ</span>
+          </div>
+
+          <ul className="waiting-list">
+            {waiting.map((item) => (
+              <li key={item.label}>
+                <span className="waiting-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+                <span className="waiting-label">{item.label}</span>
+                <span className="waiting-meta mono">{item.meta}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 };

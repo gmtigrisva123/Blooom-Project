@@ -1,237 +1,306 @@
 /* ==========================================================================
-   BLOOOM — DASHBOARD + GAMIFICATION
+   BLOOOM — DASHBOARD
+
+   Trang này đọc như một trang giấy chứ không như một bảng đồng hồ: một câu
+   dẫn ở cột trái, một ô đo ở cột phải, rồi các khối bằng chứng xếp phẳng bên
+   dưới, ngăn nhau bằng nét kẻ chứ không bằng thẻ nổi.
    ========================================================================== */
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: 2.125rem;
+  animation: rise-in var(--t-slow) both;
+}
 
 /* ==========================================================================
-   GREETING HERO
+   CÂU DẪN + Ô ĐO
    ========================================================================== */
-.dash-hero {
-  position: relative;
-  overflow: hidden;
+.dash-lede-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--sp-6);
-  padding: var(--sp-8);
-  margin-bottom: var(--sp-5);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--bg-elevated);
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 2.75rem;
+  align-items: start;
 }
 
-/* Same graph-paper texture as the section heroes, so the dashboard reads as
-   part of the same instrument panel. */
-.dash-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: linear-gradient(to bottom right, #000, transparent 60%);
-  -webkit-mask-image: linear-gradient(to bottom right, #000, transparent 60%);
-}
-
-.dash-hero > * {
-  position: relative;
-  z-index: 1;
-}
-
-.dash-hello {
-  font-size: var(--fs-sm);
-  font-weight: 600;
+.dash-kicker {
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--accent-text);
-  letter-spacing: 0.02em;
+  margin-bottom: 0.875rem;
 }
 
-.dash-hero h1 {
-  font-size: var(--fs-3xl);
-  margin: 0.2rem 0 var(--sp-2);
+.dash-headline {
+  font-family: var(--font-display);
+  font-size: 2.375rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 var(--sp-3);
+  max-width: 24ch;
 }
 
-.dash-hero p {
-  margin-bottom: var(--sp-5);
+.dash-lede {
+  font-size: 0.906rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+  margin: 0 0 1.375rem;
+  max-width: 52ch;
 }
 
-.dash-hero-cta {
+.dash-actions {
   display: flex;
   gap: var(--sp-3);
   flex-wrap: wrap;
 }
 
-/* ---- Streak + XP block on the right of the hero ------------------------- */
-.gamify-block {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  padding: var(--sp-5);
-  background: var(--bg-inset);
+/* Ô đo — khung mảnh, không nền, để con số là thứ duy nhất có trọng lượng. */
+.dash-clock {
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  backdrop-filter: blur(6px);
+  border-radius: var(--r-sm);
+  padding: var(--sp-5);
 }
 
-.streak-badge {
+.dash-clock-label {
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: var(--sp-4);
+}
+
+.dash-clock-time {
+  font-size: 3.25rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-clock-rule {
+  height: 1px;
+  background: var(--border);
+  margin: var(--sp-4) 0;
+}
+
+.dash-clock-rows {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  min-width: 5.5rem;
-}
-
-.streak-flame {
-  display: grid;
-  place-items: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: var(--r-md);
-  color: var(--c-orange-2);
-  background: color-mix(in srgb, var(--c-orange) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--c-orange) 34%, transparent);
-}
-
-.streak-flame svg {
-  animation: flame-flicker 2.4s ease-in-out infinite;
-}
-
-.streak-badge.is-cold .streak-flame {
-  background: var(--bg-active);
+  gap: 0.563rem;
+  margin: 0;
+  font-size: 0.719rem;
   color: var(--text-dim);
-  box-shadow: none;
 }
 
-.streak-badge.is-cold .streak-flame svg {
-  animation: none;
-}
-
-.streak-num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--fs-xl);
-  font-weight: 600;
-  line-height: 1.1;
-  color: var(--text);
-}
-
-.streak-cap {
-  font-size: var(--fs-2xs);
-  color: var(--text-dim);
-  text-align: center;
-}
-
-.xp-block {
-  min-width: 15rem;
-  flex: 1;
-}
-
-.xp-head {
+.dash-clock-rows > div {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-3);
-  margin-bottom: 0.35rem;
 }
 
-.xp-level {
-  font-family: var(--font-mono);
-  font-size: var(--fs-md);
-  font-weight: 600;
+.dash-clock-rows dt,
+.dash-clock-rows dd {
+  margin: 0;
+}
+
+.dash-clock-rows dd {
   color: var(--text);
-}
-
-.xp-title {
-  font-size: var(--fs-xs);
-  color: var(--accent-text);
-  font-weight: 600;
-}
-
-.xp-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  font-size: var(--fs-2xs);
-  color: var(--text-dim);
-  margin-top: 0.3rem;
-  white-space: nowrap;
-}
-
-.xp-bar-fill {
-  background: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
-   QUICK ACTION TILES
+   ĐẦU KHỐI — một dòng chữ và một con số, ngăn bằng nét kẻ
    ========================================================================== */
-.quick-tile {
-  position: relative;
-  overflow: hidden;
+.dash-block-head {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
-  padding: var(--sp-5);
-  text-align: left;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  transition:
-    transform var(--t-base),
-    border-color var(--t-base),
-    box-shadow var(--t-base);
+  align-items: baseline;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
 }
 
-.quick-tile::after {
-  content: '';
-  position: absolute;
-  right: -2.5rem;
-  bottom: -2.5rem;
-  width: 7rem;
-  height: 7rem;
-  border-radius: 50%;
-  background: var(--tile-color);
-  opacity: 0.1;
-  transition:
-    transform var(--t-base),
-    opacity var(--t-base);
+.dash-block-head.is-plain {
+  padding-bottom: 0;
+  border-bottom: 0;
+  margin-bottom: var(--sp-4);
 }
 
-.quick-tile:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--tile-color) 45%, transparent);
-  box-shadow: 0 14px 32px -14px color-mix(in srgb, var(--tile-color) 70%, transparent);
-}
-
-.quick-tile:hover::after {
-  transform: scale(1.25);
-  opacity: 0.17;
-}
-
-.quick-tile-icon {
-  display: grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: var(--r-sm);
-  color: #fff;
-  background: var(--tile-color);
-  box-shadow: 0 6px 16px -6px var(--tile-color);
-  z-index: 1;
-}
-
-.quick-tile-name {
+.dash-block-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-display);
   font-size: var(--fs-md);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text);
-  z-index: 1;
+  margin: 0;
 }
 
-.quick-tile-desc {
-  font-size: var(--fs-xs);
+.dash-block-head span {
+  font-size: var(--fs-2xs);
   color: var(--text-dim);
-  z-index: 1;
+}
+
+/* ==========================================================================
+   BA BƯỚC ĐỂ ỨNG DỤNG CÓ ÍCH
+   Ô đã xong mờ đi thay vì biến mất, để người dùng thấy mình đã đi được đâu.
+   ========================================================================== */
+.onboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.onboard {
+  padding: var(--sp-5) var(--sp-6) 1.375rem;
+  transition: opacity var(--t-base);
+}
+
+.onboard:first-child {
+  padding-left: 0;
+}
+
+.onboard:last-child {
+  padding-right: 0;
+}
+
+.onboard:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.onboard.is-done {
+  opacity: 0.62;
+}
+
+.onboard-top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: 0.625rem;
+}
+
+.onboard-n {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+.onboard.is-done .onboard-n {
+  color: var(--accent);
+}
+
+.onboard-check {
+  display: grid;
+  place-items: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: var(--r-full);
+  color: transparent;
+  background: transparent;
+  border: 1px solid var(--border);
+  transition: all var(--t-slow);
+}
+
+.onboard.is-done .onboard-check {
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.onboard-title {
+  font-family: var(--font-display);
+  font-size: 0.969rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.375rem;
+}
+
+.onboard p {
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--text-dim);
+  margin: 0 0 var(--sp-3);
+}
+
+/* Một liên kết chứ không phải một nút tô đầy: ba cái nút chính cạnh nhau sẽ
+   tranh nhau với nút "Bắt đầu" ở câu dẫn phía trên. Tên riêng chứ không mượn
+   .link-btn dùng chung, vì gạch chân là nét của riêng khối này. */
+.onboard-cta {
+  font-size: var(--fs-sm);
+  color: var(--accent-text);
+  border-bottom: 1px solid var(--accent-line);
+  padding: 0 0 1px;
+  transition: border-color var(--t-fast);
+}
+
+.onboard-cta:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* ==========================================================================
+   ĐANG CHỜ DỮ LIỆU
+   Mỗi dòng nói rõ còn thiếu bao nhiêu quan sát — chỗ trống là một con số,
+   không phải một lời hứa.
+   ========================================================================== */
+.waiting-list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.waiting-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.waiting-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--text-dim);
+}
+
+.waiting-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.844rem;
+  color: var(--text-soft);
+}
+
+.waiting-meta {
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .dash-lede-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-6);
+  }
+
+  .onboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboard {
+    padding: var(--sp-4) 0;
+  }
+
+  .onboard:not(:last-child) {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
 }
 
 /* ==========================================================================
@@ -286,7 +355,7 @@
 
 .chart-bar.is-today {
   box-shadow:
-    0 0 0 2px var(--bg-elevated),
+    0 0 0 2px var(--bg-app),
     0 0 0 3px var(--accent);
 }
 

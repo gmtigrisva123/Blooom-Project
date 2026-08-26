@@ -18,7 +18,8 @@ import {
   TrendingUp,
   CheckCircle2,
   Flame,
-  Trophy
+  Trophy,
+  Info
 } from 'lucide-react';
 
 const GOAL_RADIUS = 62;
@@ -406,6 +407,14 @@ export const PerformanceTracker = () => {
           </div>
         </form>
       </Modal>
+      <p className="method-note">
+        <Info size={14} aria-hidden="true" />
+        <span>
+          Chuỗi ngày, XP và huy hiệu được tính lại từ dữ liệu thô ở mỗi lần dựng giao diện chứ
+          không bao giờ lưu thành cột, nên chúng không thể mâu thuẫn với nhật ký phiên học của
+          bạn.
+        </span>
+      </p>
     </div>
   );
 };

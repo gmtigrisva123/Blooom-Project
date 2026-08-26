@@ -76,8 +76,11 @@ const AppContent = () => {
         </main>
 
         <footer className="app-footer">
-          <strong>Blooom — Nền tảng học tập dựa trên bằng chứng</strong>
-          <span>React + Vite • Design system CSS thuần • Dữ liệu lưu trên PostgreSQL</span>
+          <strong>Blooom v3.0 — Nền tảng học tập dựa trên bằng chứng</strong>
+          {/* Gợi ý phím tắt sống ở đây từ khi trang Bộ Đếm Giờ bỏ dải giới
+              thiệu: chúng đúng ở mọi khu vực, nên chỗ của chúng là chân trang
+              chứ không phải đầu một trang duy nhất. */}
+          <span>phím 1–9 đổi khu vực · Space chạy/dừng · ⌘K tìm nhanh</span>
         </footer>
       </div>
 

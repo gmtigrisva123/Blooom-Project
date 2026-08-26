@@ -1,3 +1,17 @@
+/* Bộ Đếm Giờ không có dải giới thiệu ở đầu trang: vòng đếm ngược chính là
+   tiêu đề của nó, và một dải chữ phía trên chỉ đẩy vòng đó xuống dưới nếp
+   gấp. Cột nhật ký rộng hơn tỉ lệ .split mặc định một chút. */
+.timer-split {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  animation: rise-in var(--t-slow) both;
+}
+
+@media (max-width: 900px) {
+  .timer-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* ==========================================================================
    STUDYHUB — POMODORO TIMER
    ========================================================================== */

@@ -84,6 +84,11 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
      having to live in context — WorkTimer registers its controls here. */
   const timerControlsRef = useRef(null);
 
+  /* Độ dài phiên đang chọn. Nằm ở đây chứ không nằm trong WorkTimer vì trang
+     Tổng Quan phải nói đúng con số người dùng đã chọn — một nút "Bắt đầu 25
+     phút" trong khi họ đang dùng khối 50 phút là một con số bịa. */
+  const [timerPrefs, setTimerPrefs] = useState({ workMinutes: 25, breakMinutes: 5 });
+
   /* ---- Toasts ----------------------------------------------------------- */
   const showToast = useCallback((message, type = 'success') => {
     const id = ++toastSeq;
@@ -570,6 +575,8 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
     isBooting,
     loadErrors,
     timerControlsRef,
+    timerPrefs,
+    setTimerPrefs,
     showToast,
     // gamification
     gamification,

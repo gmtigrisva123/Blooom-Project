@@ -510,6 +510,14 @@ export const RecallLab = () => {
           </div>
         </form>
       </Modal>
+      <p className="method-note">
+        <Info size={14} aria-hidden="true" />
+        <span>
+          Đường cong quên là một ước lượng theo mô hình Ebbinghaus suy từ lịch ôn của từng thẻ,
+          không phải một phép đo trực tiếp trí nhớ của bạn. Nó chỉ bắt đầu có hình dạng đáng đọc
+          khi bộ thẻ đủ lớn và bạn chấm điểm trung thực.
+        </span>
+      </p>
     </div>
   );
 };

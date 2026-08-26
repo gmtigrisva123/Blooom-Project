@@ -10,7 +10,17 @@ import {
   SubjectBadge,
   SkeletonCards
 } from '../common/ui';
-import { Plus, Users, Lock, Globe, Check, UserPlus, Compass, SearchX } from 'lucide-react';
+import {
+  Plus,
+  Users,
+  Lock,
+  Globe,
+  Check,
+  UserPlus,
+  Compass,
+  SearchX,
+  Info
+} from 'lucide-react';
 
 const ALL = 'All';
 const MINE = 'Mine';
@@ -172,6 +182,15 @@ export const StudyGroups = () => {
       )}
 
       <CreateGroupModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <p className="method-note">
+        <Info size={14} aria-hidden="true" />
+        <span>
+          Số thành viên hiển thị ở mỗi nhóm được đếm trực tiếp từ bảng{' '}
+          <code>group_members</code> chứ không lưu thành một cột riêng, nên nó không thể lệch
+          khỏi danh sách thành viên thật. Nhóm riêng tư chỉ trả về cho thành viên, và ràng buộc
+          đó nằm ở tầng cơ sở dữ liệu, không phải ở bộ lọc của giao diện.
+        </span>
+      </p>
     </div>
   );
 };
