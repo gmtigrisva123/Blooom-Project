@@ -104,10 +104,15 @@ npm install
    Tệp này tạo bảng, chỉ mục, trigger, chính sách Row Level Security và bucket lưu tệp ghi
    chú. Chạy lại nhiều lần không gây lỗi.
 
-3. _(Tùy chọn)_ Bật **Authentication › Sign In / Providers › Allow anonymous sign-ins** nếu
+3. Chạy tiếp [`supabase/migrations/0002_admin_access_code.sql`](supabase/migrations/0002_admin_access_code.sql)
+   theo đúng cách trên. Tệp này khóa cột `profiles.role` và dựng cổng mã truy cập cho vai
+   trò Biên Tập Viên / Admin (xem [Vai trò Admin](#vai-trò-admin)). Bỏ qua bước này thì nút
+   đổi vai trò trong ứng dụng sẽ báo lỗi thay vì đổi được vai trò.
+
+4. _(Tùy chọn)_ Bật **Authentication › Sign In / Providers › Allow anonymous sign-ins** nếu
    muốn giữ nút “Dùng thử không cần tài khoản”.
 
-4. Chép biến môi trường và điền khóa lấy ở **Project Settings › API**:
+5. Chép biến môi trường và điền khóa lấy ở **Project Settings › API**:
 
    ```bash
    cp .env.example .env
@@ -123,7 +128,7 @@ npm install
    > và mọi biến `VITE_*` đều được nhúng thẳng vào JavaScript gửi tới trình duyệt — đặt nó
    > vào `.env` là công khai quyền quản trị cơ sở dữ liệu cho bất kỳ ai mở DevTools.
 
-5. Chạy ứng dụng:
+6. Chạy ứng dụng:
 
    ```bash
    npm run dev
@@ -151,10 +156,13 @@ Mở http://localhost:3000. Nếu chưa cấu hình xong, ứng dụng sẽ hi�
 ```
 supabase/
 └── migrations/
-    └── 0001_init.sql     Lược đồ đầy đủ: bảng, index, trigger, RLS, storage
+    ├── 0001_init.sql     Lược đồ đầy đủ: bảng, index, trigger, RLS, storage
+    └── 0002_admin_access_code.sql
+                          Khóa cột role + cổng mã truy cập vai trò Admin
 
 src/
 ├── components/
+│   ├── Admin/            Hộp thoại nhập mã truy cập vai trò Admin
 │   ├── Auth/             Đăng nhập, đăng ký, chế độ khách
 │   ├── CommandPalette/   Ctrl+K palette và bảng phím tắt
 │   ├── Dashboard/        Trang tổng quan
@@ -244,6 +252,8 @@ lại sẽ làm hỏng CI thay vì âm thầm hiển thị bản cũ.
 | `articles` / `bookmarks`            | Bài viết biên tập và lượt lưu                                                 |
 | `performance_goals`                 | Mục tiêu tuần, một hàng mỗi người dùng                                        |
 | `badge_acknowledgements`            | Huy hiệu đã hiển thị, để nhãn “MỚI” chỉ xuất hiện một lần                     |
+| `admin_access_code`                 | Một hàng, chỉ chứa digest của mã truy cập Admin — không policy nào cho đọc    |
+| `admin_claim_attempts`              | Mỗi lần nhập mã Admin, đúng hay sai, dùng để giới hạn 5 lần / 15 phút         |
 
 **Row Level Security bật trên mọi bảng.** Người dùng chỉ đọc/ghi được dữ liệu của chính
 mình; hai ngoại lệ có chủ đích là nhóm học công khai và bài viết đã xuất bản. `auth_events`
@@ -253,6 +263,31 @@ chủ tài khoản, nhưng xóa tài khoản vẫn xóa sạch qua `ON DELETE CA
 Tính toàn vẹn của thí nghiệm được cưỡng chế ở tầng cơ sở dữ liệu chứ không chỉ ở giao diện:
 trigger `experiments_lock_design` từ chối mọi thay đổi giả thuyết, điều kiện hay biến đo
 sau khi phiên đầu tiên đã được ghi.
+
+### Vai trò Admin
+
+Vai trò `admin` không phải một nhãn trang trí: nó là điều kiện của policy
+`articles_insert_admin`, tức là quyền đăng bài lên mục **Mẹo Học Tập** mà mọi tài khoản
+trong hệ thống đều đọc được. Vì vậy nó đi qua một cổng mã truy cập.
+
+Nút vai trò trên thanh trên cùng mở một hộp thoại có ô nhập **mã 6 ký tự**. Việc so mã diễn
+ra hoàn toàn ở phía máy chủ, trong hàm `claim_admin_role`:
+
+- Mã chỉ tồn tại dưới dạng digest SHA-256 (kèm salt) trong bảng `admin_access_code`. Bảng
+  bật RLS và **không có policy nào**, nên với anon key nó vô hình — chỉ hàm
+  `security definer` đọc được.
+- Cột `profiles.role` bị trigger `profiles_guard_role` khóa: mọi câu `UPDATE` từ client đều
+  bị từ chối, kể cả khi gửi thẳng tới PostgREST chứ không qua giao diện. Hai hàm RPC là lối
+  duy nhất đổi được vai trò.
+- Mỗi lần nhập được ghi vào `admin_claim_attempts`; sai 5 lần trong 15 phút thì tài khoản
+  phải đợi hết cửa sổ đó.
+- Chiều ngược lại (`release_admin_role`) không hỏi mã — tự bỏ bớt quyền của mình không phải
+  việc cần canh gác.
+
+Không một hằng số nào trong `src/` biết mã đúng là gì, và đó là điều kiện cần: mọi thứ
+trong thư mục đó đều được đóng gói vào tệp JavaScript mà bất kỳ ai mở trang cũng tải về
+được. Cách đổi mã nằm trong phần chú thích đầu
+[`0002_admin_access_code.sql`](supabase/migrations/0002_admin_access_code.sql).
 
 ## Hệ thống thiết kế
 

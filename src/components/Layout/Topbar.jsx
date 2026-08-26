@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { AdminGateModal } from '../Admin/AdminGateModal';
 import { navItem } from '../../constants/nav';
 import { Menu, Search, Sun, Moon, ShieldCheck, User, Keyboard } from 'lucide-react';
 
@@ -6,13 +8,16 @@ export const Topbar = () => {
   const {
     activeTab,
     user,
-    toggleRole,
     theme,
     toggleTheme,
     setDrawerOpen,
     setPaletteOpen,
     setShortcutsOpen
   } = useApp();
+
+  /* Trạng thái của hộp thoại đổi vai trò để ở đây chứ không ở context: đây là
+     nơi duy nhất trong ứng dụng mở được nó. */
+  const [gateOpen, setGateOpen] = useState(false);
 
   const current = navItem(activeTab);
   const isAdmin = user.role === 'admin';
@@ -63,10 +68,17 @@ export const Topbar = () => {
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
+        {/* Nút này KHÔNG còn tự đổi vai trò. Nó mở hộp thoại — chiều lên Admin
+            đi qua mã truy cập, và việc so mã nằm ở máy chủ. */}
         <button
           className="role-switch"
-          onClick={toggleRole}
-          title="Nhấn để đổi vai trò thử nghiệm (Học Sinh ↔ Admin)"
+          onClick={() => setGateOpen(true)}
+          aria-haspopup="dialog"
+          title={
+            isAdmin
+              ? 'Bạn đang là Biên Tập Viên / Admin — nhấn để quay lại Học Sinh'
+              : 'Nhấn để nhập mã truy cập và chuyển sang tài khoản Admin'
+          }
         >
           {user.avatar ? (
             <img className="role-avatar" src={user.avatar} alt="" />
@@ -85,6 +97,10 @@ export const Topbar = () => {
           )}
         </button>
       </div>
+
+      {/* Gắn khi mở, tháo khi đóng — đó là thứ dọn sạch ô nhập mã và thông báo
+          lỗi giữa hai lần mở, không cần một hiệu ứng đặt lại state nào. */}
+      {gateOpen && <AdminGateModal onClose={() => setGateOpen(false)} />}
     </header>
   );
 };
