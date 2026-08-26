@@ -95,48 +95,6 @@ cd Blooom-Project
 npm install
 ```
 
-### Thiết lập cơ sở dữ liệu
-
-1. Tạo một project mới tại [supabase.com/dashboard](https://supabase.com/dashboard).
-
-2. Mở **SQL Editor**, dán toàn bộ nội dung
-   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) rồi bấm **Run**.
-   Tệp này tạo bảng, chỉ mục, trigger, chính sách Row Level Security và bucket lưu tệp ghi
-   chú. Chạy lại nhiều lần không gây lỗi.
-
-3. Chạy tiếp [`supabase/migrations/0002_admin_access_code.sql`](supabase/migrations/0002_admin_access_code.sql)
-   theo đúng cách trên. Tệp này khóa cột `profiles.role` và dựng cổng mã truy cập cho vai
-   trò Biên Tập Viên / Admin (xem [Vai trò Admin](#vai-trò-admin)). Bỏ qua bước này thì nút
-   đổi vai trò trong ứng dụng sẽ báo lỗi thay vì đổi được vai trò.
-
-4. _(Tùy chọn)_ Bật **Authentication › Sign In / Providers › Allow anonymous sign-ins** nếu
-   muốn giữ nút “Dùng thử không cần tài khoản”.
-
-5. Chép biến môi trường và điền khóa lấy ở **Project Settings › API**:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   ```
-   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-   VITE_SUPABASE_ANON_KEY=<anon-public-key>
-   ```
-
-   > [!WARNING]
-   > Chỉ dùng khóa **anon public**. Khóa `service_role` bỏ qua toàn bộ Row Level Security,
-   > và mọi biến `VITE_*` đều được nhúng thẳng vào JavaScript gửi tới trình duyệt — đặt nó
-   > vào `.env` là công khai quyền quản trị cơ sở dữ liệu cho bất kỳ ai mở DevTools.
-
-6. Chạy ứng dụng:
-
-   ```bash
-   npm run dev
-   ```
-
-Mở http://localhost:3000. Nếu chưa cấu hình xong, ứng dụng sẽ hiện màn hình hướng dẫn kèm
-đúng các bước trên thay vì chạy với dữ liệu tạm.
-
 ### Các lệnh có sẵn
 
 | Lệnh               | Tác dụng                                                       |
