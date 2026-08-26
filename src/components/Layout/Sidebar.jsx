@@ -145,7 +145,7 @@ export const Sidebar = () => {
 
           <div className="level-card-detail">
             <div className="bar bar-sm">
-              <div className="bar-fill xp-bar-fill" style={{ width: `${level.percent}%` }} />
+              <div className="bar-fill" style={{ width: `${level.percent}%` }} />
             </div>
 
             <div className="row-between" style={{ marginTop: '0.45rem' }}>

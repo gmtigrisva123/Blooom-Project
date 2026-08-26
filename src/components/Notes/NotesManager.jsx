@@ -21,7 +21,8 @@ import {
   FolderOpen,
   Link2,
   SearchX,
-  Archive
+  Archive,
+  Info
 } from 'lucide-react';
 
 const ALL = 'All';
@@ -239,6 +240,15 @@ export const NotesManager = () => {
       </Modal>
 
       <UploadNoteModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
+      <p className="method-note">
+        <Info size={14} aria-hidden="true" />
+        <span>
+          Tệp nằm trong Supabase Storage, còn bảng ghi chú chỉ giữ đường dẫn và bị Row Level
+          Security khóa theo tài khoản. Mỗi người chỉ ghi được vào thư mục mang id của mình,
+          nhưng bucket đang mở cho đọc công khai — bất cứ ai biết đúng đường dẫn tệp đều tải
+          được, nên đừng tải lên thứ gì riêng tư.
+        </span>
+      </p>
     </div>
   );
 };

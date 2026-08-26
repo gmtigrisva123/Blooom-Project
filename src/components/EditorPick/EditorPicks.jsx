@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   Flame,
   ImageOff,
-  SearchX
+  SearchX,
+  Info
 } from 'lucide-react';
 
 const ALL = 'All';
@@ -381,6 +382,15 @@ export const EditorPicks = () => {
           </div>
         </form>
       </Modal>
+      <p className="method-note">
+        <Info size={14} aria-hidden="true" />
+        <span>
+          Quyền đăng bài do một chính sách Row Level Security trên bảng <code>articles</code>{' '}
+          kiểm tra vai trò <code>admin</code>. Vai trò lại nằm trong hồ sơ mà chính bạn sửa được
+          — nút đổi vai trò ở thanh trên làm đúng việc đó — nên đây là cổng phân vai cho một đồ
+          án học tập, không phải một ranh giới bảo mật.
+        </span>
+      </p>
     </div>
   );
 };
