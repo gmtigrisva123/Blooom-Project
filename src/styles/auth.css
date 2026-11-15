@@ -30,6 +30,12 @@
   padding-block: var(--space-xl);
 }
 
+/* The wordmark keeps its own proportions inside a stretching column. */
+.auth-box > img,
+.setup-card > img {
+  align-self: flex-start;
+}
+
 .auth-box h1 {
   font-size: var(--text-3xl);
 }

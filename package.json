@@ -3,7 +3,7 @@
   "private": true,
   "version": "4.0.0",
   "type": "module",
-  "description": "Blooom — học tập trung, ôn bài đúng lúc và học cùng bạn bè, tất cả trong một nơi.",
+  "description": "Blooom: đồng hồ tập trung, thẻ nhớ tự nhắc ôn và nhóm học cho học sinh, sinh viên.",
   "keywords": [
     "react",
     "vite",
@@ -36,7 +36,6 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "assets": "python3 scripts/generate-assets.py",
     "verify": "npm run lint && npm run format:check && npm run build"
   },
   "dependencies": {

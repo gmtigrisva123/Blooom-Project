@@ -5,7 +5,7 @@ import { useGSAP } from '@gsap/react';
 import { authService } from '../../services/auth';
 import { setPrefs } from '../../services/storage';
 import { hrefFor, onLinkClick } from '../../lib/router';
-import { setIntent } from '../../lib/intent';
+import { clearIntent, setIntent } from '../../lib/intent';
 import { SUBJECTS } from '../../lib/subjects';
 import { useToast } from '../../context/ToastContext';
 import { Logo, ThemeToggle } from '../ui/bits';
@@ -113,26 +113,26 @@ export const Landing = ({ onAuthenticated, theme, onToggleTheme }) => {
     { scope: root }
   );
 
-  const enter = async (afterwards) => {
+  const enter = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      const account = await authService.loginAsGuest();
-      afterwards?.();
-      onAuthenticated(account);
+      onAuthenticated(await authService.loginAsGuest());
     } catch (error) {
+      clearIntent();
       showToast(error.message || 'Chưa vào được chế độ dùng thử.', 'error');
       setBusy(false);
     }
   };
 
   /* The closing control is the real thing: the subject picked here is the
-     subject the first session starts with. */
-  const startFirstSession = () =>
-    enter(() => {
-      setPrefs({ subject });
-      setIntent('start-focus');
-    });
+     subject the first session starts with. Both are set before signing in,
+     because the app routes the moment an account exists. */
+  const startFirstSession = () => {
+    setPrefs({ subject });
+    setIntent('start-focus');
+    enter();
+  };
 
   const active = SCREENS.find((item) => item.id === screen);
 

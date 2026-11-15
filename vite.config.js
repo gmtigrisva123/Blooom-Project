@@ -33,6 +33,10 @@ export default defineConfig(({ command, isPreview }) => ({
           // Must come before the React test — the name contains "react".
           if (id.includes('lucide-react')) return 'icons';
           if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'react';
+          // The database client and the animation library change far less often
+          // than the app, so each keeps its own long-lived cache entry.
+          if (id.includes('@supabase')) return 'supabase';
+          if (id.includes('gsap')) return 'motion';
         }
       }
     }

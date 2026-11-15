@@ -1,93 +1,64 @@
 <div align="center">
 
-<img src="public/blooom-logo.png" alt="" width="260" />
+<img src="public/blooom-logo.png" alt="Blooom" width="260" />
 
 # Blooom
 
-**Nền tảng nhóm học tập tương tác cho học sinh &amp; sinh viên**
+**Học tập trung hơn, nhớ lâu hơn.**
 
-Kết nối nhóm học theo môn · Tập trung với Pomodoro · Theo dõi hiệu suất · Số hóa ghi chú
+Đồng hồ tập trung, thẻ nhớ tự nhắc ôn và nhóm học cho học sinh, sinh viên.
 
 [![CI](https://github.com/gmtigrisva123/Blooom-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/gmtigrisva123/Blooom-Project/actions/workflows/ci.yml)
 [![Deploy](https://github.com/gmtigrisva123/Blooom-Project/actions/workflows/deploy.yml/badge.svg)](https://github.com/gmtigrisva123/Blooom-Project/actions/workflows/deploy.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-8b5cf6.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-1f2430.svg)](LICENSE)
 
-[**🌐 Xem demo trực tiếp**](https://blooom-project.vercel.app/) · [Báo lỗi](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=bug_report.yml) · [Đề xuất tính năng](https://github.com/gmtigrisva123/Blooom-Project/issues/new?template=feature_request.yml)
+[**Xem bản chạy thật**](https://blooom-project.vercel.app/)
 
-<img src="public/og-image.png" alt="Ảnh xem trước Blooom" width="720" />
+<img src="public/og-image.png" alt="Trang giới thiệu Blooom" width="720" />
 
 </div>
 
 ---
 
-## Giới thiệu
+## Blooom làm gì
 
-Blooom gom bốn thứ một học sinh thường phải dùng bốn ứng dụng khác nhau vào một chỗ: tìm
-nhóm học cùng môn, đồng hồ Pomodoro để tập trung, bảng theo dõi tiến độ, và kho ghi chú.
-Trên nền dữ liệu đó, ứng dụng chạy bốn mô hình khoa học thật: lịch ôn ngắt quãng SM-2,
-đường cong quên Ebbinghaus, thí nghiệm N-of-1 có phân bổ ngẫu nhiên, và phân tích cosinor
-nhịp sinh học.
+| Trang          | Nội dung                                                                              |
+| -------------- | ------------------------------------------------------------------------------------- |
+| **Hôm nay**    | Bắt đầu học trong một lần bấm, ba việc cần làm hôm nay, biểu đồ 7 ngày                |
+| **Tập trung**  | Đồng hồ đếm giờ học và giờ nghỉ, chạy xuyên suốt các trang, lưu cả phiên kết thúc sớm |
+| **Thẻ nhớ**    | Thẻ hỏi đáp quay lại đúng lúc sắp quên; ôn bằng bàn phím (Space, 1 đến 4)             |
+| **Tài liệu**   | Ảnh chụp vở và tệp PDF, xếp theo môn                                                  |
+| **Nhóm học**   | Tìm nhóm theo môn hoặc lập nhóm riêng                                                 |
+| **Tiến độ**    | Mục tiêu tuần, so với tuần trước, giờ học tốt nhất trong ngày, huy hiệu               |
+| **Thử nghiệm** | So sánh hai cách học (ví dụ: nghe nhạc hay im lặng) bằng chính số liệu của bạn        |
+| **Mẹo học**    | Bài viết ngắn về cách học, do biên tập viên đăng                                      |
 
-Mỗi phút học được ghi lại thành **điểm XP**, đủ XP thì lên cấp, học đều đặn thì giữ được
-**chuỗi ngày liên tiếp**, và có **14 huy hiệu** để mở khóa dần.
+Dùng thử không cần tài khoản: bấm một nút là vào học. Khi tạo tài khoản, mọi thứ đã làm vẫn còn nguyên.
+
+Mỗi trang có địa chỉ riêng, nên nút quay lại, tải lại trang và đánh dấu trang đều hoạt động. `Ctrl/⌘ + K` mở ô tìm nhanh, tìm được cả khi gõ không dấu.
 
 ### Nguyên tắc về dữ liệu
 
-Ứng dụng **không có bất kỳ dữ liệu mẫu, dữ liệu mô phỏng hay dữ liệu minh họa nào**. Một
-tài khoản mới nhìn thấy màn hình trống kèm hướng dẫn tạo dữ liệu đầu tiên, và mọi con số
-hiển thị đều tính từ hành vi có thật của chính người dùng đó.
+Ứng dụng không có dữ liệu mẫu. Tài khoản mới thấy màn hình trống kèm hướng dẫn, và mọi con số đều tính từ việc học thật của chính người dùng. Chuỗi ngày, điểm, cấp độ và huy hiệu luôn được tính lại từ dữ liệu gốc chứ không lưu riêng. Toàn bộ dữ liệu tải về được dưới dạng JSON từ menu tài khoản.
 
-Ba hệ quả được cưỡng chế trong mã nguồn:
+Khi thiếu cấu hình cơ sở dữ liệu, ứng dụng hiện thông báo thay vì âm thầm lưu tạm trong trình duyệt, để không bao giờ có chuyện giao diện chạy bình thường trong khi dữ liệu không được lưu.
 
-- Tệp migration `supabase/migrations/0001_init.sql` không chứa một câu `INSERT` dữ liệu nào.
-- Khi thiếu cấu hình cơ sở dữ liệu, ứng dụng **từ chối chạy** thay vì âm thầm lưu tạm trong
-  trình duyệt — để không bao giờ có chuyện giao diện hoạt động bình thường trong khi dữ
-  liệu thật ra không được lưu.
-- Số liệu dẫn xuất (chuỗi ngày, XP, huy hiệu, đường cong quên) **không bao giờ được lưu**;
-  chúng luôn được tính lại từ dữ liệu thô, nên không thể mâu thuẫn với dữ liệu gốc.
+## Thiết kế
 
-Toàn bộ dữ liệu thô — kể cả từng lần chấm thẻ ghi nhớ và từng phiên thí nghiệm — xuất ra
-JSON bằng nút tải trong thanh bên, để kết quả phân tích kiểm chứng lại được bằng công cụ
-bên ngoài.
+Giao diện là một thế giới **giấy cắt thủ công**: giấy kem có vân, nút bấm kiểu bìa cứng nhấn xuống được, mực xanh đen, và một khu vườn lớn lên theo số phút học mỗi ngày. Toàn bộ hệ thống thiết kế được mô tả trong [`DESIGN.md`](DESIGN.md) (định dạng [design.md](https://github.com/google-labs-code/design.md)); mọi màu sắc và phông chữ chỉ được khai báo ở [`src/styles/tokens.css`](src/styles/tokens.css).
 
-## Tính năng
+Vài quy tắc được giữ xuyên suốt:
 
-| Khu vực                 | Nội dung                                                                                                                     |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 📊 **Tổng Quan**        | Lời chào theo buổi, chuỗi ngày học, thanh XP, biểu đồ 7 ngày, dòng hoạt động gần đây, bộ sưu tập huy hiệu                    |
-| 👥 **Nhóm Học Tập**     | Tạo và tham gia nhóm, lọc theo 7 môn, tìm kiếm, nhóm công khai / riêng tư                                                    |
-| ⏱️ **Bộ Đếm Giờ**       | Pomodoro với vòng đếm SVG, 3 cấu hình dựng sẵn (25/50/90 phút), âm báo Web Audio, tự chuyển sang giờ nghỉ, nhật ký phiên học |
-| ✨ **Editor's Pick**    | Bài viết mẹo học tập, lưu bài yêu thích, đăng bài mới ở vai trò Admin                                                        |
-| 📈 **Hiệu Suất**        | Vòng đo mục tiêu tuần, lịch nhiệt 7 ngày, phân phối thời gian theo môn, đặt mục tiêu                                         |
-| 📁 **Ghi Chú**          | Tải ảnh chụp vở hoặc PDF lên Supabase Storage, phân loại theo môn, gắn vào nhóm học, xem và tải về                           |
-| 🧠 **Ôn Tập**           | Thẻ ghi nhớ lên lịch bằng SM-2, đường cong quên Ebbinghaus, dự báo số thẻ đến hạn 14 ngày, nhật ký từng lần chấm điểm        |
-| 🧪 **Phòng Thí Nghiệm** | Thí nghiệm N-of-1: khai báo giả thuyết trước, phân bổ ngẫu nhiên theo khối, kiểm định Welch kèm Cohen's d và KTC 95%         |
-| 🌊 **Nhịp Sinh Học**    | Khớp cosinor 24 giờ tìm giờ đỉnh tập trung, hồi quy OLS dự báo tuần tới kèm khoảng tin cậy                                   |
+- Bốn màu nhấn, mỗi màu một việc: lê vàng cho hành động, xanh dương cho liên kết và viền tiêu điểm, san hô cho một điểm nhấn duy nhất, bạc hà cho sự tăng trưởng.
+- Không có thuật ngữ mà người mới vào phải tra cứu; không có số liệu, lời khen hay logo bịa.
+- Chỉ chuyển động `transform` và `opacity`; mọi chuyển động đều dừng khi người dùng bật giảm chuyển động.
+- CSS thuần, không framework; phông Quicksand tự lưu trữ, đủ dấu tiếng Việt.
 
-**Xuyên suốt toàn app:** giao diện sáng/tối, màu nhấn đổi theo từng khu vực, command palette
-`Ctrl+K` tìm kiếm không dấu, phím tắt đầy đủ, responsive từ 375px, tôn trọng
-`prefers-reduced-motion`.
-
-## Phím tắt
-
-| Phím                          | Chức năng                                              |
-| ----------------------------- | ------------------------------------------------------ |
-| <kbd>Ctrl</kbd>+<kbd>K</kbd>  | Mở command palette (tìm nhóm, ghi chú, bài viết, lệnh) |
-| <kbd>1</kbd>…<kbd>6</kbd>     | Nhảy tới từng khu vực                                  |
-| <kbd>Space</kbd>              | Chạy / tạm dừng Pomodoro (khi đang ở tab Bộ Đếm Giờ)   |
-| <kbd>R</kbd>                  | Đặt lại bộ đếm                                         |
-| <kbd>Shift</kbd>+<kbd>D</kbd> | Đổi giao diện sáng / tối                               |
-| <kbd>?</kbd>                  | Mở bảng tra cứu phím tắt                               |
-| <kbd>Esc</kbd>                | Đóng hộp thoại đang mở                                 |
-
-Phím tắt tự động vô hiệu khi con trỏ đang ở trong ô nhập liệu.
+Ảnh sản phẩm trên trang giới thiệu (`public/shots/`) là ảnh chụp thật của ứng dụng.
 
 ## Bắt đầu
 
-**Yêu cầu:** Node.js 22.12 trở lên, và một dự án [Supabase](https://supabase.com) (gói miễn
-phí là đủ).
+**Yêu cầu:** Node.js 22.12 trở lên và một dự án [Supabase](https://supabase.com) (gói miễn phí là đủ).
 
 ```bash
 git clone https://github.com/gmtigrisva123/Blooom-Project.git
@@ -95,207 +66,63 @@ cd Blooom-Project
 npm install
 ```
 
-### Các lệnh có sẵn
+1. Trong Supabase, mở **SQL Editor** và lần lượt chạy hai tệp trong `supabase/migrations`.
+2. Muốn có nút "Dùng thử": **Authentication › Sign In / Providers** › bật **Allow anonymous sign-ins**.
+3. Chép `.env.example` thành `.env` rồi điền `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` (chỉ dùng khóa `anon`, không bao giờ dùng `service_role`).
 
-| Lệnh               | Tác dụng                                                       |
-| ------------------ | -------------------------------------------------------------- |
-| `npm run dev`      | Chạy máy chủ phát triển kèm hot reload                         |
-| `npm run build`    | Build bản production vào `dist/`                               |
-| `npm run preview`  | Xem thử bản đã build                                           |
-| `npm run lint`     | Kiểm tra mã bằng ESLint                                        |
-| `npm run lint:fix` | Tự sửa những lỗi lint sửa được                                 |
-| `npm run format`   | Định dạng toàn bộ mã bằng Prettier                             |
-| `npm run verify`   | Chạy cả lint + format:check + build (giống hệt CI)             |
-| `npm run assets`   | Tạo lại icon và ảnh Open Graph từ `scripts/generate-assets.py` |
-| `npm run formulas` | Sắp chữ lại các công thức Toán bằng KaTeX (xem bên dưới)       |
+| Lệnh              | Tác dụng                                         |
+| ----------------- | ------------------------------------------------ |
+| `npm run dev`     | Chạy máy chủ phát triển                          |
+| `npm run build`   | Build bản production vào `dist/`                 |
+| `npm run preview` | Xem thử bản đã build                             |
+| `npm run lint`    | Kiểm tra mã bằng ESLint                          |
+| `npm run format`  | Định dạng mã bằng Prettier                       |
+| `npm run verify`  | Lint, kiểm tra định dạng và build (giống hệt CI) |
 
 ## Cấu trúc dự án
 
 ```
-supabase/
-└── migrations/
-    ├── 0001_init.sql     Lược đồ đầy đủ: bảng, index, trigger, RLS, storage
-    └── 0002_admin_access_code.sql
-                          Khóa cột role + cổng mã truy cập vai trò Admin
-
+DESIGN.md                 Hệ thống thiết kế
+supabase/migrations/      Lược đồ cơ sở dữ liệu, quyền truy cập từng hàng, quyền biên tập viên
+public/                   Logo, biểu tượng, ảnh chụp sản phẩm
 src/
+├── App.jsx               Chọn màn hình: giới thiệu, đăng nhập hoặc ứng dụng
 ├── components/
-│   ├── Admin/            Hộp thoại nhập mã truy cập vai trò Admin
-│   ├── Auth/             Đăng nhập, đăng ký, chế độ khách
-│   ├── CommandPalette/   Ctrl+K palette và bảng phím tắt
-│   ├── Dashboard/        Trang tổng quan
-│   ├── EditorPick/       Bài viết mẹo học tập
-│   ├── Groups/           Nhóm học tập
-│   ├── Insights/         Cosinor nhịp sinh học và dự báo
-│   ├── Lab/              Thí nghiệm N-of-1
-│   ├── Landing/          Trang giới thiệu
-│   ├── Layout/           Sidebar và topbar
-│   ├── Notes/            Kho ghi chú
-│   ├── Performance/      Theo dõi hiệu suất
-│   ├── Recall/           Ôn tập ngắt quãng SM-2
-│   ├── Setup/            Màn hình hướng dẫn khi chưa cấu hình CSDL
-│   ├── Timer/            Pomodoro
-│   └── common/           Modal, empty state, thẻ số liệu, skeleton...
-├── constants/            Danh sách môn học và cấu hình điều hướng
-├── context/              AppContext — trạng thái dùng chung, mọi thao tác ghi async
-├── hooks/                Phím tắt toàn cục, chủ đề, đồng hồ chung
-├── services/
-│   ├── db/
-│   │   ├── index.js      Repository cho từng bảng + nạp/xuất toàn bộ dữ liệu
-│   │   └── mappers.js    Ánh xạ snake_case (SQL) ↔ camelCase (React)
-│   ├── supabase.js       Khởi tạo client, dịch lỗi sang tiếng Việt
-│   ├── auth.js           Đăng ký / đăng nhập / nhật ký phiên qua Supabase Auth
-│   ├── srs.js            Thuật toán SM-2 và mô hình quên Ebbinghaus
-│   ├── experiments.js    Ngẫu nhiên hóa khối và phân tích N-of-1
-│   ├── chronobiology.js  Khớp cosinor 24 giờ
-│   ├── statistics.js     Welch t-test, hồi quy OLS, thống kê mô tả
-│   ├── gamification.js   Streak, XP, cấp độ, huy hiệu (luôn tính lại, không lưu)
-│   └── storage.js        Chỉ tùy chọn giao diện theo thiết bị
-└── styles/               Design system CSS thuần, tách theo vai trò
+│   ├── landing/          Trang giới thiệu, thẻ nhớ dùng thử, biểu đồ trí nhớ
+│   ├── auth/             Đăng nhập, đăng ký, xác nhận email
+│   ├── shell/            Thanh bên, thanh trên, thanh tab, tìm nhanh, tài khoản
+│   ├── pages/            Tám trang của ứng dụng
+│   └── ui/               Hộp thoại, mảnh giấy xé, khu vườn, các phần dùng chung
+├── context/              Dữ liệu của người dùng, đồng hồ tập trung, thông báo
+├── lib/                  Định tuyến, môn học, thời gian, thống kê, giấy
+├── services/             Supabase, tài khoản, lịch ôn thẻ, thử nghiệm, huy hiệu
+└── styles/               tokens → base → ui → landing, auth, shell, pages
 ```
 
-### Công thức Toán
+## Dữ liệu và bảo mật
 
-Mọi công thức trong ứng dụng được sắp chữ bằng **KaTeX**, nhưng KaTeX **không** nằm trong
-bundle gửi tới trình duyệt. Các công thức đều tĩnh — chúng là mô hình mà ứng dụng thực sự
-đánh giá, không phải thứ người dùng nhập — nên chúng được dựng sẵn thành HTML một lần lúc
-phát triển:
+Toàn bộ dữ liệu nằm trong PostgreSQL do Supabase quản lý. Row Level Security bật trên mọi bảng: mỗi người chỉ đọc và ghi được dữ liệu của chính mình, trừ nhóm học công khai và bài viết đã đăng. Mật khẩu do Supabase Auth xử lý; ứng dụng không bao giờ đọc được.
 
-```bash
-npm run formulas
-```
-
-Lệnh này đọc danh mục trong [`scripts/render-formulas.mjs`](scripts/render-formulas.mjs) —
-nguồn sự thật duy nhất cho mọi công thức của dự án — và ghi ra hai tệp vào
-`src/generated/`:
-
-| Tệp           | Nội dung                                                 |
-| ------------- | -------------------------------------------------------- |
-| `formulas.js` | HTML + MathML của từng công thức, KaTeX dựng sẵn         |
-| `katex.css`   | CSS của KaTeX đã lọc bỏ `woff` và `ttf`, chỉ giữ `woff2` |
-
-Đổi lại là **76 kB gzip JavaScript không phải tải về**, công thức hiện ngay từ khung hình
-đầu tiên không nhảy layout, và vẫn đọc được cả khi JavaScript hỏng. KaTeX vì thế là
-`devDependency`, không phải `dependency`.
-
-Việc lọc phông là vì Vite phát sinh **mọi** tệp mà CSS trỏ tới. Bản `katex.min.css` gốc
-khai báo mỗi bộ phông bằng ba định dạng, nên bản dựng mang theo 59 tệp phông nặng 1,1 MB
-trong đó khoảng hai phần ba không trình duyệt nào tải về. `woff2` được hỗ trợ từ 2016
-(Chrome 36, Firefox 39, Safari 10, Edge 14) — rộng hơn cả `color-mix()` mà dự án vốn đã
-dùng — nên hai định dạng kia không mua thêm được khả năng tương thích nào.
-
-Chi phí thực tế của toàn bộ tính năng, đo trên cùng một cấu hình build:
-
-|            | Trước         | Sau                  |
-| ---------- | ------------- | -------------------- |
-| JavaScript | 107,9 kB gzip | 113,1 kB gzip        |
-| CSS        | 15,1 kB gzip  | 23,5 kB gzip         |
-| Phông      | —             | 19 tệp woff2, 292 kB |
-
-`npm run verify` chạy `formulas:check` trước tiên, nên một công thức được sửa mà quên sinh
-lại sẽ làm hỏng CI thay vì âm thầm hiển thị bản cũ.
-
-### Tầng dữ liệu
-
-| Bảng                                | Nội dung                                                                      |
-| ----------------------------------- | ----------------------------------------------------------------------------- |
-| `profiles`                          | Hồ sơ 1-1 với `auth.users`, kèm `sign_in_count` và `last_sign_in_at`          |
-| `auth_events`                       | Nhật ký bất biến mỗi lần đăng ký / đăng nhập / đăng xuất                      |
-| `study_groups`                      | Nhóm học; số thành viên là `COUNT` trên `group_members`, không phải cột riêng |
-| `group_members`                     | Quan hệ nhiều-nhiều giữa người dùng và nhóm                                   |
-| `timer_sessions`                    | Phiên Pomodoro — đơn vị quan sát cơ bản của cả nền tảng                       |
-| `notes`                             | Ghi chú; tệp nằm trong Storage, bảng chỉ giữ đường dẫn                        |
-| `cards` / `card_reviews`            | Trạng thái lịch SM-2, và nhật ký từng lần chấm điểm                           |
-| `experiments` / `experiment_trials` | Thiết kế thí nghiệm (bị khóa sau phiên đầu) và từng phiên đo                  |
-| `articles` / `bookmarks`            | Bài viết biên tập và lượt lưu                                                 |
-| `performance_goals`                 | Mục tiêu tuần, một hàng mỗi người dùng                                        |
-| `badge_acknowledgements`            | Huy hiệu đã hiển thị, để nhãn “MỚI” chỉ xuất hiện một lần                     |
-| `admin_access_code`                 | Một hàng, chỉ chứa digest của mã truy cập Admin — không policy nào cho đọc    |
-| `admin_claim_attempts`              | Mỗi lần nhập mã Admin, đúng hay sai, dùng để giới hạn 5 lần / 15 phút         |
-
-**Row Level Security bật trên mọi bảng.** Người dùng chỉ đọc/ghi được dữ liệu của chính
-mình; hai ngoại lệ có chủ đích là nhóm học công khai và bài viết đã xuất bản. `auth_events`
-không có chính sách `UPDATE` hay `DELETE` — nhật ký đăng nhập là bất biến, kể cả với chính
-chủ tài khoản, nhưng xóa tài khoản vẫn xóa sạch qua `ON DELETE CASCADE`.
-
-Tính toàn vẹn của thí nghiệm được cưỡng chế ở tầng cơ sở dữ liệu chứ không chỉ ở giao diện:
-trigger `experiments_lock_design` từ chối mọi thay đổi giả thuyết, điều kiện hay biến đo
-sau khi phiên đầu tiên đã được ghi.
-
-### Vai trò Admin
-
-Vai trò `admin` không phải một nhãn trang trí: nó là điều kiện của policy
-`articles_insert_admin`, tức là quyền đăng bài lên mục **Mẹo Học Tập** mà mọi tài khoản
-trong hệ thống đều đọc được. Vì vậy nó đi qua một cổng mã truy cập.
-
-Nút vai trò trên thanh trên cùng mở một hộp thoại có ô nhập **mã 6 ký tự**. Việc so mã diễn
-ra hoàn toàn ở phía máy chủ, trong hàm `claim_admin_role`:
-
-- Mã chỉ tồn tại dưới dạng digest SHA-256 (kèm salt) trong bảng `admin_access_code`. Bảng
-  bật RLS và **không có policy nào**, nên với anon key nó vô hình — chỉ hàm
-  `security definer` đọc được.
-- Cột `profiles.role` bị trigger `profiles_guard_role` khóa: mọi câu `UPDATE` từ client đều
-  bị từ chối, kể cả khi gửi thẳng tới PostgREST chứ không qua giao diện. Hai hàm RPC là lối
-  duy nhất đổi được vai trò.
-- Mỗi lần nhập được ghi vào `admin_claim_attempts`; sai 5 lần trong 15 phút thì tài khoản
-  phải đợi hết cửa sổ đó.
-- Chiều ngược lại (`release_admin_role`) không hỏi mã — tự bỏ bớt quyền của mình không phải
-  việc cần canh gác.
-
-Không một hằng số nào trong `src/` biết mã đúng là gì, và đó là điều kiện cần: mọi thứ
-trong thư mục đó đều được đóng gói vào tệp JavaScript mà bất kỳ ai mở trang cũng tải về
-được. Cách đổi mã nằm trong phần chú thích đầu
-[`0002_admin_access_code.sql`](supabase/migrations/0002_admin_access_code.sql).
-
-## Hệ thống thiết kế
-
-Giao diện dùng **CSS thuần, không framework**. Mọi màu sắc, khoảng cách, bo góc, đổ bóng và
-thời lượng chuyển động đều là biến CSS trong [`src/styles/tokens.css`](src/styles/tokens.css).
-
-Điểm đặc trưng là **màu nhấn theo khu vực**: thuộc tính `data-section` trên khung ứng dụng
-ghi đè biến `--accent`, nên toàn bộ nút, badge, biểu đồ và hiệu ứng tự đổi màu khi người
-dùng chuyển tab.
-
-| Khu vực       | Màu               |
-| ------------- | ----------------- |
-| Tổng Quan     | `#6366f1` Indigo  |
-| Nhóm Học Tập  | `#8b5cf6` Tím     |
-| Bộ Đếm Giờ    | `#f97316` Cam     |
-| Editor's Pick | `#ec4899` Hồng    |
-| Hiệu Suất     | `#10b981` Xanh lá |
-| Ghi Chú       | `#06b6d4` Cyan    |
-
-> [!NOTE]
-> Đừng gom `--accent` vào một biến tổng hợp ở `:root` (kiểu
-> `--accent-grad: linear-gradient(..., var(--accent))`). CSS thay thế `var()` tại nơi biến
-> được **khai báo**, nên biến đó sẽ đóng băng màu mặc định và không đổi theo khu vực nữa.
-> Hãy viết gradient trực tiếp tại chỗ sử dụng.
+Quyền đăng bài ở mục Mẹo học đi qua một mã 6 ký tự được kiểm tra hoàn toàn ở máy chủ (`supabase/migrations/0002_admin_access_code.sql`); không tệp nào trong `src/` biết mã đúng là gì.
 
 ## Tự động hóa
 
-| Quy trình                                                          | Khi nào chạy                        | Làm gì                                                        |
-| ------------------------------------------------------------------ | ----------------------------------- | ------------------------------------------------------------- |
-| [`ci.yml`](.github/workflows/ci.yml)                               | Mỗi push và pull request            | Lint, kiểm tra định dạng, build, báo cáo kích thước bundle    |
-| [`deploy.yml`](.github/workflows/deploy.yml)                       | Push vào `main` + ngày 1 hằng tháng | Build và deploy lên GitHub Pages                              |
-| [`lighthouse.yml`](.github/workflows/lighthouse.yml)               | Ngày 1 hằng tháng                   | Chấm điểm hiệu năng / tiếp cận / SEO rồi mở issue kèm kết quả |
-| [`monthly-ui-review.yml`](.github/workflows/monthly-ui-review.yml) | Ngày 1 hằng tháng                   | Mở issue checklist rà soát giao diện                          |
-| [`dependabot.yml`](.github/dependabot.yml)                         | Hằng tháng                          | Mở PR nâng cấp thư viện và GitHub Actions                     |
+| Quy trình                                                          | Khi nào chạy                        | Làm gì                             |
+| ------------------------------------------------------------------ | ----------------------------------- | ---------------------------------- |
+| [`ci.yml`](.github/workflows/ci.yml)                               | Mỗi push và pull request            | Lint, kiểm tra định dạng, build    |
+| [`deploy.yml`](.github/workflows/deploy.yml)                       | Push vào `main` + ngày 1 hằng tháng | Build và deploy lên GitHub Pages   |
+| [`lighthouse.yml`](.github/workflows/lighthouse.yml)               | Ngày 1 hằng tháng                   | Chấm điểm hiệu năng, tiếp cận, SEO |
+| [`monthly-ui-review.yml`](.github/workflows/monthly-ui-review.yml) | Ngày 1 hằng tháng                   | Mở issue rà soát giao diện         |
+| [`dependabot.yml`](.github/dependabot.yml)                         | Hằng tháng                          | Mở PR nâng cấp thư viện            |
 
 ## Công nghệ
 
-- [React 18](https://react.dev) — thư viện giao diện
-- [Vite](https://vite.dev) — công cụ build
-- [Supabase](https://supabase.com) — PostgreSQL, xác thực và lưu trữ tệp
-- [KaTeX](https://katex.org) — sắp chữ công thức Toán (chỉ chạy lúc build)
-- [lucide-react](https://lucide.dev) — bộ icon
-- [canvas-confetti](https://github.com/catdad/canvas-confetti) — hiệu ứng khi hoàn thành phiên học
-- CSS thuần với biến CSS — không dùng framework CSS
+[React 18](https://react.dev), [Vite](https://vite.dev), [Supabase](https://supabase.com), [GSAP](https://gsap.com) cho hai chuyển động có chủ đích trên trang giới thiệu, [lucide-react](https://lucide.dev) cho biểu tượng, [canvas-confetti](https://github.com/catdad/canvas-confetti) khi hoàn thành phiên học, phông [Quicksand](https://fonts.google.com/specimen/Quicksand) qua Fontsource.
 
 ## Đóng góp
 
-Xem [CONTRIBUTING.md](CONTRIBUTING.md) để biết quy ước commit, quy trình pull request và
-tiêu chuẩn kiểm tra trước khi gửi thay đổi.
+Xem [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Giấy phép
 
-Phát hành theo giấy phép [MIT](LICENSE) — © 2026 Viet Anh Ho.
+[MIT](LICENSE), © 2026 Viet Anh Ho.

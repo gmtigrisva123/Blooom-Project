@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppProvider } from './context/AppContext';
 import { TimerProvider } from './context/TimerContext';
 import { ToastProvider } from './context/ToastContext';
@@ -61,6 +61,15 @@ export function App() {
     return authService.onAuthStateChange(setAccount);
   }, []);
 
+  /* True from the moment the visitor chooses to sign out. The auth listener
+     reports the sign-out before this component has finished handling it, and
+     the redirect below needs to know which of the two it is looking at. */
+  const leaving = useRef(false);
+
+  useEffect(() => {
+    if (account) leaving.current = false;
+  }, [account]);
+
   const isAppRoute = Boolean(pageByRoute(route));
   const authMode = AUTH_ROUTES[route] || null;
 
@@ -72,11 +81,15 @@ export function App() {
     if (account && !isAppRoute) {
       /* "Bắt đầu học" on the landing page lands on the timer, not the home page. */
       navigate(peekIntent('start-focus') ? 'tap-trung' : HOME_ROUTE, { replace: true });
-    } else if (!account && isAppRoute) navigate('dang-nhap', { replace: true });
-    else if (!account && route !== '' && !authMode) navigate('', { replace: true });
+    } else if (!account && isAppRoute) {
+      /* Signing out on purpose goes home; a session that simply ended asks
+         for a sign-in again. */
+      navigate(leaving.current ? '' : 'dang-nhap', { replace: true });
+    } else if (!account && route !== '' && !authMode) navigate('', { replace: true });
   }, [ready, account, route, isAppRoute, authMode]);
 
   const handleSignOut = useCallback(async () => {
+    leaving.current = true;
     await authService.logout();
     /* A running timer belongs to the person who started it. */
     writeTimerSnapshot(null);
