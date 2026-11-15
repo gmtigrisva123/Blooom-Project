@@ -52,3 +52,7 @@ Thumbs.db
 
 # Claude Code local session files
 .claude/settings.local.json
+
+# Design-linter working folders
+.hallmark/
+.taste-skill/

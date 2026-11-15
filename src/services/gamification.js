@@ -1,7 +1,7 @@
 /* ==========================================================================
-   STUDYHUB — GAMIFICATION ENGINE
-   Streaks, XP, levels and achievement badges are all derived from data the
-   app already records (Pomodoro sessions, groups, notes, bookmarks). Nothing
+   BLOOOM — STREAKS, POINTS, LEVELS AND BADGES
+   All of it is derived from data the app already records (focus sessions,
+   groups, files, saved articles). Nothing
    here invents new tracking — it only reads what the user has done.
    ========================================================================== */
 
@@ -31,9 +31,9 @@ export const startOfDay = (date) => {
 };
 
 /* --------------------------------------------------------------------------
-   XP & LEVELS
-   1 minute studied = 1 XP. Each level costs 50 XP more than the previous one
-   (100, 150, 200, ...), so total XP required to reach level L is
+   POINTS & LEVELS
+   1 minute studied = 1 point. Each level costs 50 points more than the last
+   (100, 150, 200, ...), so the total needed to reach level L is
    25 * (L - 1) * (L + 2).
    -------------------------------------------------------------------------- */
 export const xpForLevel = (level) => 25 * (level - 1) * (level + 2);
@@ -42,12 +42,12 @@ export const levelFromXp = (xp) =>
   Math.max(1, Math.floor((-1 + Math.sqrt(9 + (4 * Math.max(0, xp)) / 25)) / 2));
 
 const LEVEL_TITLES = [
-  { min: 1, title: 'Tân Binh Chăm Chỉ' },
-  { min: 3, title: 'Học Sinh Kiên Trì' },
-  { min: 5, title: 'Chiến Binh Pomodoro' },
-  { min: 7, title: 'Cao Thủ Tập Trung' },
-  { min: 10, title: 'Bậc Thầy Kỷ Luật' },
-  { min: 14, title: 'Huyền Thoại Blooom' }
+  { min: 1, title: 'Hạt mầm' },
+  { min: 3, title: 'Chồi non' },
+  { min: 5, title: 'Cây con' },
+  { min: 7, title: 'Nụ hoa' },
+  { min: 10, title: 'Hoa nở' },
+  { min: 14, title: 'Vườn hoa' }
 ];
 
 export const levelTitle = (level) =>
@@ -71,7 +71,7 @@ export const computeLevel = (xp) => {
 
 /* --------------------------------------------------------------------------
    STREAKS
-   A day counts when at least one Pomodoro session was completed on it.
+   A day counts when at least one focus session was completed on it.
    Today not being studied yet does not break the streak — the run is measured
    from today if studied, otherwise from yesterday (a normal "grace" rule).
    -------------------------------------------------------------------------- */
@@ -116,15 +116,15 @@ export const BADGES = [
     id: 'first-step',
     icon: '🌱',
     color: '#10b981',
-    name: 'Bước Đầu Tiên',
-    requirement: 'Hoàn thành 1 phiên học',
+    name: 'Bước đầu tiên',
+    requirement: 'Hoàn thành 1 phiên tập trung',
     test: (s) => s.totalSessions >= 1
   },
   {
     id: 'streak-3',
     icon: '🔥',
     color: '#f97316',
-    name: 'Chuỗi 3 Ngày',
+    name: '3 ngày liền',
     requirement: 'Học 3 ngày liên tiếp',
     test: (s) => s.longestStreak >= 3
   },
@@ -132,7 +132,7 @@ export const BADGES = [
     id: 'streak-7',
     icon: '⚡',
     color: '#f59e0b',
-    name: 'Tuần Hoàn Hảo',
+    name: 'Trọn một tuần',
     requirement: 'Học 7 ngày liên tiếp',
     test: (s) => s.longestStreak >= 7
   },
@@ -140,7 +140,7 @@ export const BADGES = [
     id: 'streak-30',
     icon: '👑',
     color: '#eab308',
-    name: 'Kỷ Luật Thép',
+    name: '30 ngày bền bỉ',
     requirement: 'Học 30 ngày liên tiếp',
     test: (s) => s.longestStreak >= 30
   },
@@ -148,47 +148,47 @@ export const BADGES = [
     id: 'sessions-25',
     icon: '🎯',
     color: '#8b5cf6',
-    name: 'Thợ Săn Pomodoro',
-    requirement: 'Hoàn thành 25 phiên',
+    name: '25 phiên',
+    requirement: 'Hoàn thành 25 phiên tập trung',
     test: (s) => s.totalSessions >= 25
   },
   {
     id: 'hours-10',
     icon: '⏳',
     color: '#06b6d4',
-    name: '10 Giờ Miệt Mài',
-    requirement: 'Tích lũy 10 giờ học',
+    name: '10 giờ học',
+    requirement: 'Học tổng cộng 10 giờ',
     test: (s) => s.totalMinutes >= 600
   },
   {
     id: 'hours-50',
     icon: '🏆',
     color: '#ec4899',
-    name: '50 Giờ Bền Bỉ',
-    requirement: 'Tích lũy 50 giờ học',
+    name: '50 giờ học',
+    requirement: 'Học tổng cộng 50 giờ',
     test: (s) => s.totalMinutes >= 3000
   },
   {
     id: 'marathon',
     icon: '🚀',
     color: '#ef4444',
-    name: 'Siêu Tập Trung',
-    requirement: 'Một phiên dài từ 90 phút',
+    name: 'Siêu tập trung',
+    requirement: 'Một phiên dài 90 phút',
     test: (s) => s.longestSession >= 90
   },
   {
     id: 'polymath',
     icon: '🧠',
     color: '#a855f7',
-    name: 'Toàn Diện',
-    requirement: 'Học đủ 5 môn khác nhau',
+    name: 'Học đều các môn',
+    requirement: 'Học 5 môn khác nhau',
     test: (s) => s.subjectCount >= 5
   },
   {
     id: 'early-bird',
     icon: '🐦',
     color: '#22d3ee',
-    name: 'Chim Sớm',
+    name: 'Dậy sớm',
     requirement: 'Học trước 6 giờ sáng',
     test: (s) => s.hasEarlyBird
   },
@@ -196,15 +196,15 @@ export const BADGES = [
     id: 'night-owl',
     icon: '🦉',
     color: '#6366f1',
-    name: 'Cú Đêm',
-    requirement: 'Học sau 22 giờ đêm',
+    name: 'Cú đêm',
+    requirement: 'Học sau 10 giờ tối',
     test: (s) => s.hasNightOwl
   },
   {
     id: 'team-player',
     icon: '🤝',
     color: '#3b82f6',
-    name: 'Đồng Đội',
+    name: 'Đồng đội',
     requirement: 'Tham gia 3 nhóm học',
     test: (s) => s.joinedGroups >= 3
   },
@@ -212,16 +212,16 @@ export const BADGES = [
     id: 'archivist',
     icon: '📚',
     color: '#14b8a6',
-    name: 'Nhà Lưu Trữ',
-    requirement: 'Tải lên 5 ghi chú',
+    name: 'Ngăn nắp',
+    requirement: 'Lưu 5 tài liệu',
     test: (s) => s.noteCount >= 5
   },
   {
     id: 'curator',
     icon: '🔖',
     color: '#f472b6',
-    name: 'Người Sưu Tầm',
-    requirement: 'Lưu 3 bài viết yêu thích',
+    name: 'Ham đọc',
+    requirement: 'Lưu 3 bài mẹo học',
     test: (s) => s.bookmarkCount >= 3
   }
 ];

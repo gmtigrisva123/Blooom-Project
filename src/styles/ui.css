@@ -1,0 +1,866 @@
+/* ==========================================================================
+   UI · the shared parts. Controls are card stock: they sit on a solid edge,
+   rise a little under the pointer and press flat under the finger.
+   ========================================================================== */
+
+/* ---- Buttons ------------------------------------------------------------ */
+.btn {
+  --edge: 4px;
+  --edge-color: var(--color-edge);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: var(--control);
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-stock);
+  background: var(--grain), var(--color-card);
+  color: var(--color-ink);
+  font-weight: 700;
+  font-size: var(--text-md);
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    0 var(--edge) 0 0 var(--edge-color);
+  transition:
+    translate var(--dur-micro) var(--ease-snap),
+    box-shadow var(--dur-micro) var(--ease-snap);
+}
+
+.btn:hover:not(:disabled) {
+  --edge: 6px;
+  translate: 0 -2px;
+}
+
+.btn:active:not(:disabled) {
+  --edge: 1px;
+  translate: 0 3px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn svg {
+  flex: none;
+}
+
+/* Pear is the action. The spring belongs to this button and no other. */
+.btn-primary {
+  --edge-color: var(--color-accent-deep);
+  background: var(--grain), var(--color-accent);
+  color: var(--color-accent-ink);
+  box-shadow: 0 var(--edge) 0 0 var(--edge-color);
+  transition-timing-function: var(--ease-spring);
+}
+
+.btn-danger {
+  color: var(--color-error);
+}
+
+/* A quiet button: words on the paper, no stock under them. */
+.btn-ghost {
+  --edge: 0px;
+  background: none;
+  box-shadow: none;
+  color: var(--color-ink-2);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  --edge: 0px;
+  translate: none;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+.btn-ghost:active:not(:disabled) {
+  --edge: 0px;
+  translate: 0 1px;
+}
+
+.btn-sm {
+  --edge: 3px;
+  min-height: 38px;
+  padding: 0 var(--space-md);
+  border-radius: var(--space-sm);
+  font-size: var(--text-sm);
+}
+
+.btn-sm:hover:not(:disabled) {
+  --edge: 4px;
+  translate: 0 -1px;
+}
+
+.btn-lg {
+  --edge: 5px;
+  min-height: 54px;
+  padding: 0 var(--space-xl);
+  font-size: 1.0625rem;
+}
+
+.btn-lg:hover:not(:disabled) {
+  --edge: 7px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: var(--space-sm);
+  color: var(--color-ink-2);
+  transition: background-color var(--dur-micro) var(--ease-snap);
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+.icon-btn:active:not(:disabled) {
+  translate: 0 1px;
+}
+
+.icon-btn:disabled {
+  opacity: 0.55;
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.icon-btn.is-danger:hover:not(:disabled) {
+  color: var(--color-error);
+}
+
+.link {
+  color: var(--color-accent-2);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ---- Fields ------------------------------------------------------------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field > label,
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.field-hint {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.field-error {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-error);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: var(--control);
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-input);
+  border: 1px solid var(--color-muted);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.textarea {
+  padding: var(--space-sm) var(--space-md);
+  min-height: 104px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  border-radius: var(--radius-input);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.input:disabled,
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.select {
+  appearance: none;
+  padding-right: var(--space-xl);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-muted) 50%),
+    linear-gradient(135deg, var(--color-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 21px) 55%,
+    calc(100% - 15px) 55%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon > svg {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  translate: 0 -50%;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.input-icon > .input {
+  padding-left: 2.75rem;
+}
+
+.input-icon > .icon-btn {
+  position: absolute;
+  right: var(--space-3xs);
+  top: var(--space-3xs);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-md);
+}
+
+@media (max-width: 520px) {
+  .field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
+  box-shadow: inset 0 0 0 1px var(--color-muted);
+  transition: background-color var(--dur-short) var(--ease-snap);
+}
+
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  transition: translate var(--dur-short) var(--ease-snap);
+}
+
+.switch input:checked + .switch-track {
+  background: var(--color-mint);
+}
+
+.switch input:checked + .switch-track::after {
+  translate: 18px 0;
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Card: one layer of paper, never a card inside a card --------------- */
+.card {
+  background: var(--grain), var(--color-card);
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    var(--shadow-card);
+}
+
+.card-title {
+  font-size: var(--text-lg);
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+/* ---- Chips: a chosen pill is ink with paper type ------------------------ */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  box-shadow: inset 0 0 0 1px var(--color-rule);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease-snap),
+    color var(--dur-micro) var(--ease-snap);
+}
+
+.chip:hover {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+.chip:active {
+  translate: 0 1px;
+}
+
+.chip.is-active {
+  background: var(--color-ink);
+  box-shadow: none;
+  color: var(--color-paper);
+}
+
+.chip-count {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ---- Tags --------------------------------------------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 26px;
+  padding: 0 var(--space-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* A subject's swatch: the same colour it has in every chart. */
+.tag-dot,
+.subject-dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--dot, var(--color-muted));
+}
+
+.tag-due {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.tag-good {
+  background: var(--color-mint);
+  color: var(--color-accent-ink);
+}
+
+/* ---- Segmented control -------------------------------------------------- */
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: var(--space-2xs);
+  gap: var(--space-3xs);
+  border-radius: var(--radius-stock);
+  background: var(--color-paper-3);
+}
+
+.segmented button {
+  min-height: 40px;
+  padding: 0 var(--space-md);
+  border-radius: var(--space-sm);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease-snap),
+    color var(--dur-micro) var(--ease-snap);
+}
+
+.segmented button:hover:not(:disabled) {
+  color: var(--color-ink);
+}
+
+.segmented button:active:not(:disabled) {
+  translate: 0 1px;
+}
+
+.segmented button.is-active {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.segmented button:disabled {
+  opacity: 0.55;
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* ---- Strip: progress as a length of kraft paper ------------------------- */
+.bar {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-3);
+  overflow: hidden;
+}
+
+.bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grain), var(--bar-color, var(--color-sand));
+  transform-origin: left center;
+  transition: transform var(--dur-long) var(--ease-snap);
+}
+
+/* ---- Empty state -------------------------------------------------------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-xs);
+  max-width: 34rem;
+}
+
+.empty-art {
+  color: var(--color-muted);
+}
+
+.empty h3 {
+  font-size: var(--text-xl);
+}
+
+.empty p {
+  color: var(--color-muted);
+}
+
+.empty .btn {
+  margin-top: var(--space-sm);
+}
+
+/* ---- Skeleton ----------------------------------------------------------- */
+.skeleton {
+  border-radius: var(--radius-stock);
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-2) 25%,
+    var(--color-paper-3) 50%,
+    var(--color-paper-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+/* ---- Notice ------------------------------------------------------------- */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-input);
+  background: var(--color-paper-2);
+  box-shadow: inset 0 0 0 1px var(--color-rule);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.notice svg {
+  flex: none;
+  margin-top: var(--space-3xs);
+}
+
+.notice-error {
+  box-shadow: inset 0 0 0 1px var(--color-error);
+}
+
+.notice-error svg {
+  color: var(--color-error);
+}
+
+.notice-ok svg {
+  color: var(--color-success);
+}
+
+/* ---- Dialog ------------------------------------------------------------- */
+.dialog-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: var(--color-scrim);
+  animation: fade var(--dur-short) var(--ease-snap);
+  overflow-y: auto;
+}
+
+.dialog {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 3rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--grain), var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lift);
+  animation: settle var(--dur-short) var(--ease-snap);
+}
+
+.dialog-wide {
+  width: min(100%, 720px);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg) 0;
+}
+
+.dialog-head h2 {
+  font-size: var(--text-xl);
+}
+
+.dialog-head p {
+  margin-top: var(--space-2xs);
+  color: var(--color-muted);
+}
+
+.dialog-head .icon-btn {
+  margin: calc(var(--space-xs) * -1) calc(var(--space-xs) * -1) 0 0;
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* On a phone a dialog is a sheet that comes up from the thumb's side. */
+@media (max-width: 600px) {
+  .dialog-scrim {
+    place-items: end stretch;
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    animation: sheet-up var(--dur-long) var(--ease-snap);
+  }
+
+  .dialog-foot {
+    padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+  }
+
+  .dialog-foot .btn {
+    flex: 1;
+  }
+}
+
+/* ---- Toasts: for failures and for effects nobody can see ---------------- */
+.toasts {
+  position: fixed;
+  z-index: var(--z-toast);
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: min(92vw, 420px);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-stock);
+  background: var(--color-night);
+  color: var(--color-night-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-align: left;
+  line-height: 1.4;
+  box-shadow: var(--shadow-lift);
+  transition:
+    opacity var(--dur-long) ease,
+    translate var(--dur-long) ease;
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 100%;
+  }
+}
+
+.toast svg {
+  flex: none;
+}
+
+.toast-success svg {
+  color: var(--color-mint);
+}
+
+.toast-error svg {
+  color: var(--color-accent-3);
+}
+
+.toast-info svg {
+  color: var(--color-accent);
+}
+
+@media (max-width: 1023px) {
+  .toasts {
+    right: var(--space-md);
+    left: var(--space-md);
+    bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + var(--space-sm));
+    align-items: center;
+  }
+}
+
+/* ---- Menu: grows from the control that opened it ------------------------ */
+.menu {
+  position: absolute;
+  z-index: var(--z-raised);
+  min-width: 248px;
+  padding: var(--space-xs);
+  background: var(--grain), var(--color-card);
+  border-radius: var(--radius-stock);
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    var(--shadow-lift);
+  transform-origin: top right;
+  animation: settle var(--dur-micro) var(--ease-snap);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-sm);
+  border-radius: var(--space-sm);
+  color: var(--color-ink);
+  font-weight: 700;
+  text-align: left;
+}
+
+.menu-item svg {
+  color: var(--color-muted);
+  flex: none;
+}
+
+.menu-item:hover {
+  background: var(--color-paper-2);
+}
+
+.menu-item:active {
+  translate: 0 1px;
+}
+
+.menu-item.is-danger,
+.menu-item.is-danger svg {
+  color: var(--color-error);
+}
+
+.menu-sep {
+  height: 1px;
+  margin: var(--space-xs) 0;
+  background: var(--color-rule);
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ---- Sheet: a cut piece of paper with one torn edge --------------------- */
+.sheet {
+  position: relative;
+  filter: var(--shadow-paper);
+}
+
+.sheet > .sheet-fringe,
+.sheet > .sheet-face {
+  position: absolute;
+  inset: 0;
+}
+
+.sheet > .sheet-fringe {
+  background: var(--color-fringe);
+  translate: 0 1.5px;
+}
+
+.sheet > .sheet-face {
+  background: var(--grain), var(--fibre), var(--sheet-color, var(--color-paper-3));
+}
+
+.sheet > .sheet-body {
+  position: relative;
+}
+
+/* ---- Garden: growth set in type ----------------------------------------- */
+.garden {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--space-2xs);
+}
+
+.plot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.plot.is-today {
+  color: var(--color-ink);
+}
+
+.plant {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: var(--garden-height, 56px);
+  border-bottom: 3px solid var(--color-kraft);
+}
+
+/* The stem is drawn at full length and scaled, and the head rides down to
+   meet it, so a plant grows without any box changing size. */
+.plant-stem {
+  width: 4px;
+  height: calc(var(--garden-height, 56px) - 22px);
+  border-radius: var(--space-3xs);
+  background: var(--color-leaf);
+  transform-origin: bottom center;
+  transform: scaleY(var(--grow, 0));
+  transition: transform var(--dur-long) var(--ease-snap);
+}
+
+.plant-head {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--bloom, var(--color-accent-3));
+  translate: 0 calc((1 - var(--grow, 0)) * (var(--garden-height, 56px) - 22px));
+  transition: translate var(--dur-long) var(--ease-snap);
+}
+
+.plant.is-bare .plant-head {
+  display: none;
+}
+
+.plant.is-bare .plant-stem {
+  transform: scaleY(0.14);
+  background: var(--color-edge);
+}
+
+.plot.is-today .plant.is-bare .plant-stem {
+  background: var(--color-kraft);
+}

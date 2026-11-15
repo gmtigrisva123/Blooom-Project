@@ -1,15 +1,15 @@
 {
-  "name": "Blooom — Nền Tảng Nhóm Học Tập Tương Tác",
+  "name": "Blooom: học tập trung hơn, nhớ lâu hơn",
   "short_name": "Blooom",
-  "description": "Nền tảng nhóm học tập tương tác giúp học sinh kết nối theo môn học, quản lý thời gian Pomodoro, theo dõi hiệu suất và số hóa ghi chú bài học.",
+  "description": "Đồng hồ tập trung và thẻ nhớ tự nhắc ôn cho học sinh, sinh viên.",
   "lang": "vi",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0a0a14",
-  "theme_color": "#8b5cf6",
+  "background_color": "#f8f5ea",
+  "theme_color": "#f8f5ea",
   "categories": ["education", "productivity"],
   "icons": [
     {

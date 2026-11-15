@@ -95,9 +95,7 @@ export const cosinorFit = (sessions, metric = 'minutes') => {
       profile,
       sessionCount: sessions.length,
       distinctHours,
-      reason:
-        `Cần ít nhất ${MIN_SESSIONS_FOR_FIT} phiên học trải trên ` +
-        `${MIN_DISTINCT_HOURS} khung giờ khác nhau để ước lượng nhịp ngày đêm.`
+      reason: `Cần ${MIN_SESSIONS_FOR_FIT} phiên học vào ${MIN_DISTINCT_HOURS} khung giờ khác nhau.`
     };
   }
 
@@ -176,21 +174,18 @@ export const peakWindow = (profile, width = 3) => {
 export const CHRONOTYPES = [
   {
     id: 'morning',
-    label: 'Kiểu buổi sáng',
-    description: 'Đỉnh tập trung rơi vào trước trưa — ưu tiên môn khó vào buổi sáng.',
-    icon: '🌅'
+    label: 'Bạn là người của buổi sáng',
+    description: 'Xếp môn khó nhất vào buổi sáng, để tối cho việc nhẹ hơn.'
   },
   {
     id: 'intermediate',
-    label: 'Kiểu trung gian',
-    description: 'Đỉnh tập trung rơi vào đầu giờ chiều — khá cân bằng trong ngày.',
-    icon: '🌤️'
+    label: 'Bạn học tốt nhất vào buổi chiều',
+    description: 'Dành đầu giờ chiều cho môn khó, sáng và tối để ôn lại.'
   },
   {
     id: 'evening',
-    label: 'Kiểu buổi tối',
-    description: 'Đỉnh tập trung rơi vào tối — giữ buổi sáng cho việc ôn tập nhẹ.',
-    icon: '🌙'
+    label: 'Bạn là người của buổi tối',
+    description: 'Để dành môn khó cho buổi tối, buổi sáng chỉ nên ôn nhẹ.'
   }
 ];
 

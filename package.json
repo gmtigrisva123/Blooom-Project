@@ -1,19 +1,17 @@
 {
   "name": "blooom",
   "private": true,
-  "version": "3.0.0",
+  "version": "4.0.0",
   "type": "module",
-  "description": "Nền tảng học tập dựa trên bằng chứng cho học sinh & sinh viên — nhóm học theo môn, Pomodoro, ôn tập ngắt quãng SM-2, thí nghiệm N-of-1 và phân tích nhịp sinh học.",
+  "description": "Blooom: đồng hồ tập trung, thẻ nhớ tự nhắc ôn và nhóm học cho học sinh, sinh viên.",
   "keywords": [
     "react",
     "vite",
-    "pomodoro",
-    "study-groups",
+    "study",
+    "focus-timer",
+    "flashcards",
     "spaced-repetition",
-    "sm-2",
-    "n-of-1-trial",
-    "cosinor",
-    "learning-analytics",
+    "study-groups",
     "education",
     "vietnamese"
   ],
@@ -38,16 +36,16 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "assets": "python3 scripts/generate-assets.py",
-    "verify": "npm run formulas:check && npm run lint && npm run format:check && npm run build",
-    "formulas": "node scripts/render-formulas.mjs",
-    "formulas:check": "node scripts/render-formulas.mjs --check"
+    "verify": "npm run lint && npm run format:check && npm run build"
   },
   "dependencies": {
+    "@fontsource-variable/quicksand": "^5.3.0",
+    "@gsap/react": "^2.1.2",
     "@supabase/supabase-js": "^2.112.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "canvas-confetti": "^1.9.4",
+    "gsap": "^3.15.1",
     "lucide-react": "^1.27.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -64,7 +62,6 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.8.0",
-    "katex": "^0.18.1",
     "prettier": "^3.9.6",
     "vite": "^8.1.5"
   }

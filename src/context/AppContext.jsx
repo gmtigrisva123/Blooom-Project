@@ -1,13 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback
-} from 'react';
-import { getUiPrefs, setUiPrefs } from '../services/storage';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   loadWorkspace,
   groupsRepo,
@@ -25,86 +16,47 @@ import { authService } from '../services/auth';
 import { computeGamification } from '../services/gamification';
 import { applyReview, createCard } from '../services/srs';
 import { createExperiment, nextAllocation } from '../services/experiments';
+import { useToast } from './ToastContext';
 
-const AppContext = createContext();
+const AppContext = createContext(null);
 
-let toastSeq = 0;
-
-/* Mục tiêu tuần hiển thị khi học sinh chưa tự đặt. Cờ `isDefault` đi kèm để
-   giao diện nói rõ đây là gợi ý mặc định chứ không phải con số người dùng đã
-   chọn — trình bày một giá trị mặc định như thể nó là lựa chọn của người
-   dùng chính là một dạng dữ liệu bịa. */
-const DEFAULT_GOALS = {
-  targetHoursPerWeek: 10,
-  targetSessionsPerWeek: 10,
-  isDefault: true
-};
+/* Shown until a student sets their own weekly goal. `isDefault` travels with
+   it so the interface can say "suggested" instead of presenting a number the
+   student never chose as if they had. */
+const DEFAULT_GOALS = { targetHoursPerWeek: 10, targetSessionsPerWeek: 10, isDefault: true };
 
 /* ==========================================================================
-   APP PROVIDER
+   APP PROVIDER — everything the signed-in student owns.
 
-   Toàn bộ dữ liệu đến từ PostgreSQL. Provider nạp một lần khi gắn (App.jsx
-   remount nó theo account.id, nên đổi tài khoản là nạp lại từ đầu), rồi giữ
-   một bản sao trong state để giao diện không phải chờ mạng cho mỗi lần đọc.
+   Data is loaded once when the provider mounts (App.jsx remounts it per
+   account) and kept in state so screens never wait on the network to read.
 
-   Mỗi thao tác ghi đi theo cùng một khuôn: gọi repository, chờ máy chủ xác
-   nhận, rồi mới cập nhật state từ chính hàng máy chủ trả về. Cố ý KHÔNG cập
-   nhật lạc quan trước rồi hoàn tác sau: một học sinh nhìn thấy phiên học của
-   mình hiện lên rồi biến mất sẽ không biết rốt cuộc nó đã được lưu hay chưa.
+   Every write follows one shape: call the server, wait for it to confirm,
+   and only then update the screen from the row the server returned. Nothing
+   is shown optimistically — a session that appears and then vanishes would
+   leave a student unsure whether it was saved at all.
    ========================================================================== */
-export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }) => {
-  /* ---- Domain data ------------------------------------------------------ */
+export const AppProvider = ({ children, account, onSignOut }) => {
+  const showToast = useToast();
+
+  const [user, setUser] = useState(account);
   const [groups, setGroups] = useState([]);
-  const [timerSessions, setTimerSessions] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [notes, setNotes] = useState([]);
   const [cards, setCards] = useState([]);
   const [experiments, setExperiments] = useState([]);
-  const [editorPicks, setEditorPicks] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
-  const [performanceGoals, setPerformanceGoals] = useState(DEFAULT_GOALS);
+  const [goals, setGoals] = useState(DEFAULT_GOALS);
   const [seenBadges, setSeenBadges] = useState([]);
 
-  /* Hồ sơ hiển thị. Nguồn sự thật là bảng `profiles`; `account` là ảnh chụp
-     lúc đăng nhập, và mọi thay đổi hồ sơ đều ghi ngược lại cơ sở dữ liệu. */
-  const [user, setUser] = useState(account);
-
-  /* ---- Loading & error -------------------------------------------------- */
-  const [isBooting, setIsBooting] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [loadErrors, setLoadErrors] = useState([]);
 
-  /* ---- Interface state -------------------------------------------------- */
-  const [activeTab, setActiveTabRaw] = useState('dashboard');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => getUiPrefs().sidebarCollapsed);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const [toasts, setToasts] = useState([]);
-
-  /* Lets the global Space/R shortcuts drive the Pomodoro without the timer
-     having to live in context — WorkTimer registers its controls here. */
-  const timerControlsRef = useRef(null);
-
-  /* Độ dài phiên đang chọn. Nằm ở đây chứ không nằm trong WorkTimer vì trang
-     Tổng Quan phải nói đúng con số người dùng đã chọn — một nút "Bắt đầu 25
-     phút" trong khi họ đang dùng khối 50 phút là một con số bịa. */
-  const [timerPrefs, setTimerPrefs] = useState({ workMinutes: 25, breakMinutes: 5 });
-
-  /* ---- Toasts ----------------------------------------------------------- */
-  const showToast = useCallback((message, type = 'success') => {
-    const id = ++toastSeq;
-    setToasts((prev) => [...prev.slice(-2), { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3600);
-  }, []);
-
-  const dismissToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
-  /* Khuôn chung cho mọi thao tác ghi: chạy, báo thành công, hoặc hiện lỗi
-     thật của máy chủ. Không thao tác ghi nào được phép thất bại trong im
-     lặng — nếu dữ liệu không lưu được, học sinh phải biết ngay lúc đó. */
+  /* One write, one outcome: the result, or null plus a toast with the real
+     reason. No write is ever allowed to fail silently. Success is silent
+     wherever the effect is already on screen (the row appears, the dialog
+     closes); a toast is kept for failures and for effects nobody can see. */
   const run = useCallback(
     async (action, successMessage, successType = 'success') => {
       try {
@@ -112,116 +64,106 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
         if (successMessage) showToast(successMessage, successType);
         return result;
       } catch (error) {
-        showToast(error.message || 'Thao tác không thành công.', 'error');
+        showToast(error.message || 'Chưa làm được. Bạn thử lại nhé.', 'error');
         return null;
       }
     },
     [showToast]
   );
 
-  /* ---- Nạp dữ liệu ------------------------------------------------------ */
+  /* ---- Load ------------------------------------------------------------- */
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
-      const data = await loadWorkspace();
+    loadWorkspace().then((data) => {
       if (cancelled) return;
-
       setGroups(data.groups);
-      setTimerSessions(data.sessions);
+      setSessions(data.sessions);
       setNotes(data.notes);
       setCards(data.cards);
       setExperiments(data.experiments);
-      setEditorPicks(data.articles);
+      setArticles(data.articles);
       setBookmarks(data.bookmarks);
       setSeenBadges(data.seenBadges);
-      setPerformanceGoals(data.goals ? { ...data.goals, isDefault: false } : DEFAULT_GOALS);
+      setGoals(data.goals ? { ...data.goals, isDefault: false } : DEFAULT_GOALS);
       setLoadErrors(data.errors);
-      setIsBooting(false);
-    })();
+      setLoading(false);
+    });
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  /* ---- Sidebar ---------------------------------------------------------- */
-  const toggleSidebarCollapsed = useCallback(() => {
-    setSidebarCollapsed((prev) => {
-      setUiPrefs({ sidebarCollapsed: !prev });
-      return !prev;
-    });
-  }, []);
-
-  const setActiveTab = useCallback((tab) => {
-    setActiveTabRaw(tab);
-    setDrawerOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  /* ---- Vai trò ----------------------------------------------------------
-     Ai được làm Biên Tập Viên là quyết định của MÁY CHỦ, không phải của giao
-     diện: hàm claim_admin_role so mã và tự tay đổi cột role, còn cột đó thì bị
-     trigger khóa với mọi lệnh ghi khác. Hai hàm dưới đây chỉ chuyển tiếp câu
-     trả lời của máy chủ. */
-
-  /* Trả về nguyên kết quả cho hộp thoại thay vì chỉ hiện toast: mã sai cần
-     hiện NGAY BÊN CẠNH ô nhập, ở nơi người dùng đang nhìn. Một mẩu thông báo
-     trôi ở góc màn hình, cùng chỗ với mọi thông báo khác của ứng dụng, không
-     nói được rằng lần gõ vừa rồi đã sai. */
-  const claimAdminRole = useCallback(
-    async (code) => {
-      try {
-        const result = await authService.claimAdminRole(code);
-        if (result.ok && result.account) {
-          setUser(result.account);
-          showToast('Đã mở quyền Biên Tập Viên / Admin.', 'success');
-        }
-        return result;
-      } catch (error) {
-        return {
-          ok: false,
-          reason: 'error',
-          message: error.message || 'Không xác minh được mã truy cập.'
-        };
-      }
-    },
-    [showToast]
-  );
-
-  const releaseAdminRole = useCallback(async () => {
-    const updated = await run(
-      () => authService.releaseAdminRole(),
-      'Đã quay lại vai trò Học Sinh.',
-      'info'
-    );
-    if (updated) setUser(updated);
-    return updated;
-  }, [run]);
-
+  /* ---- Account ---------------------------------------------------------- */
   const updateProfile = useCallback(
     async (patch) => {
-      const updated = await run(() => authService.updateProfile(patch), 'Đã cập nhật hồ sơ.');
+      const updated = await run(() => authService.updateProfile(patch), null);
       if (updated) setUser(updated);
       return updated;
     },
     [run]
   );
 
-  /* ---- Nhóm học --------------------------------------------------------- */
-  const handleAddGroup = useCallback(
-    async (groupData) => {
-      const created = await run(() => groupsRepo.create(groupData));
-      if (!created) return null;
-
-      setGroups((prev) => [created, ...prev]);
-      showToast(`Đã tạo nhóm học "${created.name}" thành công!`);
-      return created;
+  /* Turns a try-it-out visit into a real account without losing anything:
+     the user id stays the same, so every row already saved still belongs to
+     them. Errors are returned (not toasted) so the form can show them next
+     to the field the student is looking at. */
+  const upgradeGuest = useCallback(
+    async (details) => {
+      try {
+        const updated = await authService.upgradeGuest(details);
+        setUser(updated);
+        showToast('Đã lưu tài khoản. Dữ liệu của bạn vẫn còn nguyên.');
+        return { ok: true, account: updated };
+      } catch (error) {
+        return { ok: false, message: error.message || 'Chưa tạo được tài khoản.' };
+      }
     },
-    [run, showToast]
+    [showToast]
   );
 
-  const handleToggleJoinGroup = useCallback(
+  /* Who may publish study tips is decided by the server, never by this
+     screen: the code is checked there and the role column is locked against
+     every other write. These two only relay the answer. */
+  const claimEditor = useCallback(
+    async (code) => {
+      try {
+        const result = await authService.claimAdminRole(code);
+        if (result.ok && result.account) {
+          setUser(result.account);
+          showToast('Bạn đã có quyền đăng bài.');
+        }
+        return result;
+      } catch (error) {
+        return { ok: false, message: error.message || 'Chưa kiểm tra được mã.' };
+      }
+    },
+    [showToast]
+  );
+
+  const releaseEditor = useCallback(async () => {
+    const updated = await run(
+      () => authService.releaseAdminRole(),
+      'Đã tắt quyền đăng bài.',
+      'info'
+    );
+    if (updated) setUser(updated);
+    return updated;
+  }, [run]);
+
+  /* ---- Groups ----------------------------------------------------------- */
+  const addGroup = useCallback(
+    async (data) => {
+      const created = await run(() => groupsRepo.create(data));
+      if (!created) return null;
+      setGroups((prev) => [created, ...prev]);
+      return created;
+    },
+    [run]
+  );
+
+  const toggleJoinGroup = useCallback(
     async (groupId) => {
       const group = groups.find((g) => g.id === groupId);
       if (!group || !user) return;
@@ -244,184 +186,109 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
           return { ...g, members, memberCount: members.length };
         })
       );
-
-      showToast(
-        isMember ? `Đã rời nhóm "${group.name}"` : `Đã tham gia nhóm "${group.name}"`,
-        isMember ? 'info' : 'success'
-      );
     },
-    [groups, user, run, showToast]
+    [groups, user, run]
   );
 
-  /* ---- Phiên học -------------------------------------------------------- */
-  const handleSaveTimerSession = useCallback(
-    async (sessionData) => {
-      const saved = await run(() => sessionsRepo.create(sessionData));
-      if (!saved) return null;
+  const deleteGroup = useCallback(
+    async (groupId) => {
+      const done = await run(() => groupsRepo.remove(groupId).then(() => true), null, 'info');
+      if (done) setGroups((prev) => prev.filter((g) => g.id !== groupId));
+    },
+    [run]
+  );
 
-      setTimerSessions((prev) => [saved, ...prev]);
+  /* ---- Focus sessions --------------------------------------------------- */
+  const saveSession = useCallback(
+    async (data) => {
+      const saved = await run(() => sessionsRepo.create(data));
+      if (!saved) return null;
+      setSessions((prev) => [saved, ...prev]);
       showToast(
-        `Hoàn thành ${sessionData.durationMinutes} phút môn ${sessionData.subject}! +${sessionData.durationMinutes} XP 🎉`
+        `Xong ${data.durationMinutes} phút ${data.subject}. +${data.durationMinutes} điểm!`
       );
       return saved;
     },
     [run, showToast]
   );
 
-  /* ---- Mục tiêu --------------------------------------------------------- */
-  const handleUpdateGoals = useCallback(
-    async (newGoals) => {
-      const saved = await run(
-        () => goalsRepo.save(newGoals),
-        'Đã cập nhật mục tiêu học tập tuần thành công!'
-      );
-      if (saved) setPerformanceGoals({ ...saved, isDefault: false });
+  /* ---- Weekly goal ------------------------------------------------------ */
+  const updateGoals = useCallback(
+    async (next) => {
+      const saved = await run(() => goalsRepo.save(next), null);
+      if (saved) setGoals({ ...saved, isDefault: false });
+      return saved;
     },
     [run]
   );
 
-  /* ---- Bài viết --------------------------------------------------------- */
-  const handleAddEditorPick = useCallback(
-    async (article) => {
-      const created = await run(
-        () => articlesRepo.create(article),
-        'Đã đăng bài viết mẹo học tập mới thành công!'
-      );
-      if (created) setEditorPicks((prev) => [created, ...prev]);
-      return created;
-    },
-    [run]
-  );
-
-  const handleDeleteEditorPick = useCallback(
-    async (id) => {
-      const done = await run(
-        () => articlesRepo.remove(id).then(() => true),
-        'Đã xóa bài viết khỏi danh sách.',
-        'info'
-      );
-      if (done) setEditorPicks((prev) => prev.filter((a) => a.id !== id));
-    },
-    [run]
-  );
-
-  const handleToggleBookmark = useCallback(
-    async (articleId) => {
-      const exists = bookmarks.includes(articleId);
-
-      const done = await run(async () => {
-        if (exists) await bookmarksRepo.remove(articleId);
-        else await bookmarksRepo.add(articleId);
-        return true;
-      });
-      if (!done) return;
-
-      setBookmarks((prev) =>
-        exists ? prev.filter((id) => id !== articleId) : [...prev, articleId]
-      );
-
-      /* Số lượt lưu hiển thị trên thẻ bài viết là COUNT phía máy chủ; cập
-         nhật tại chỗ để con số khớp ngay mà không phải nạp lại cả danh sách. */
-      setEditorPicks((prev) =>
-        prev.map((a) =>
-          a.id === articleId ? { ...a, likesCount: a.likesCount + (exists ? -1 : 1) } : a
-        )
-      );
-
-      showToast(
-        exists ? 'Đã bỏ lưu bài viết.' : 'Đã lưu bài viết vào danh sách yêu thích!',
-        'info'
-      );
-    },
-    [bookmarks, run, showToast]
-  );
-
-  /* ---- Ghi chú ---------------------------------------------------------- */
-  const handleAddNote = useCallback(
-    async (noteData) => {
-      const created = await run(() => notesRepo.create(noteData));
+  /* ---- Files ------------------------------------------------------------ */
+  const addNote = useCallback(
+    async (data) => {
+      const created = await run(() => notesRepo.create(data));
       if (!created) return null;
-
       setNotes((prev) => [created, ...prev]);
-      showToast(`Đã tải lên ghi chú "${created.title}" thành công!`);
       return created;
     },
-    [run, showToast]
+    [run]
   );
 
-  const handleDeleteNote = useCallback(
+  const deleteNote = useCallback(
     async (id) => {
-      const done = await run(
-        () => notesRepo.remove(id).then(() => true),
-        'Đã xóa ghi chú thành công.',
-        'info'
-      );
+      const done = await run(() => notesRepo.remove(id).then(() => true), null, 'info');
       if (done) setNotes((prev) => prev.filter((n) => n.id !== id));
     },
     [run]
   );
 
-  /* ---- Thẻ ghi nhớ (SM-2) ----------------------------------------------- */
-  const handleAddCard = useCallback(
-    async (cardData) => {
-      const created = await run(
-        () => cardsRepo.create(createCard(cardData)),
-        'Đã thêm thẻ ghi nhớ vào bộ ôn tập.'
-      );
+  /* ---- Flashcards ------------------------------------------------------- */
+  const addCard = useCallback(
+    async (data) => {
+      const created = await run(() => cardsRepo.create(createCard(data)), null);
       if (created) setCards((prev) => [created, ...prev]);
       return created;
     },
     [run]
   );
 
-  /* Chấm điểm là nơi duy nhất lịch ôn thay đổi. Thuật toán SM-2 chạy ở client
-     để giao diện lật thẻ được ngay, nhưng cả trạng thái lịch mới lẫn bản ghi
-     của chính lần chấm đó đều được ghi xuống cơ sở dữ liệu trước khi hàm này
-     trả về — nên khoảng cách hiển thị luôn là khoảng cách đã lưu. */
-  const handleReviewCard = useCallback(
+  /* Grading is the only place a card's schedule changes. The next review
+     date is worked out here so the card can flip at once, but both the new
+     schedule and the grade itself are saved before this returns — so the date
+     on screen is always the date that was stored. */
+  const reviewCard = useCallback(
     async (card, quality) => {
       const after = applyReview(card, quality);
-
       const saved = await run(() => cardsRepo.applyReview({ before: card, after, quality }));
       if (!saved) return null;
-
       setCards((prev) => prev.map((c) => (c.id === saved.id ? saved : c)));
       return saved;
     },
     [run]
   );
 
-  const handleDeleteCard = useCallback(
+  const deleteCard = useCallback(
     async (id) => {
-      const done = await run(
-        () => cardsRepo.remove(id).then(() => true),
-        'Đã xóa thẻ ghi nhớ.',
-        'info'
-      );
+      const done = await run(() => cardsRepo.remove(id).then(() => true), null, 'info');
       if (done) setCards((prev) => prev.filter((c) => c.id !== id));
     },
     [run]
   );
 
-  /* ---- Thí nghiệm N-of-1 ------------------------------------------------ */
-  const handleCreateExperiment = useCallback(
+  /* ---- Experiments ------------------------------------------------------ */
+  const addExperiment = useCallback(
     async (design) => {
-      const created = await run(
-        () => experimentsRepo.create(createExperiment(design)),
-        'Đã khởi tạo thí nghiệm. Điều kiện đầu tiên đã được bốc ngẫu nhiên.'
-      );
+      const created = await run(() => experimentsRepo.create(createExperiment(design)), null);
       if (created) setExperiments((prev) => [created, ...prev]);
       return created;
     },
     [run]
   );
 
-  const handleRecordTrial = useCallback(
+  const recordTrial = useCallback(
     async (experiment, entry) => {
-      /* Phân bổ cho phiên kế tiếp được bốc TRƯỚC khi phiên đó diễn ra, bằng
-         khối hoán vị cỡ 2 (services/experiments.js), rồi lưu xuống cùng lúc
-         với phiên vừa ghi. Đó là điều khiến học sinh không thể chọn điều kiện
-         sau khi đã biết kết quả. */
+      /* Which way to study next is drawn BEFORE that session happens, and
+         saved together with the result just entered. That is what stops
+         anyone from picking the option that suits today's mood. */
       const trialsAfter = [
         ...experiment.trials,
         { condition: experiment.pendingCondition, value: entry.value }
@@ -439,23 +306,17 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
       if (!updated) return null;
 
       setExperiments((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
-      showToast(
-        `Đã ghi phiên ${updated.trials.length}. Phiên tới sẽ chạy điều kiện ${updated.pendingCondition}.`
-      );
       return updated;
     },
-    [run, showToast]
+    [run]
   );
 
-  const handleFinishExperiment = useCallback(
+  const toggleExperimentDone = useCallback(
     async (experiment) => {
       const nextStatus = experiment.status === 'completed' ? 'running' : 'completed';
-
       const updated = await run(
         () => experimentsRepo.setStatus(experiment.id, nextStatus),
-        nextStatus === 'completed'
-          ? 'Đã chốt thí nghiệm. Kết quả được khóa lại để báo cáo.'
-          : 'Đã mở lại thí nghiệm để thu thập thêm dữ liệu.',
+        null,
         'info'
       );
       if (updated)
@@ -465,149 +326,148 @@ export const AppProvider = ({ children, account, onSignOut, theme, toggleTheme }
     [run]
   );
 
-  const handleDeleteExperiment = useCallback(
+  const deleteExperiment = useCallback(
     async (id) => {
-      const done = await run(
-        () => experimentsRepo.remove(id).then(() => true),
-        'Đã xóa thí nghiệm.',
-        'info'
-      );
+      const done = await run(() => experimentsRepo.remove(id).then(() => true), null, 'info');
       if (done) setExperiments((prev) => prev.filter((e) => e.id !== id));
     },
     [run]
   );
 
-  /* ---- Xuất dữ liệu ----------------------------------------------------- */
-  const handleExportData = useCallback(async () => {
-    const payload = await run(() => exportAllData(), 'Đã xuất toàn bộ dữ liệu của bạn.');
+  /* ---- Study tips ------------------------------------------------------- */
+  const addArticle = useCallback(
+    async (article) => {
+      const created = await run(() => articlesRepo.create(article), null);
+      if (created) setArticles((prev) => [created, ...prev]);
+      return created;
+    },
+    [run]
+  );
+
+  const deleteArticle = useCallback(
+    async (id) => {
+      const done = await run(() => articlesRepo.remove(id).then(() => true), null, 'info');
+      if (done) setArticles((prev) => prev.filter((a) => a.id !== id));
+    },
+    [run]
+  );
+
+  const toggleBookmark = useCallback(
+    async (articleId) => {
+      const saved = bookmarks.includes(articleId);
+
+      const done = await run(async () => {
+        if (saved) await bookmarksRepo.remove(articleId);
+        else await bookmarksRepo.add(articleId);
+        return true;
+      });
+      if (!done) return;
+
+      setBookmarks((prev) =>
+        saved ? prev.filter((id) => id !== articleId) : [...prev, articleId]
+      );
+      /* The save count on each article is counted by the server; nudging it
+         here keeps the number right without reloading the whole list. */
+      setArticles((prev) =>
+        prev.map((a) =>
+          a.id === articleId ? { ...a, likesCount: a.likesCount + (saved ? -1 : 1) } : a
+        )
+      );
+    },
+    [bookmarks, run]
+  );
+
+  /* ---- Export ----------------------------------------------------------- */
+  const exportData = useCallback(async () => {
+    const payload = await run(() => exportAllData(), 'Đã tải dữ liệu của bạn về máy.');
     if (!payload) return;
 
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `blooom-du-lieu-${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `blooom-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
   }, [run]);
 
-  /* ---- Gamification (suy ra, không bao giờ lưu) ------------------------- */
-  const gamification = useMemo(
-    () =>
-      computeGamification({
-        sessions: timerSessions,
-        groups,
-        notes,
-        bookmarks,
-        userId: user?.id
-      }),
-    [timerSessions, groups, notes, bookmarks, user?.id]
+  /* ---- Streak, points, level, badges (derived, never stored) ------------ */
+  const game = useMemo(
+    () => computeGamification({ sessions, groups, notes, bookmarks, userId: user?.id }),
+    [sessions, groups, notes, bookmarks, user?.id]
   );
 
   const newBadgeIds = useMemo(
-    () => gamification.unlockedIds.filter((id) => !seenBadges.includes(id)),
-    [gamification.unlockedIds, seenBadges]
+    () => game.unlockedIds.filter((id) => !seenBadges.includes(id)),
+    [game.unlockedIds, seenBadges]
   );
 
   const acknowledgeBadges = useCallback(async () => {
     if (newBadgeIds.length === 0) return;
 
-    /* Cập nhật state trước rồi mới ghi: đây là ngoại lệ duy nhất so với quy
-       tắc "chờ máy chủ", vì hậu quả xấu nhất khi ghi hỏng là nhãn "MỚI" xuất
-       hiện lại ở lần mở sau — không có dữ liệu nào bị mất. */
+    /* The one write that updates the screen first: if saving fails, the
+       worst outcome is a "new" label showing once more. No data is lost. */
     setSeenBadges((prev) => [...new Set([...prev, ...newBadgeIds])]);
-
     try {
       await badgesRepo.markSeen(newBadgeIds);
     } catch {
-      /* Im lặng có chủ đích: xem giải thích ngay phía trên. */
+      /* Deliberately silent — see above. */
     }
   }, [newBadgeIds]);
 
   const value = {
-    // identity
-    account,
     user,
-    setUser,
+    isGuest: Boolean(user?.isAnonymous),
+    isEditor: user?.role === 'admin',
     updateProfile,
-    onSignOut,
-    claimAdminRole,
-    releaseAdminRole,
-    // data
-    groups,
-    handleAddGroup,
-    handleToggleJoinGroup,
-    timerSessions,
-    handleSaveTimerSession,
-    performanceGoals,
-    handleUpdateGoals,
-    editorPicks,
-    handleAddEditorPick,
-    handleDeleteEditorPick,
-    bookmarks,
-    handleToggleBookmark,
-    notes,
-    handleAddNote,
-    handleDeleteNote,
-    cards,
-    handleAddCard,
-    handleReviewCard,
-    handleDeleteCard,
-    experiments,
-    handleCreateExperiment,
-    handleRecordTrial,
-    handleFinishExperiment,
-    handleDeleteExperiment,
-    handleExportData,
-    // ui
-    activeTab,
-    setActiveTab,
-    theme,
-    toggleTheme,
-    drawerOpen,
-    setDrawerOpen,
-    sidebarCollapsed,
-    toggleSidebarCollapsed,
-    paletteOpen,
-    setPaletteOpen,
-    shortcutsOpen,
-    setShortcutsOpen,
-    isBooting,
+    upgradeGuest,
+    claimEditor,
+    releaseEditor,
+    signOut: onSignOut,
+
+    loading,
     loadErrors,
-    timerControlsRef,
-    timerPrefs,
-    setTimerPrefs,
-    showToast,
-    // gamification
-    gamification,
+
+    groups,
+    addGroup,
+    toggleJoinGroup,
+    deleteGroup,
+
+    sessions,
+    saveSession,
+
+    goals,
+    updateGoals,
+
+    notes,
+    addNote,
+    deleteNote,
+
+    cards,
+    addCard,
+    reviewCard,
+    deleteCard,
+
+    experiments,
+    addExperiment,
+    recordTrial,
+    toggleExperimentDone,
+    deleteExperiment,
+
+    articles,
+    addArticle,
+    deleteArticle,
+    bookmarks,
+    toggleBookmark,
+
+    exportData,
+
+    game,
     newBadgeIds,
     acknowledgeBadges
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-
-      <div className="toast-stack" role="status" aria-live="polite">
-        {toasts.map((toast) => (
-          /* A button, because clicking a toast dismisses it — that makes it
-             reachable and operable from the keyboard too. */
-          <button
-            key={toast.id}
-            type="button"
-            className={`toast toast-${toast.type}`}
-            onClick={() => dismissToast(toast.id)}
-            title="Bấm để đóng thông báo"
-          >
-            <span className="toast-icon" aria-hidden="true">
-              {toast.type === 'error' ? '⚠️' : toast.type === 'info' ? 'ℹ️' : '✅'}
-            </span>
-            <span>{toast.message}</span>
-          </button>
-        ))}
-      </div>
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useApp = () => useContext(AppContext);

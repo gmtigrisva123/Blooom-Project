@@ -38,29 +38,29 @@ export const REVIEW_GRADES = [
     id: 'again',
     quality: 1,
     label: 'Quên rồi',
-    hint: 'Không nhớ được — học lại từ đầu',
-    color: '#fb7185'
+    hint: 'Không nhớ ra',
+    color: 'var(--red)'
   },
   {
     id: 'hard',
     quality: 3,
     label: 'Khó',
-    hint: 'Nhớ ra nhưng phải nghĩ lâu',
-    color: '#f0a85c'
+    hint: 'Phải nghĩ lâu',
+    color: 'var(--orange)'
   },
   {
     id: 'good',
     quality: 4,
     label: 'Nhớ được',
-    hint: 'Nhớ ra sau một chút do dự',
-    color: '#2dd4bf'
+    hint: 'Nhớ ra được',
+    color: 'var(--green)'
   },
   {
     id: 'easy',
     quality: 5,
-    label: 'Quá dễ',
-    hint: 'Bật ra ngay lập tức',
-    color: '#818cf8'
+    label: 'Dễ',
+    hint: 'Nhớ ngay',
+    color: 'var(--violet)'
   }
 ];
 
@@ -171,7 +171,16 @@ export const deckRetention = (cards, now = new Date()) => {
 /* --------------------------------------------------------------------------
    QUEUES & FORECAST
    -------------------------------------------------------------------------- */
-export const isDue = (card, now = new Date()) => new Date(card.dueAt) <= now;
+/* A card is due for the whole of its due day, not from a particular minute:
+   a student who reviews at breakfast should not be told that the card they
+   studied last night "isn't ready until 8 pm". */
+const endOfDay = (now) => {
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  return end;
+};
+
+export const isDue = (card, now = new Date()) => new Date(card.dueAt) <= endOfDay(now);
 
 /* Due cards, weakest memory first — reviewing the most-forgotten card first
    is what spaced repetition is for. */

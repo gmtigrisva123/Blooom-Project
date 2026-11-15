@@ -1,58 +1,71 @@
 /* ==========================================================================
-   BLOOOM — TÙY CHỌN GIAO DIỆN THEO THIẾT BỊ
+   BLOOOM — THIS DEVICE'S PREFERENCES
 
-   Tệp này từng là "cơ sở dữ liệu" của Blooom. Nó không còn giữ vai trò đó
-   nữa: toàn bộ dữ liệu học tập — hồ sơ, nhóm học, phiên Pomodoro, ghi chú,
-   thẻ ghi nhớ, thí nghiệm — nay nằm trong PostgreSQL và đi qua
-   services/db/index.js.
-
-   Thứ còn lại ở đây là những tùy chọn THUỘC VỀ THIẾT BỊ chứ không thuộc về
-   người dùng: thanh bên đang thu gọn hay mở, giao diện sáng hay tối. Một học
-   sinh mở Blooom trên máy tính ở trường và trên điện thoại ở nhà hoàn toàn
-   có lý do để muốn hai thiết lập khác nhau, nên đồng bộ chúng lên máy chủ sẽ
-   là làm sai. Chúng cũng không phải dữ liệu nghiên cứu, nên không có lý do
-   gì để chúng rời khỏi máy.
+   Everything a student creates lives in the database. What stays here is only
+   what belongs to the device rather than to the person: whether the chime is
+   on, and the timer lengths last used on this screen.
    ========================================================================== */
 
-const UI_PREFS_KEY = 'blooom_ui_prefs';
+const PREFS_KEY = 'blooom_prefs';
 
-const DEFAULT_PREFS = { sidebarCollapsed: false };
+const DEFAULT_PREFS = {
+  sound: true,
+  workMinutes: 25,
+  breakMinutes: 5,
+  subject: 'Toán'
+};
 
-/* localStorage ném lỗi ở chế độ ẩn danh và khi hết dung lượng. Đọc hỏng phải
-   thoái lui về giá trị mặc định, không bao giờ được làm vỡ một lần render. */
-export const getUiPrefs = () => {
+/* localStorage throws in private mode and when it is full. A failed read must
+   fall back to the defaults, never break a render. */
+export const getPrefs = () => {
   try {
-    const raw = localStorage.getItem(UI_PREFS_KEY);
+    const raw = localStorage.getItem(PREFS_KEY);
     return raw ? { ...DEFAULT_PREFS, ...JSON.parse(raw) } : DEFAULT_PREFS;
   } catch {
     return DEFAULT_PREFS;
   }
 };
 
-export const setUiPrefs = (patch) => {
-  const next = { ...getUiPrefs(), ...patch };
+export const setPrefs = (patch) => {
+  const next = { ...getPrefs(), ...patch };
   try {
-    localStorage.setItem(UI_PREFS_KEY, JSON.stringify(next));
+    localStorage.setItem(PREFS_KEY, JSON.stringify(next));
   } catch {
-    /* Không lưu được thì thiết lập chỉ sống trong phiên này — chấp nhận được. */
+    /* Not saved: the setting simply lasts for this visit. */
   }
   return next;
 };
 
-/* ==========================================================================
-   DỌN DẸP DỮ LIỆU CỦA PHIÊN BẢN CŨ
+/* --------------------------------------------------------------------------
+   A running timer survives a refresh but not a closed tab — which is exactly
+   what sessionStorage is. Closing the tab is the student walking away.
+   -------------------------------------------------------------------------- */
+const TIMER_KEY = 'blooom_timer';
 
-   Các phiên bản Blooom trước lưu toàn bộ dữ liệu học tập trong localStorage,
-   trong đó có cả một bộ dữ liệu mẫu được sinh sẵn (nhóm học, bài viết, phiên
-   học và thẻ ghi nhớ không có thật). Bộ dữ liệu đó nay đã bị gỡ khỏi mã
-   nguồn, nhưng nó vẫn còn nằm trong trình duyệt của bất kỳ ai từng mở phiên
-   bản cũ — và sẽ không tự biến mất.
+export const readTimerSnapshot = () => {
+  try {
+    const raw = sessionStorage.getItem(TIMER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
 
-   Hàm này xóa chúng đi, một lần, lúc ứng dụng khởi động. Nếu không dọn, một
-   máy tính dùng để trình bày có thể vẫn hiện "Ôn thi THPT Quốc Gia - Toán 12
-   High Scores" bên cạnh dữ liệu thật, và không có cách nào để người xem phân
-   biệt được hai thứ.
-   ========================================================================== */
+export const writeTimerSnapshot = (snapshot) => {
+  try {
+    if (snapshot) sessionStorage.setItem(TIMER_KEY, JSON.stringify(snapshot));
+    else sessionStorage.removeItem(TIMER_KEY);
+  } catch {
+    /* Losing the snapshot only costs the refresh-resume convenience. */
+  }
+};
+
+/* --------------------------------------------------------------------------
+   Earlier versions of Blooom kept all study data — including a generated set
+   of sample groups, articles and sessions — in localStorage. That data would
+   otherwise sit in the browser of anyone who opened an old build, so it is
+   cleared once at start-up.
+   -------------------------------------------------------------------------- */
 const LEGACY_KEYS = [
   'studyhub_user_profile',
   'studyhub_study_groups',
@@ -63,6 +76,8 @@ const LEGACY_KEYS = [
   'studyhub_bookmarks',
   'studyhub_seen_badges',
   'studyhub_ui_prefs',
+  'studyhub_theme',
+  'blooom_ui_prefs',
   'blooom_flashcards',
   'blooom_experiments',
   'blooom_accounts',
@@ -70,31 +85,22 @@ const LEGACY_KEYS = [
 ];
 
 export const purgeLegacyLocalData = () => {
-  let removed = 0;
-
   try {
-    /* Phiên bản cũ đặt tiền tố "blooom:<accountId>:" trước mỗi khóa để tách
-       dữ liệu giữa các hồ sơ trên cùng một máy, nên không thể chỉ xóa danh
-       sách khóa cố định — phải quét toàn bộ. */
     const doomed = [];
 
     for (let i = 0; i < localStorage.length; i += 1) {
       const key = localStorage.key(i);
       if (!key) continue;
 
-      const isNamespacedLegacy =
+      /* Old builds also namespaced keys as "blooom:<accountId>:<key>". */
+      const namespaced =
         key.startsWith('blooom:') && LEGACY_KEYS.some((legacy) => key.endsWith(legacy));
 
-      if (LEGACY_KEYS.includes(key) || isNamespacedLegacy) doomed.push(key);
+      if (LEGACY_KEYS.includes(key) || namespaced) doomed.push(key);
     }
 
-    doomed.forEach((key) => {
-      localStorage.removeItem(key);
-      removed += 1;
-    });
+    doomed.forEach((key) => localStorage.removeItem(key));
   } catch {
-    /* Không đọc được localStorage thì cũng không có gì để dọn. */
+    /* No access to localStorage means there is nothing to clear either. */
   }
-
-  return removed;
 };

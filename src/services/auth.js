@@ -187,12 +187,9 @@ const toAdminGateError = (error) => {
     error?.code === 'PGRST202' || error?.message?.includes('Could not find the function');
 
   if (notInstalled) {
-    return Object.assign(
-      new Error(
-        'Máy chủ chưa cài cổng mã truy cập. Hãy chạy supabase/migrations/0002_admin_access_code.sql trong SQL Editor.'
-      ),
-      { cause: error }
-    );
+    return Object.assign(new Error('Tính năng biên tập viên chưa được bật trên máy chủ này.'), {
+      cause: error
+    });
   }
 
   return toFriendlyError(error, 'Không xác minh được mã truy cập.');
@@ -314,7 +311,7 @@ export const authService = {
     if (error) {
       if (error.message?.includes('Anonymous sign-ins are disabled')) {
         throw new Error(
-          'Chế độ dùng thử chưa được bật. Trong Supabase: Authentication › Sign In / Providers › bật "Allow anonymous sign-ins".'
+          'Chế độ dùng thử đang tạm đóng. Bạn tạo tài khoản miễn phí để bắt đầu nhé.'
         );
       }
       throw toFriendlyError(error, 'Không vào được chế độ dùng thử.');

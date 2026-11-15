@@ -51,9 +51,7 @@ export const supabase = isSupabaseConfigured
 
 export const requireClient = () => {
   if (!supabase) {
-    throw new Error(
-      'Chưa cấu hình cơ sở dữ liệu. Hãy tạo tệp .env với VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY.'
-    );
+    throw new Error('Blooom chưa kết nối được máy chủ. Hãy thử lại sau ít phút.');
   }
   return supabase;
 };
@@ -92,8 +90,7 @@ const FRIENDLY_BY_CODE = {
   /* Vi phạm CHECK constraint. */
   23514: 'Dữ liệu nhập vào không hợp lệ.',
   /* Bảng chưa tồn tại — gần như luôn là chưa chạy migration. */
-  '42P01':
-    'Cơ sở dữ liệu chưa có bảng nào. Hãy chạy supabase/migrations/0001_init.sql trong SQL Editor.'
+  '42P01': 'Máy chủ chưa được cài đặt xong. Hãy báo cho người quản trị Blooom.'
 };
 
 export const toFriendlyError = (error, fallback = 'Không kết nối được cơ sở dữ liệu.') => {

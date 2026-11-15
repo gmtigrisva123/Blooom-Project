@@ -1,590 +1,618 @@
 /* ==========================================================================
-   BLOOOM — LANDING PAGE
-   A document, not a dashboard: one column of running argument on the left, one
-   live instrument on the right, then flat grids of evidence below. No cards
-   float, nothing pulses, and the only image on the page is a plot drawn from
-   the app's own model.
+   LANDING · the public page. One idea to a screen, the product on every one.
    ========================================================================== */
 
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.lead {
+  max-width: 40ch;
+  color: var(--color-ink-2);
+  font-size: var(--text-lead);
+  line-height: 1.45;
+}
+
+/* ---- Bar: steps away on the way down, returns on the way up ------------- */
 .landing {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  background: var(--bg-app);
+  padding-top: var(--topbar);
 }
 
-/* Giấy kẻ ô phía sau toàn trang, mờ dần về phía chân trang bằng một mặt nạ
-   hình tròn: nó định vị trang trong cùng hệ hình với các bề mặt đo bên trong
-   ứng dụng, nhưng không được phép cạnh tranh với chữ. */
-.landing-grid {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.75;
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(120% 80% at 50% 0%, #000 5%, transparent 70%);
-  -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, #000 5%, transparent 70%);
+.lp-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-sticky-nav);
+  background: var(--grain), var(--color-paper);
+  transition: translate var(--dur-short) var(--ease-snap);
 }
 
-.landing > *:not(.landing-grid) {
-  position: relative;
-  z-index: 1;
+.lp-nav.is-away {
+  translate: 0 -100%;
 }
 
-/* ==========================================================================
-   DẢI CHẠY — môn học và mô hình
-   Trang trí, nên nó mang aria-hidden và không chứa thông tin nào không có ở
-   chỗ khác. Dừng lại khi người dùng đã yêu cầu giảm chuyển động.
-   ========================================================================== */
-.landing-marquee {
-  overflow: hidden;
-  padding: 0.875rem 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-}
-
-.landing-marquee-track {
+.lp-nav-row {
   display: flex;
-  gap: 2.75rem;
-  width: max-content;
-  animation: marquee 26s linear infinite;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  height: var(--topbar);
 }
 
-.landing-marquee-track span {
-  font-size: var(--fs-xs);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-dim);
+.lp-nav-links {
+  display: flex;
+  gap: var(--space-lg);
+  margin-right: auto;
+  margin-left: var(--space-xl);
+}
+
+.lp-nav-links a {
+  font-weight: 700;
+  color: var(--color-ink-2);
   white-space: nowrap;
 }
 
-/* ==========================================================================
-   NAV
-   ========================================================================== */
-.landing-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  padding: var(--sp-4) var(--sp-6);
-  background: color-mix(in srgb, var(--bg-app) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+.lp-nav-links a:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
 }
 
-.landing-brand img {
-  width: 6.5rem;
-  height: auto;
-}
-
-.landing-nav-links {
+.lp-nav-actions {
   display: flex;
   align-items: center;
-  gap: var(--sp-5);
-  margin-left: var(--sp-4);
+  gap: var(--space-xs);
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+.lp-hero {
+  display: grid;
+  align-items: center;
+  min-height: calc(100svh - var(--topbar));
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+.lp-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+  gap: var(--gap-columns);
+}
+
+.lp-hero-text {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.lp-hero h1 {
+  font-size: clamp(2.5rem, 3.4vw + 1rem, 4.25rem);
+}
+
+.lp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.hero-demo {
+  grid-column: span 6;
+  position: relative;
+  padding: var(--space-lg) var(--space-lg) var(--space-xl);
+  background: none;
+}
+
+.hero-mat {
+  position: absolute;
+  inset: 0 var(--space-xs) var(--space-xs) var(--space-xs);
+  rotate: 2.5deg;
+}
+
+.hero-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    var(--shadow-lift);
+}
+
+.hero-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.hero-card-top .bar {
   flex: 1;
 }
 
-.landing-nav-links a {
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  color: var(--text-soft);
-  white-space: nowrap;
-}
-
-.landing-nav-links a:hover {
-  color: var(--text);
-}
-
-.landing-nav-actions {
+.hero-quiz {
   display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  margin-left: auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  min-height: 216px;
 }
 
-/* ==========================================================================
-   SHARED SECTION RHYTHM
-   ========================================================================== */
-.landing main {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 var(--sp-6);
+/* In the hero the garden is the point, so it is drawn large. */
+.hero-card .garden {
+  --garden-height: 104px;
 }
 
-.landing-section {
-  padding: var(--sp-12) 0;
-  border-top: 1px solid var(--border);
+.hero-card .plant-stem {
+  width: 6px;
 }
 
-.landing-section-head {
-  max-width: 46rem;
-  margin-bottom: var(--sp-8);
+.hero-card .plant-head {
+  font-size: 1.75rem;
 }
 
-.landing-section-head h2 {
-  font-size: var(--fs-2xl);
-  margin-bottom: var(--sp-3);
+.hero-card .plot {
+  font-size: var(--text-xs);
 }
 
-.landing-section-head p {
-  font-size: var(--fs-md);
-  color: var(--text-soft);
-  margin: 0;
+.hero-strip {
+  align-self: stretch;
 }
 
-/* ==========================================================================
-   HERO
-   ========================================================================== */
-.landing-hero {
+.hero-strip > .sheet-body {
+  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) + var(--space-xs));
+}
+
+.hero-question {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: var(--tracking-display);
+  color: var(--color-accent-ink);
+}
+
+.hero-quiz > .hero-question {
+  color: var(--color-ink);
+}
+
+/* The answer pops in mint: recall is growth. */
+.hero-answer {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-stock);
+  background: var(--grain), var(--color-mint);
+  color: var(--color-accent-ink);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  animation: settle var(--dur-short) var(--ease-snap);
+}
+
+.hero-verdict {
+  font-weight: 700;
+}
+
+mark {
+  padding: 0 var(--space-2xs);
+  background: color-mix(in oklab, var(--color-accent) 70%, transparent);
+  color: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* One die-cut sticker carries the offer. */
+.sticker {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: var(--sp-10);
+  place-items: center;
+  padding: var(--space-sm) var(--space-lg);
+  border: 4px solid var(--color-fringe);
+  border-radius: var(--radius-pill);
+  background: var(--grain), var(--color-accent-3);
+  color: var(--color-accent-ink);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1;
+  rotate: 8deg;
+  box-shadow: var(--shadow-card);
+}
+
+/* ---- Sections ----------------------------------------------------------- */
+.lp-section {
+  display: grid;
   align-items: center;
-  padding: var(--sp-12) 0;
+  padding-block: var(--section-gap);
 }
 
-.landing-hero h1 {
-  font-size: clamp(2.1rem, 5.2vw, 3.4rem);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
-  margin: var(--sp-4) 0 var(--sp-5);
+.lp-section h2,
+.lp-close h2 {
+  max-width: 18ch;
+  font-size: var(--text-section);
 }
 
-.landing-lede {
-  font-size: var(--fs-md);
-  line-height: 1.7;
-  color: var(--text-soft);
-  max-width: 34rem;
-  margin: 0;
-}
-
-.landing-cta {
+.lp-head {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  margin-top: var(--sp-6);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
 }
 
-.landing-fineprint {
-  margin: var(--sp-4) 0 0;
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
+.lp-why,
+.lp-screens {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+  gap: var(--gap-columns);
 }
 
-/* Câu mở đầu dựng lên theo trình tự đọc — chỉ ở lần tải đầu, và chỉ ở khối
-   hero: phần còn lại của trang do useReveal điều khiển khi cuộn tới. */
-.landing-hero-copy .tag-line {
-  animation: rise-in 0.7s var(--ease-out) both;
+.lp-why .lp-head {
+  grid-column: span 5;
 }
 
-.landing-hero-copy h1 {
-  animation: rise-in 0.8s var(--ease-out) 0.08s both;
+.lp-why .chart {
+  grid-column: span 7;
 }
 
-.landing-hero-copy .landing-lede {
-  animation: rise-in 0.8s var(--ease-out) 0.16s both;
+.lp-screens .lp-head {
+  grid-column: span 4;
 }
 
-.landing-hero-copy .landing-cta {
-  animation: rise-in 0.8s var(--ease-out) 0.24s both;
+.lp-shot {
+  grid-column: span 8;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-paper-2);
+  box-shadow:
+    0 0 0 1px var(--color-rule),
+    var(--shadow-lift);
 }
 
-.landing-hero-copy .landing-fineprint {
-  animation: rise-in 0.8s var(--ease-out) 0.32s both;
+.lp-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  animation: fade var(--dur-short) var(--ease-snap);
 }
 
-.landing-hero-figure {
-  animation: pop-in 0.9s var(--ease-out) 0.2s both;
+/* ---- Chart -------------------------------------------------------------- */
+.chart {
+  padding: var(--space-lg);
+  border-radius: var(--radius-card);
+  background: var(--grain), var(--color-card);
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    var(--shadow-card);
 }
 
-/* ==========================================================================
-   RETENTION PLOT
-   ========================================================================== */
-.plot-figure {
-  margin: 0;
-}
-
-.plot-frame {
-  padding: var(--sp-5);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-}
-
-.plot-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-4);
-}
-
-.plot-title {
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.plot-eq {
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
-}
-
-.plot-svg {
-  display: block;
+.chart svg {
   width: 100%;
   height: auto;
-  overflow: visible;
 }
 
-.plot-line {
+.mc-grid {
+  stroke: var(--color-rule);
+  stroke-width: 1;
+}
+
+.mc-axis,
+.mc-label {
+  fill: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mc-label {
+  font-weight: 700;
+}
+
+.mc-label-reviewed {
+  fill: var(--color-mint-deep);
+}
+
+.mc-line {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 4;
+  stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.plot-line-scheduled {
-  stroke: var(--d-1);
+.mc-forgotten {
+  stroke: var(--color-muted);
+  stroke-dasharray: 1 10;
 }
 
-.plot-line-control {
-  stroke: var(--text-dim);
-  stroke-dasharray: 4 3;
-  stroke-width: 1.5;
+.mc-reviewed {
+  stroke: var(--color-mint-deep);
 }
 
-.plot-review-dot {
-  fill: var(--d-1);
-  stroke: var(--bg-elevated);
-  stroke-width: 1.5;
+.mc-dot {
+  fill: var(--color-card);
+  stroke: var(--color-mint-deep);
+  stroke-width: 4;
 }
 
-.plot-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-5);
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-4);
-  border-top: 1px solid var(--border);
+/* ---- The one pear field ------------------------------------------------- */
+.lp-field {
+  background: var(--grain), var(--fibre), var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
-.plot-key {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: var(--fs-xs);
-  color: var(--text-soft);
-}
-
-.plot-key b {
-  color: var(--text);
-}
-
-.plot-swatch {
-  width: 0.85rem;
-  height: 2px;
-  flex: none;
-  border-radius: 2px;
-}
-
-.plot-swatch-scheduled {
-  background: var(--d-1);
-}
-
-.plot-swatch-control {
-  background: var(--text-dim);
-}
-
-.plot-caption {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-xs);
-  line-height: 1.6;
-  color: var(--text-dim);
-}
-
-/* ==========================================================================
-   INSTRUMENT GRID
-   ========================================================================== */
-.instrument-grid {
+.lp-needs {
   display: grid;
-  /* 22rem chứ không phải 17rem: từ khi các thẻ này trưng công thức được sắp
-     chữ thật (phân số lồng, căn bậc hai), 17rem cho ra bốn cột trên màn hình
-     1280px và mỗi cột chỉ còn ~232px bề rộng dùng được — hẹp hơn cả công thức
-     SM-2. Nới điểm ngắt xuống còn hai cột ở cỡ đó, để công thức có chỗ thở
-     thay vì phải thu nhỏ tới mức khó đọc. */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  overflow: hidden;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--gap-columns);
 }
 
-.instrument {
+.lp-needs h2 {
+  grid-column: span 5;
+}
+
+.lp-needs ul {
+  grid-column: span 7;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  padding: var(--sp-6);
-  background: var(--bg-elevated);
 }
 
-.instrument-top {
+.lp-needs li {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding-block: var(--space-lg);
+  border-top: 1px solid var(--color-accent-ink);
+}
+
+.lp-needs li:last-child {
+  border-bottom: 1px solid var(--color-accent-ink);
+}
+
+.lp-needs p {
+  font-size: var(--text-lead);
+}
+
+.lp-needs h3 {
+  font-size: var(--text-title);
+}
+
+/* ---- Close: a torn sheet of ink, and the job itself --------------------- */
+.lp-close-sheet {
+  filter: none;
+  color: var(--color-night-ink);
+}
+
+.lp-close-sheet > .sheet-fringe {
+  translate: 0 -1.5px;
+}
+
+.lp-close-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
+  gap: var(--gap-columns);
+  padding-block: var(--section-gap);
 }
 
-.instrument-icon {
-  display: grid;
-  place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  border-radius: var(--r-sm);
-  color: var(--accent-text);
-  background: var(--accent-soft);
-}
-
-.instrument h3 {
-  font-size: var(--fs-md);
-  margin: 0;
-}
-
-.instrument p {
-  flex: 1;
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.65;
-  color: var(--text-soft);
-}
-
-.instrument-source {
-  font-size: var(--fs-2xs);
-  color: var(--text-dim);
-}
-
-/* ==========================================================================
-   WORKSPACE LIST
-   ========================================================================== */
-.workspace-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  gap: var(--sp-2);
-  list-style: none;
-}
-
-.workspace-list li {
+.lp-close-text {
+  grid-column: span 7;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  gap: var(--space-lg);
 }
 
-.workspace-list svg {
-  flex: none;
-  margin-top: 0.15rem;
-  color: var(--accent-text);
+.lp-close-text > p {
+  color: var(--color-night-muted);
+  font-weight: 700;
 }
 
-.workspace-list strong {
-  display: block;
-  font-size: var(--fs-sm);
-  color: var(--text);
+.lp-close .chip {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--color-night-muted);
+  color: var(--color-night-ink);
 }
 
-.workspace-list span {
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
+.lp-close .chip.is-active {
+  background: var(--color-night-ink);
+  box-shadow: none;
+  color: var(--color-night);
 }
 
-/* ==========================================================================
-   STEPS
-   ========================================================================== */
-.step-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-  gap: var(--sp-6);
-  list-style: none;
-  counter-reset: none;
+.lp-close :focus-visible {
+  outline-color: var(--color-accent);
 }
 
-.step-list li {
-  padding-top: var(--sp-4);
-  border-top: 2px solid var(--accent);
-}
-
-.step-n {
-  display: block;
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
-  margin-bottom: var(--sp-2);
-}
-
-.step-list h3 {
-  font-size: var(--fs-md);
-  margin-bottom: var(--sp-2);
-}
-
-.step-list p {
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.65;
-  color: var(--text-soft);
-}
-
-/* ==========================================================================
-   DISCLOSURES
-   ========================================================================== */
-.disclosure-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
-  gap: var(--sp-5);
-}
-
-.disclosure {
-  padding: var(--sp-5);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-}
-
-.disclosure-icon {
-  display: grid;
-  place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  margin-bottom: var(--sp-3);
-  border-radius: var(--r-sm);
-  color: var(--text-soft);
-  background: var(--bg-inset);
-  border: 1px solid var(--border);
-}
-
-.disclosure h3 {
-  font-size: var(--fs-base);
-  margin-bottom: var(--sp-2);
-}
-
-.disclosure p {
-  margin: 0;
-  font-size: var(--fs-sm);
-  line-height: 1.65;
-  color: var(--text-soft);
-}
-
-/* ==========================================================================
-   CLOSE + FOOTER
-   ========================================================================== */
-.landing-close {
-  padding: var(--sp-12) 0;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.landing-close h2 {
-  font-size: var(--fs-2xl);
-  margin-bottom: var(--sp-3);
-}
-
-.landing-close p {
-  max-width: 34rem;
-  margin: 0 auto;
-  color: var(--text-soft);
-}
-
-.landing-close .landing-cta {
-  justify-content: center;
-}
-
-/* Nút cuối trang thở nhẹ — nó là lối ra duy nhất ở đây, nên nó được phép là
-   thứ động duy nhất. */
-.btn.is-beckon {
-  animation: pulse-ring 3s ease-in-out infinite;
-}
-
-.landing-footer {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--sp-6);
-  flex-wrap: wrap;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: var(--sp-8) var(--sp-6) var(--sp-10);
-  border-top: 1px solid var(--border);
-}
-
-.landing-footer-logo {
-  width: 6rem;
-  margin-bottom: var(--sp-3);
-}
-
-.landing-footer p {
-  margin: 0;
-  font-size: var(--fs-sm);
-  color: var(--text-dim);
-}
-
-.landing-footer-meta {
+.lp-ready {
+  grid-column: span 5;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
-  text-align: right;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  color: var(--color-ink);
 }
 
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-@media (max-width: 900px) {
-  .landing-hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-8);
-    padding: var(--sp-8) 0;
+.lp-ready-time {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 7vw, 6rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* ---- Footer: a statement ------------------------------------------------ */
+.lp-footer {
+  background: var(--color-night);
+  color: var(--color-night-ink);
+  padding-block: 0 var(--space-2xl);
+}
+
+.lp-footer-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--color-night-muted);
+}
+
+.lp-footer-line {
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: 700;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.lp-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-lg);
+  font-weight: 700;
+}
+
+.lp-footer nav a {
+  text-decoration: underline;
+}
+
+.lp-footer .muted {
+  color: var(--color-night-muted);
+  font-weight: 500;
+}
+
+.lp-footer :focus-visible {
+  outline-color: var(--color-accent);
+}
+
+/* ---- One section to a screen on a laptop -------------------------------- */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .lp-section:not(.lp-field) {
+    min-height: 100svh;
+  }
+}
+
+@media (max-width: 1023px) {
+  .lp-hero {
+    min-height: 0;
   }
 
-  .landing-nav-links {
+  .lp-hero-text,
+  .hero-demo,
+  .lp-why .lp-head,
+  .lp-why .chart,
+  .lp-screens .lp-head,
+  .lp-shot,
+  .lp-close-text,
+  .lp-ready {
+    grid-column: 1 / -1;
+  }
+
+  .lp-hero h1 {
+    max-width: 14ch;
+  }
+
+  .lp-nav-links {
     display: none;
   }
+
+  .lp-needs h2,
+  .lp-needs ul {
+    grid-column: 1 / -1;
+  }
 }
 
-@media (max-width: 560px) {
-  .landing main,
-  .landing-footer {
-    padding-inline: var(--sp-4);
+@media (max-width: 600px) {
+  .hero-demo {
+    padding: var(--space-md) 0 var(--space-lg);
   }
 
-  .landing-nav {
-    padding-inline: var(--sp-4);
+  .hero-card {
+    padding: var(--space-lg);
   }
 
-  .landing-section {
-    padding: var(--sp-10) 0;
+  .hero-mat {
+    inset: 0;
+    rotate: 1.5deg;
   }
 
-  .landing-cta .btn {
-    width: 100%;
+  .lp-actions .btn {
+    flex: 1 1 100%;
   }
 
-  .landing-footer {
-    align-items: flex-start;
+  .sticker {
+    top: calc(var(--space-md) * -1);
+    font-size: var(--text-md);
   }
 
-  .landing-footer-meta {
-    text-align: left;
+  .lp-screens .segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-self: stretch;
   }
+}
+
+/* ---- Setup notice ------------------------------------------------------- */
+.setup {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-lg);
+}
+
+.setup-card {
+  width: min(100%, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  border-radius: var(--radius-card);
+  background: var(--grain), var(--color-card);
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    var(--shadow-card);
+}
+
+.setup-card h1 {
+  font-size: var(--text-2xl);
+}
+
+.setup-details {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-rule);
+  font-size: var(--text-sm);
+}
+
+.setup-details summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.setup-details ol {
+  display: grid;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0;
+  padding-left: var(--space-lg);
+  list-style: decimal;
+  color: var(--color-ink-2);
+}
+
+.setup-details code,
+.setup-details pre {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  background: var(--color-paper-2);
+  border-radius: var(--space-2xs);
+  padding: 0 var(--space-2xs);
+}
+
+.setup-details pre {
+  margin: var(--space-xs) 0 0;
+  padding: var(--space-sm) var(--space-md);
+  white-space: pre-wrap;
 }
