@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CalendarDays, Check, Layers, Plus, Trash2, X } from 'lucide-react';
+import { Check, Plus, Trash2, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { clearIntent, peekIntent } from '../../lib/intent';
 import { subjectLabel } from '../../lib/subjects';
@@ -156,7 +156,7 @@ const Review = ({ onDone }) => {
           ))}
         </div>
       ) : (
-        <p className="tiny faint review-hint">
+        <p className="tiny muted review-hint">
           Thử tự nhớ ra trước, rồi bấm <kbd>Space</kbd> để xem đáp án.
         </p>
       )}
@@ -339,7 +339,7 @@ export const Cards = () => {
         description="Blooom nhắc bạn ôn ngay trước lúc quên."
         action={
           cards.length > 0 && (
-            <button type="button" className="btn btn-outline" onClick={() => setAdding(true)}>
+            <button type="button" className="btn" onClick={() => setAdding(true)}>
               <Plus size={18} aria-hidden="true" /> Thêm thẻ
             </button>
           )
@@ -349,7 +349,6 @@ export const Cards = () => {
       {cards.length === 0 ? (
         <div className="card">
           <Empty
-            icon={<Layers size={32} />}
             title="Chưa có thẻ nào"
             action={
               <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
@@ -374,7 +373,7 @@ export const Cards = () => {
                   className="btn btn-primary btn-lg"
                   onClick={() => setReviewing(true)}
                 >
-                  Ôn ngay <ArrowRight size={18} aria-hidden="true" />
+                  Ôn ngay
                 </button>
               </>
             ) : (
@@ -392,11 +391,7 @@ export const Cards = () => {
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setAdding(true)}
-                >
+                <button type="button" className="btn" onClick={() => setAdding(true)}>
                   <Plus size={18} aria-hidden="true" /> Thêm thẻ
                 </button>
               </>
@@ -404,26 +399,28 @@ export const Cards = () => {
           </section>
 
           <div className="cards-overview">
-            <div className="stats stats-3">
-              <div className="stat">
-                <span className="stat-value num">{stats.total}</span>
-                <span className="stat-label">thẻ tất cả</span>
+            <dl className="card facts">
+              <div>
+                <dt>Tất cả thẻ</dt>
+                <dd className="num">{stats.total}</dd>
               </div>
-              <div className="stat">
-                <span className="stat-value num">{stats.mature}</span>
-                <span className="stat-label">thẻ đã nhớ chắc</span>
+              <div>
+                <dt>Thẻ đã nhớ chắc</dt>
+                <dd className="num">{stats.mature}</dd>
               </div>
-              <div className="stat">
-                <span className="stat-value num">
-                  {stats.retention === null ? '—' : `${Math.round(stats.retention * 100)}%`}
-                </span>
-                <span className="stat-label">mức nhớ ước tính</span>
+              <div>
+                <dt>Mức nhớ ước tính</dt>
+                <dd className="num">
+                  {stats.retention === null
+                    ? 'chưa có'
+                    : `${Math.round(stats.retention * 100)}%`}
+                </dd>
               </div>
-            </div>
+            </dl>
 
-            <section className="card card-pad-sm" aria-labelledby="forecast">
+            <section className="card" aria-labelledby="forecast">
               <h2 className="card-title forecast-title" id="forecast">
-                <CalendarDays size={18} aria-hidden="true" /> 14 ngày tới
+                14 ngày tới
               </h2>
               <div
                 className="forecast"
@@ -444,7 +441,7 @@ export const Cards = () => {
                   </span>
                 ))}
               </div>
-              <div className="forecast-axis tiny faint">
+              <div className="forecast-axis tiny muted">
                 <span>Hôm nay</span>
                 <span>2 tuần nữa</span>
               </div>
@@ -475,7 +472,7 @@ export const Cards = () => {
                       </div>
                       <div className="deck-meta">
                         <span className="tag">{subjectLabel(card.subject)}</span>
-                        <span className={`tag ${due ? 'tag-orange' : ''}`}>
+                        <span className={`tag ${due ? 'tag-due' : ''}`}>
                           {due ? 'Cần ôn' : `Ôn lại ${dueLabel(card.dueAt, now)}`}
                         </span>
                         <Strength card={card} />
@@ -501,7 +498,7 @@ export const Cards = () => {
         open={adding}
         onClose={() => setAdding(false)}
         title="Thêm thẻ nhớ"
-        description="Mỗi thẻ một ý — ngắn thì dễ nhớ."
+        description="Mỗi thẻ một ý. Ngắn thì dễ nhớ."
       >
         <AddCardForm onClose={() => setAdding(false)} />
       </Dialog>

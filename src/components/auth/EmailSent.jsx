@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, MailCheck, RefreshCw } from 'lucide-react';
+import { ExternalLink, MailCheck, RefreshCw } from 'lucide-react';
 import { authService } from '../../services/auth';
 
 /* Opens the inbox of a few common providers. Only the inbox home page — the
@@ -83,7 +83,7 @@ export const EmailSent = ({ email, onBackToSignIn, onChangeEmail }) => {
         )}
         <button
           type="button"
-          className="btn btn-outline btn-block"
+          className="btn btn-block"
           onClick={resend}
           disabled={cooldown > 0 || busy}
         >
@@ -110,7 +110,7 @@ export const EmailSent = ({ email, onBackToSignIn, onChangeEmail }) => {
       </p>
 
       <button type="button" className="btn btn-ghost btn-sm" onClick={onBackToSignIn}>
-        <ArrowLeft size={16} aria-hidden="true" /> Tôi đã xác nhận, về trang đăng nhập
+        Tôi đã xác nhận, về trang đăng nhập
       </button>
     </div>
   );

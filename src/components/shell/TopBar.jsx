@@ -19,7 +19,6 @@ const TimerPill = ({ hidden }) => {
       onClick={onLinkClick('tap-trung')}
       aria-label={`${timer.mode === 'work' ? 'Đang tập trung' : 'Đang nghỉ'}, còn ${clock(timer.remainingSeconds)}. Mở đồng hồ.`}
     >
-      <i aria-hidden="true" />
       <span className="num">{clock(timer.remainingSeconds)}</span>
       <span className="timer-pill-label">
         {timer.mode === 'work' ? (timer.isRunning ? 'Đang học' : 'Tạm dừng') : 'Nghỉ'}

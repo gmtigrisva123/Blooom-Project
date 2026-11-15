@@ -1,7 +1,7 @@
 import { applyReview, createCard, stabilityOf } from '../../services/srs';
 
 /* ==========================================================================
-   MEMORY CHART — two lines over one month: a lesson never revisited, and the
+   MEMORY CHART · two lines over one month: a lesson never revisited, and the
    same lesson reviewed whenever Blooom would schedule it.
 
    Both lines are produced by the scheduling code the app itself runs, so the
@@ -9,9 +9,9 @@ import { applyReview, createCard, stabilityOf } from '../../services/srs';
    ========================================================================== */
 
 const DAYS = 30;
-const W = 560;
-const H = 300;
-const PAD = { top: 24, right: 20, bottom: 40, left: 46 };
+const W = 640;
+const H = 380;
+const PAD = { top: 28, right: 24, bottom: 46, left: 52 };
 
 const x = (day) => PAD.left + (day / DAYS) * (W - PAD.left - PAD.right);
 const y = (level) => PAD.top + (1 - level) * (H - PAD.top - PAD.bottom);
@@ -39,7 +39,7 @@ const build = () => {
     }
 
     if (until < DAYS) {
-      reviews.push([until, Math.exp(-(until - from) / stability)]);
+      reviews.push(until);
       /* The review itself: memory is back to full, and lasts longer. */
       reviewed.push([until, 1]);
       card = applyReview(card, 4, new Date(until * 86400000));
@@ -60,7 +60,6 @@ const toPath = (points) =>
 const { forgotten, reviewed, reviews } = build();
 const forgottenPath = toPath(forgotten);
 const reviewedPath = toPath(reviewed);
-const reviewedArea = `${reviewedPath} L${x(DAYS)} ${y(0)} L${x(0)} ${y(0)} Z`;
 const forgottenEnd = Math.round(forgotten[forgotten.length - 1][1] * 100);
 
 const TICKS = [
@@ -72,12 +71,18 @@ const TICKS = [
 ];
 
 export const MemoryChart = () => (
-  <figure className="memory-chart">
+  <figure className="chart memory-chart">
     <svg
       viewBox={`0 0 ${W} ${H}`}
       role="img"
       aria-label={`Biểu đồ mức nhớ trong một tháng. Không ôn lại: chỉ còn khoảng ${forgottenEnd}% sau một tháng. Ôn cùng Blooom ${reviews.length} lần: luôn giữ trên 90%.`}
     >
+      <defs>
+        <clipPath id="memoryReveal">
+          <rect className="mc-reveal" x="0" y="0" width={W} height={H} />
+        </clipPath>
+      </defs>
+
       {[0, 0.5, 1].map((level) => (
         <g key={level}>
           <line
@@ -87,7 +92,7 @@ export const MemoryChart = () => (
             y1={y(level)}
             y2={y(level)}
           />
-          <text className="mc-axis" x={PAD.left - 10} y={y(level) + 4} textAnchor="end">
+          <text className="mc-axis" x={PAD.left - 12} y={y(level) + 5} textAnchor="end">
             {level * 100}%
           </text>
         </g>
@@ -98,26 +103,27 @@ export const MemoryChart = () => (
           key={day}
           className="mc-axis"
           x={x(day)}
-          y={H - 12}
+          y={H - 14}
           textAnchor={day === 0 ? 'start' : day === DAYS ? 'end' : 'middle'}
         >
           {label}
         </text>
       ))}
 
-      <path className="mc-area" d={reviewedArea} />
-      <path className="mc-line mc-forgotten" d={forgottenPath} />
-      <path className="mc-line mc-reviewed" d={reviewedPath} />
+      <g clipPath="url(#memoryReveal)">
+        <path className="mc-line mc-forgotten" d={forgottenPath} />
+        <path className="mc-line mc-reviewed" d={reviewedPath} />
+        {reviews.map((day) => (
+          <circle key={day} className="mc-dot" cx={x(day)} cy={y(1)} r="7" />
+        ))}
+      </g>
 
-      {reviews.map(([day]) => (
-        <circle key={day} className="mc-dot" cx={x(day)} cy={y(1)} r="5.5" />
-      ))}
+      <text className="mc-label mc-label-reviewed" x={x(30)} y={y(1) - 14} textAnchor="end">
+        Ôn cùng Blooom
+      </text>
+      <text className="mc-label" x={x(30)} y={y(forgottenEnd / 100) - 14} textAnchor="end">
+        Không ôn lại
+      </text>
     </svg>
-
-    <figcaption>
-      <span className="mc-key mc-key-reviewed">Ôn cùng Blooom</span>
-      <span className="mc-key mc-key-forgotten">Không ôn lại</span>
-      <span className="mc-key mc-key-dot">Một lần ôn</span>
-    </figcaption>
   </figure>
 );

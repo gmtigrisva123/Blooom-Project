@@ -177,7 +177,7 @@ const SearchPanel = ({ onClose }) => {
                     >
                       <Icon size={18} aria-hidden="true" />
                       <span className="grow truncate">{item.title}</span>
-                      <span className="tiny faint truncate">{item.meta}</span>
+                      <span className="tiny muted truncate">{item.meta}</span>
                       {index === active && <CornerDownLeft size={15} aria-hidden="true" />}
                     </button>
                   );

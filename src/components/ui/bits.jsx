@@ -2,7 +2,7 @@ import { Moon, Search, Sun, X } from 'lucide-react';
 import { SUBJECTS, subjectColor, subjectLabel } from '../../lib/subjects';
 
 /* ==========================================================================
-   SMALL SHARED PARTS — the pieces every screen reaches for.
+   SMALL SHARED PARTS · the pieces every screen reaches for.
    ========================================================================== */
 
 const LOGO_SRC = `${import.meta.env.BASE_URL}blooom-logo.png`;
@@ -19,55 +19,25 @@ export const Logo = ({ height = 34, className = '' }) => (
   />
 );
 
-/* A progress ring. `value` runs 0–1; children sit in the middle. */
-export const Ring = ({ value = 0, size = 120, stroke = 10, color, children, label }) => {
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const clamped = Math.min(1, Math.max(0, value));
+/* Progress as a strip of kraft paper. `value` runs 0 to 1. The fill is
+   scaled, never resized, so it animates without moving the layout. */
+export const Bar = ({ value = 0, color, label }) => {
+  const amount = Math.min(1, Math.max(0, value));
 
   return (
     <div
-      className="ring"
-      style={{ width: size, height: size, '--ring-color': color }}
-      role={label ? 'img' : undefined}
+      className="bar"
+      style={{ '--bar-color': color }}
+      role="progressbar"
       aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(amount * 100)}
     >
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-        <circle
-          className="ring-track"
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          strokeWidth={stroke}
-        />
-        <circle
-          className="ring-value"
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          strokeWidth={stroke}
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - clamped)}
-        />
-      </svg>
-      {children && <div className="ring-center">{children}</div>}
+      <span style={{ transform: `scaleX(${amount})` }} />
     </div>
   );
 };
-
-export const Bar = ({ value = 0, color, label }) => (
-  <div
-    className="bar"
-    style={{ '--bar-color': color }}
-    role="progressbar"
-    aria-label={label}
-    aria-valuemin={0}
-    aria-valuemax={100}
-    aria-valuenow={Math.round(Math.min(1, Math.max(0, value)) * 100)}
-  >
-    <span style={{ width: `${Math.min(1, Math.max(0, value)) * 100}%` }} />
-  </div>
-);
 
 export const Empty = ({ icon, title, children, action }) => (
   <div className="empty">
@@ -162,14 +132,13 @@ export const ThemeToggle = ({ theme, onToggle }) => (
     className="icon-btn"
     onClick={onToggle}
     aria-label={theme === 'dark' ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
-    title={theme === 'dark' ? 'Nền sáng' : 'Nền tối'}
   >
-    {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
+    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
   </button>
 );
 
 /* The first letter of a name, for the round avatar. */
-export const Avatar = ({ name, size = 36 }) => (
+export const Avatar = ({ name, size = 40 }) => (
   <span className="avatar" style={{ width: size, height: size }} aria-hidden="true">
     {(name || 'B').trim().charAt(0) || 'B'}
   </span>

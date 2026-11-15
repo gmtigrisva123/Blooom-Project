@@ -139,7 +139,7 @@ export const Groups = () => {
 
       {groups.length === 0 ? (
         <div className="card">
-          <Empty icon={<Users size={32} />} title="Chưa có nhóm nào" action={createButton}>
+          <Empty title="Chưa có nhóm nào" action={createButton}>
             Hãy là người mở nhóm đầu tiên và rủ bạn bè vào học cùng.
           </Empty>
         </div>
@@ -175,11 +175,7 @@ export const Groups = () => {
                 title={scope === 'mine' ? 'Bạn chưa vào nhóm nào' : 'Không tìm thấy nhóm nào'}
                 action={
                   scope === 'mine' && (
-                    <button
-                      type="button"
-                      className="btn btn-outline"
-                      onClick={() => setScope('all')}
-                    >
+                    <button type="button" className="btn" onClick={() => setScope('all')}>
                       Xem tất cả nhóm
                     </button>
                   )
@@ -225,7 +221,7 @@ export const Groups = () => {
 
                       {isOwner ? (
                         <div className="row" style={{ gap: 4 }}>
-                          <span className="tag tag-violet">Nhóm của bạn</span>
+                          <span className="tag">Nhóm của bạn</span>
                           <button
                             type="button"
                             className="icon-btn is-danger"
@@ -238,7 +234,7 @@ export const Groups = () => {
                       ) : (
                         <button
                           type="button"
-                          className={`btn btn-sm ${isMember ? 'btn-outline' : 'btn-soft'}`}
+                          className={`btn btn-sm ${isMember ? '' : ''}`}
                           onClick={() => toggle(group)}
                           disabled={pendingId === group.id}
                         >

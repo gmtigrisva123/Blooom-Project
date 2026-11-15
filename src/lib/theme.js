@@ -22,7 +22,7 @@ export const useTheme = () => {
   const [theme, setTheme] = useState(initial);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-mode', theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {

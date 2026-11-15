@@ -1,16 +1,5 @@
 import { useState } from 'react';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  ShieldCheck,
-  TriangleAlert,
-  UserRound
-} from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, TriangleAlert, UserRound } from 'lucide-react';
 import {
   authService,
   passwordIssues,
@@ -20,7 +9,7 @@ import {
 } from '../../services/auth';
 import { hrefFor, navigate, onLinkClick } from '../../lib/router';
 import { Logo, ThemeToggle } from '../ui/bits';
-import { Loops } from '../ui/Doodles';
+import { Sheet } from '../ui/Paper';
 import { EmailSent } from './EmailSent';
 
 const SIDE_POINTS = [
@@ -116,7 +105,7 @@ export const AuthPage = ({ mode, onAuthenticated, theme, onToggleTheme }) => {
       <main className="auth-main">
         <div className="auth-top">
           <a className="btn btn-ghost btn-sm" href={hrefFor('')} onClick={onLinkClick('')}>
-            <ArrowLeft size={16} aria-hidden="true" /> Trang chủ
+            Về trang chủ
           </a>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         </div>
@@ -276,10 +265,7 @@ export const AuthPage = ({ mode, onAuthenticated, theme, onToggleTheme }) => {
                       <span className="spinner" aria-hidden="true" /> Chờ một chút…
                     </>
                   ) : (
-                    <>
-                      {isSignup ? 'Tạo tài khoản' : 'Đăng nhập'}
-                      <ArrowRight size={18} aria-hidden="true" />
-                    </>
+                    <>{isSignup ? 'Tạo tài khoản' : 'Đăng nhập'}</>
                   )}
                 </button>
               </form>
@@ -290,7 +276,7 @@ export const AuthPage = ({ mode, onAuthenticated, theme, onToggleTheme }) => {
 
               <button
                 type="button"
-                className="btn btn-outline btn-block"
+                className="btn btn-block"
                 onClick={tryAsGuest}
                 disabled={busy}
               >
@@ -298,7 +284,6 @@ export const AuthPage = ({ mode, onAuthenticated, theme, onToggleTheme }) => {
               </button>
 
               <p className="auth-note">
-                <ShieldCheck size={16} aria-hidden="true" />
                 Mật khẩu được mã hóa. Chỉ mình bạn xem được dữ liệu học của mình.
               </p>
             </>
@@ -306,17 +291,14 @@ export const AuthPage = ({ mode, onAuthenticated, theme, onToggleTheme }) => {
         </div>
       </main>
 
-      <aside className="auth-side" aria-hidden="true">
-        <Loops className="auth-side-doodle" />
+      <Sheet seed={57} depth={12} color="var(--color-accent)" className="auth-side">
         <p className="auth-side-quote">Học đều mỗi ngày, rồi sẽ đến lúc nở hoa.</p>
         <ul>
           {SIDE_POINTS.map((point) => (
-            <li key={point}>
-              <Check size={18} /> {point}
-            </li>
+            <li key={point}>{point}</li>
           ))}
         </ul>
-      </aside>
+      </Sheet>
     </div>
   );
 };

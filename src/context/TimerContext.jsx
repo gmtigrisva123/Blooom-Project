@@ -12,6 +12,7 @@ import { useApp } from './AppContext';
 import { useToast } from './ToastContext';
 import { getPrefs, setPrefs, readTimerSnapshot, writeTimerSnapshot } from '../services/storage';
 import { clock } from '../lib/time';
+import { tokenHex } from '../lib/paper';
 
 const TimerContext = createContext(null);
 
@@ -76,7 +77,11 @@ const celebrate = () => {
       particleCount: 110,
       spread: 76,
       origin: { y: 0.6 },
-      colors: ['#7440e0', '#d43f8d', '#e8590c', '#f5b83d']
+      /* Paper scraps in the four accents, read from the tokens. */
+      shapes: ['square'],
+      colors: ['--color-accent', '--color-accent-3', '--color-mint', '--color-accent-2'].map(
+        tokenHex
+      )
     });
   } catch {
     /* Decoration only — must never get in the way of saving the session. */

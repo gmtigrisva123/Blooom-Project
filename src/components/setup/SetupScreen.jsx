@@ -61,7 +61,7 @@ export const SetupScreen = () => {
               <pre>{'VITE_SUPABASE_URL\nVITE_SUPABASE_ANON_KEY'}</pre>
             </li>
           </ol>
-          <p className="tiny faint">
+          <p className="tiny muted">
             Lấy hai giá trị ở <b>Project Settings › API</b>. Chỉ dùng khóa <code>anon</code>,
             tuyệt đối không dùng khóa <code>service_role</code>.
           </p>

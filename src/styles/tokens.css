@@ -1,132 +1,214 @@
-/* ==========================================================================
-   BLOOOM — DESIGN TOKENS
+/* Hallmark · shape: Split Studio · genre: playful · theme: Hum (deal 2/3, seed blooom-study-app-vietnamese-9d0c·cecd53bf·2026-11-15·r0) · job: try · draw: a267d8
+ * hero: Stage · nav: wordmark, two links and one action on a retracting bar · footer: statement · imagery: the product, live in the hero and captured in the switcher · signature: a flashcard answered on card stock grows a plant in the week's garden
+ * axes: light/rounded-sans/chromatic-yellow · posture: full-palette · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: R, the garden and the torn edges both wanted every screen; inside the app they are kept to one strip and one sheet */
+/* Hallmark · answered F4 · on the pear start sheet the primary button inverts to ink, because a pear button on a pear field would vanish */
+/* Hallmark · dismissed 41 · .forecast-col and .hours-col are chart tracks with no text inside them */
+/* Hallmark · answered F3 · Quicksand stands in for Chillax, which has no Vietnamese glyphs; display leading is 1.14, not 1.02, because Vietnamese stacks two marks above a vowel */
 
-   The look is "crayon on paper": a warm paper page, near-black ink, and the
-   three crayon colours of the Blooom wordmark (violet, pink, orange). Every
-   colour, radius, shadow and duration in the interface comes from here.
+/* ==========================================================================
+   BLOOOM · DESIGN TOKENS
+
+   The world is cut paper: cream stock with a visible grain, card you can
+   press, blue-black ink. Pear is the action, blue is links and focus, coral
+   is one loud moment, mint is growth. Every colour and face in the product
+   is declared here and nowhere else. DESIGN.md at the repository root is the
+   written form of this file.
    ========================================================================== */
 
 :root {
-  /* ---- Type ------------------------------------------------------------ */
-  --font-display: 'Bricolage Grotesque Variable', 'Be Vietnam Pro', system-ui, sans-serif;
-  --font-body:
-    'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-
-  /* ---- Space (4px grid) ------------------------------------------------- */
-  --s-1: 0.25rem;
-  --s-2: 0.5rem;
-  --s-3: 0.75rem;
-  --s-4: 1rem;
-  --s-5: 1.25rem;
-  --s-6: 1.5rem;
-  --s-8: 2rem;
-  --s-10: 2.5rem;
-  --s-12: 3rem;
-  --s-16: 4rem;
-  --s-20: 5rem;
-  --s-24: 6rem;
-
-  /* ---- Shape ------------------------------------------------------------ */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 18px;
-  --r-xl: 26px;
-  --r-full: 999px;
-
-  /* ---- Motion ----------------------------------------------------------- */
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --t-fast: 120ms;
-  --t: 200ms;
-  --t-slow: 420ms;
-
-  /* ---- Layout ----------------------------------------------------------- */
-  --sidebar-w: 252px;
-  --topbar-h: 68px;
-  --tabbar-h: 64px;
-  --page-max: 1120px;
-}
-
-/* --------------------------------------------------------------------------
-   LIGHT — the default. Paper, not white: pure white pages glare, and the
-   crayon colours of the logo only read as crayon against something warm.
-   -------------------------------------------------------------------------- */
-:root,
-[data-theme='light'] {
   color-scheme: light;
 
-  --paper: #fbf8f2;
-  --paper-2: #f3ede2;
-  --surface: #ffffff;
-  --surface-2: #f8f4ec;
+  /* ---- Space ------------------------------------------------------------ */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 144px;
 
-  --ink: #1f1a29;
-  --ink-2: #554e63;
-  --ink-3: #6f6880;
+  /* ---- Type ------------------------------------------------------------- */
+  --font-display: 'Quicksand Variable', ui-rounded, ui-sans-serif, sans-serif;
+  --font-body: var(--font-display);
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --text-display: clamp(2.75rem, 4.2vw + 1rem, 5rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem);
+  --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem);
+  --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+  --tracking-display: -0.03em;
+  --display-weight: 700;
+  --leading-display: 1.14;
 
-  --line: #ebe3d6;
-  --line-2: #d9cfbe;
+  /* ---- Shape ------------------------------------------------------------ */
+  --radius-card: 24px;
+  --radius-stock: 16px;
+  --radius-input: 14px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
 
-  --violet: #7440e0;
-  --violet-strong: #5f2fc4;
-  --violet-soft: #efe8fd;
-  --on-violet: #ffffff;
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
 
-  --pink: #d43f8d;
-  --pink-soft: #fce7f1;
-  --orange: #e8590c;
-  --orange-soft: #ffeadb;
+  /* ---- Layout ----------------------------------------------------------- */
+  --container: 1440px;
+  --gutter: 64px;
+  --gap-columns: 32px;
+  --section-gap: 144px;
+  --sidebar: 264px;
+  --topbar: 72px;
+  --tabbar: 64px;
+  --page: 1120px;
+  --control: 48px;
 
-  --green: #1a8a57;
-  --green-soft: #e2f4ea;
-  --red: #cf3a3a;
-  --red-soft: #fce8e8;
-  --yellow: #a96a12;
-  --yellow-soft: #fdf2d6;
+  --z-raised: 10;
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-modal: 400;
+  --z-toast: 500;
 
-  --scrim: rgba(31, 26, 41, 0.42);
-  --shadow-1: 0 1px 2px rgba(31, 26, 41, 0.05), 0 1px 1px rgba(31, 26, 41, 0.03);
-  --shadow-2: 0 2px 4px rgba(31, 26, 41, 0.04), 0 14px 30px -16px rgba(31, 26, 41, 0.2);
-  --shadow-3: 0 30px 70px -24px rgba(31, 26, 41, 0.34);
+  /* ---- Paper and ink ---------------------------------------------------- */
+  --color-paper: oklch(97% 0.012 95);
+  --color-paper-2: oklch(94.5% 0.018 95);
+  --color-paper-3: oklch(91% 0.022 95);
+  --color-card: oklch(98.8% 0.007 95);
+  --color-ink: oklch(20% 0.014 255);
+  --color-ink-2: oklch(29% 0.014 255);
+  --color-muted: oklch(47% 0.014 255);
+  --color-rule: oklch(87% 0.016 95);
+  --color-edge: oklch(83% 0.04 88);
+  --color-fringe: oklch(99.2% 0.006 95);
+  --color-scrim: oklch(20% 0.014 255 / 0.46);
+
+  /* ---- The four accents, which never blend ------------------------------ */
+  --color-accent: oklch(87% 0.175 96);
+  --color-accent-deep: oklch(72% 0.16 92);
+  --color-accent-ink: oklch(20% 0.014 255);
+  --color-accent-2: oklch(50% 0.17 250);
+  --color-accent-3: oklch(70% 0.2 22);
+  --color-accent-3-deep: oklch(56% 0.19 22);
+  --color-mint: oklch(82% 0.15 152);
+  --color-mint-deep: oklch(48% 0.12 155);
+  --color-focus: oklch(50% 0.17 250);
+  --color-error: oklch(52% 0.19 27);
+  --color-success: oklch(48% 0.12 155);
+
+  /* ---- Cut-paper grounds ------------------------------------------------ */
+  --color-kraft: oklch(63% 0.085 62);
+  --color-sand: oklch(77% 0.1 76);
+  --color-sugar: oklch(89% 0.035 236);
+  --color-hill-1: oklch(94.5% 0.03 118);
+  --color-hill-2: oklch(91.5% 0.045 135);
+  --color-leaf: oklch(64% 0.15 150);
+  --color-night: oklch(20% 0.014 255);
+  --color-night-ink: oklch(97% 0.012 95);
+  --color-night-muted: oklch(78% 0.014 255);
+
+  /* ---- Subjects: one hue each, the same in every chart and tag ---------- */
+  --subject-toan: oklch(58% 0.16 250);
+  --subject-van: oklch(70% 0.14 76);
+  --subject-anh: oklch(62% 0.18 352);
+  --subject-ly: oklch(66% 0.11 215);
+  --subject-hoa: oklch(64% 0.15 150);
+  --subject-sinh: oklch(66% 0.19 22);
+  --subject-tin: oklch(60% 0.1 190);
+  --subject-khac: oklch(62% 0.014 255);
+
+  /* ---- Depth: light falls from the top left ----------------------------- */
+  --shadow-card:
+    0 1px 2px oklch(20% 0.014 255 / 0.06), 0 12px 28px -14px oklch(20% 0.014 255 / 0.22);
+  --shadow-lift:
+    0 2px 4px oklch(20% 0.014 255 / 0.08), 6px 22px 40px -18px oklch(20% 0.014 255 / 0.34);
+  --shadow-paper: drop-shadow(0 0 0.6px oklch(20% 0.014 255 / 0.32))
+    drop-shadow(1.5px 2.5px 1.5px oklch(20% 0.014 255 / 0.1))
+    drop-shadow(6px 14px 16px oklch(20% 0.014 255 / 0.13));
+
+  /* ---- The paper itself: a fine grain and a long fibre ------------------ */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .12 0 0 0 0 .12 0 0 0 0 .16 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --fibre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='.008 .32' numOctaves='2' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 .12 0 0 0 0 .12 0 0 0 0 .16 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
 }
 
 /* --------------------------------------------------------------------------
-   DARK — a desk at night. Same three crayons, lifted so they stay readable.
+   DARK · the same desk after the lamp goes off. Every token is re-derived,
+   none inverted: paper drops to L 16, ink rises to L 94, accents lose a
+   little chroma, and no hue moves.
    -------------------------------------------------------------------------- */
-[data-theme='dark'] {
+[data-mode='dark'] {
   color-scheme: dark;
 
-  --paper: #15121c;
-  --paper-2: #0f0d15;
-  --surface: #1e1a28;
-  --surface-2: #272233;
+  --color-paper: oklch(16% 0.012 95);
+  --color-paper-2: oklch(19.5% 0.014 95);
+  --color-paper-3: oklch(23% 0.016 95);
+  --color-card: oklch(21% 0.012 95);
+  --color-ink: oklch(94% 0.014 255);
+  --color-ink-2: oklch(86% 0.014 255);
+  --color-muted: oklch(70% 0.014 255);
+  --color-rule: oklch(31% 0.016 95);
+  --color-edge: oklch(11% 0.012 88);
+  --color-fringe: oklch(28% 0.012 95);
+  --color-scrim: oklch(8% 0.012 255 / 0.66);
 
-  --ink: #f4f0fa;
-  --ink-2: #c5bdd4;
-  --ink-3: #a199b3;
+  --color-accent: oklch(86% 0.145 96);
+  --color-accent-deep: oklch(64% 0.13 92);
+  --color-accent-2: oklch(74% 0.13 250);
+  --color-accent-3: oklch(74% 0.16 22);
+  --color-accent-3-deep: oklch(58% 0.16 22);
+  --color-mint: oklch(80% 0.12 152);
+  --color-mint-deep: oklch(78% 0.12 155);
+  --color-focus: oklch(74% 0.13 250);
+  --color-error: oklch(72% 0.16 27);
+  --color-success: oklch(78% 0.12 155);
 
-  --line: #2e283b;
-  --line-2: #433a54;
+  --color-kraft: oklch(50% 0.07 62);
+  --color-sand: oklch(60% 0.08 76);
+  --color-sugar: oklch(32% 0.035 236);
+  --color-hill-1: oklch(24% 0.03 118);
+  --color-hill-2: oklch(28% 0.045 135);
+  --color-leaf: oklch(60% 0.13 150);
+  --color-night: oklch(11% 0.012 255);
 
-  --violet: #a988ff;
-  --violet-strong: #bda3ff;
-  --violet-soft: #2b2242;
-  --on-violet: #17121f;
+  --subject-toan: oklch(72% 0.13 250);
+  --subject-van: oklch(78% 0.12 76);
+  --subject-anh: oklch(74% 0.14 352);
+  --subject-ly: oklch(76% 0.09 215);
+  --subject-hoa: oklch(76% 0.12 150);
+  --subject-sinh: oklch(74% 0.15 22);
+  --subject-tin: oklch(74% 0.08 190);
+  --subject-khac: oklch(70% 0.014 255);
 
-  --pink: #f47db8;
-  --pink-soft: #3a1f30;
-  --orange: #ff9a61;
-  --orange-soft: #3b261a;
+  --shadow-card: 0 1px 2px oklch(5% 0.01 255 / 0.4), 0 12px 28px -14px oklch(5% 0.01 255 / 0.7);
+  --shadow-lift:
+    0 2px 4px oklch(5% 0.01 255 / 0.4), 6px 22px 40px -18px oklch(5% 0.01 255 / 0.85);
+  --shadow-paper: drop-shadow(0 0 0.6px oklch(5% 0.01 255 / 0.6))
+    drop-shadow(1.5px 2.5px 1.5px oklch(5% 0.01 255 / 0.3))
+    drop-shadow(6px 14px 16px oklch(5% 0.01 255 / 0.45));
+}
 
-  --green: #55d6a0;
-  --green-soft: #173327;
-  --red: #ff8585;
-  --red-soft: #3d1f22;
-  --yellow: #f2c35a;
-  --yellow-soft: #3a2f16;
+@media (max-width: 60rem) {
+  :root {
+    --gutter: 24px;
+    --section-gap: 96px;
+  }
+}
 
-  --scrim: rgba(5, 3, 10, 0.62);
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-2: 0 2px 4px rgba(0, 0, 0, 0.24), 0 14px 30px -16px rgba(0, 0, 0, 0.6);
-  --shadow-3: 0 30px 70px -24px rgba(0, 0, 0, 0.8);
+@media (max-width: 40rem) {
+  :root {
+    --gutter: 16px;
+    --section-gap: 72px;
+    --gap-columns: 16px;
+  }
 }

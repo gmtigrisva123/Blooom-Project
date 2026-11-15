@@ -30,7 +30,7 @@ import {
   peakWindow
 } from '../../services/chronobiology';
 import { addDays, formatMinutes } from '../../services/gamification';
-import { Bar, PageHead, Ring } from '../ui/bits';
+import { Bar, PageHead } from '../ui/bits';
 import { Dialog } from '../ui/Dialog';
 
 const BADGE_ICONS = {
@@ -141,8 +141,12 @@ const BestHours = ({ sessions }) => {
             ? `Học thêm ${left} phiên nữa, Blooom sẽ tìm ra khung giờ bạn học tốt nhất.`
             : 'Thử học vào vài khung giờ khác nhau để Blooom so sánh được.'}
         </p>
-        <Bar value={have / MIN_SESSIONS_FOR_FIT} color="var(--orange)" label="Số phiên đã có" />
-        <span className="tiny faint">
+        <Bar
+          value={have / MIN_SESSIONS_FOR_FIT}
+          color="var(--color-sand)"
+          label="Số phiên đã có"
+        />
+        <span className="tiny muted">
           {have}/{MIN_SESSIONS_FOR_FIT} phiên
         </span>
       </section>
@@ -178,7 +182,7 @@ const BestHours = ({ sessions }) => {
           <span
             key={bucket.hour}
             className={`hours-col ${inPeak(bucket.hour) ? 'is-peak' : ''}`}
-            title={`${hour(bucket.hour)} — ${bucket.minutes} phút`}
+            title={`${hour(bucket.hour)}: ${bucket.minutes} phút`}
           >
             <i
               style={{
@@ -188,7 +192,7 @@ const BestHours = ({ sessions }) => {
           </span>
         ))}
       </div>
-      <div className="hours-axis tiny faint" aria-hidden="true">
+      <div className="hours-axis tiny muted" aria-hidden="true">
         <span>0h</span>
         <span>6h</span>
         <span>12h</span>
@@ -242,42 +246,35 @@ export const Progress = () => {
 
       <div className="progress-top">
         <section className="card goal" aria-labelledby="weekGoal">
-          <Ring
+          <h2 className="card-title" id="weekGoal">
+            Mục tiêu tuần này
+          </h2>
+          <p className="goal-figure">
+            <strong className="num">{hoursLabel(weekMinutes)}</strong>
+            <span className="muted">trên {goals.targetHoursPerWeek} giờ</span>
+          </p>
+          <Bar
             value={weekMinutes / goalMinutes}
-            size={148}
-            stroke={13}
-            color="var(--green)"
-            label={`Đã đạt ${Math.round((weekMinutes / goalMinutes) * 100)}% mục tiêu tuần`}
-          >
-            <span>
-              <strong className="num goal-value">{hoursLabel(weekMinutes)}</strong>
-              <span className="tiny faint goal-of">/ {goals.targetHoursPerWeek} giờ</span>
-            </span>
-          </Ring>
+            color="var(--color-mint)"
+            label="Số giờ trong tuần"
+          />
 
           <div className="grow stack-sm">
-            <h2 className="card-title" id="weekGoal">
-              Mục tiêu tuần này
-            </h2>
             <div className="goal-line">
               <span className="small muted">
                 {thisWeek.length} / {goals.targetSessionsPerWeek} phiên
               </span>
               <Bar
                 value={thisWeek.length / goals.targetSessionsPerWeek}
-                color="var(--green)"
+                color="var(--color-mint)"
                 label="Số phiên trong tuần"
               />
             </div>
             {goals.isDefault && (
-              <p className="tiny faint">Đây là mức gợi ý. Bạn đổi cho hợp với mình nhé.</p>
+              <p className="tiny muted">Đây là mức gợi ý. Bạn đổi cho hợp với mình nhé.</p>
             )}
             <div>
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => setEditingGoal(true)}
-              >
+              <button type="button" className="btn btn-sm" onClick={() => setEditingGoal(true)}>
                 Đổi mục tiêu
               </button>
             </div>
@@ -316,7 +313,7 @@ export const Progress = () => {
             </span>
             <span>
               <strong className="num">{streak.current} ngày liên tiếp</strong>
-              <span className="tiny faint" style={{ display: 'block' }}>
+              <span className="tiny muted" style={{ display: 'block' }}>
                 Dài nhất: {streak.longest} ngày
               </span>
             </span>
@@ -362,9 +359,7 @@ export const Progress = () => {
               <span className="bar-track">
                 <span
                   className="bar-fill"
-                  style={{
-                    height: `${Math.max(day.minutes > 0 ? 5 : 0, (day.minutes / tallest) * 100)}%`
-                  }}
+                  style={{ transform: `scaleY(${day.minutes / tallest})` }}
                   title={`${day.date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })}: ${day.minutes} phút`}
                 />
               </span>
@@ -424,10 +419,14 @@ export const Progress = () => {
           </div>
           <div className="level">
             <span className="small">
-              <strong>Cấp {level.level}</strong> · {level.title}
+              <strong>Cấp {level.level}</strong>, {level.title.toLowerCase()}
             </span>
-            <Bar value={level.percent / 100} color="var(--pink)" label="Tiến độ lên cấp" />
-            <span className="tiny faint">Còn {level.xpRemaining} điểm nữa lên cấp</span>
+            <Bar
+              value={level.percent / 100}
+              color="var(--color-accent-3)"
+              label="Tiến độ lên cấp"
+            />
+            <span className="tiny muted">Còn {level.xpRemaining} điểm nữa lên cấp</span>
           </div>
         </div>
 
@@ -444,9 +443,9 @@ export const Progress = () => {
                   {badge.unlocked ? <Icon size={24} /> : <Lock size={20} />}
                 </span>
                 <strong>{badge.name}</strong>
-                <span className="tiny faint">{badge.requirement}</span>
+                <span className="tiny muted">{badge.requirement}</span>
                 {freshBadges.includes(badge.id) && (
-                  <span className="tag tag-pink badge-new">Mới</span>
+                  <span className="tag tag-due badge-new">Mới</span>
                 )}
               </li>
             );

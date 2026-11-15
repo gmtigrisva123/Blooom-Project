@@ -1,48 +1,46 @@
-import { Flame } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NAV_GROUPS, PAGES } from '../../lib/nav';
 import { hrefFor, onLinkClick } from '../../lib/router';
 import { useNow } from '../../lib/time';
+import { dailyTotals } from '../../lib/stats';
 import { dueQueue } from '../../services/srs';
-import { addDays, dayKey, startOfDay } from '../../services/gamification';
-import { Bar, Logo } from '../ui/bits';
+import { Logo } from '../ui/bits';
+import { Garden } from '../ui/Paper';
 
-const DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-
-/* The last seven days as dots: filled when the student studied that day. */
-export const WeekDots = ({ days, now }) => {
-  const today = startOfDay(now);
+/* The last seven days as a garden, with the words that go with it. Shared by
+   the sidebar (laptop) and the home page (phone, which has no sidebar). */
+export const WeekGarden = ({ height = 56 }) => {
+  const { sessions, game } = useApp();
+  const now = useNow();
+  const days = dailyTotals(sessions, 7, now);
+  const studied = days.filter((day) => day.minutes > 0).length;
 
   return (
-    <div className="week-dots" aria-hidden="true">
-      {Array.from({ length: 7 }, (_, i) => {
-        const date = addDays(today, i - 6);
-        const done = days.has(dayKey(date));
-        return (
-          <span
-            key={i}
-            className={`week-dot ${done ? 'is-done' : ''} ${i === 6 ? 'is-today' : ''}`}
-          >
-            <i />
-            {DOW[date.getDay()]}
-          </span>
-        );
-      })}
-    </div>
+    <>
+      <div>
+        <strong className="num">{game.streak.current} ngày liên tiếp</strong>
+        <span className="tiny muted">
+          Cấp {game.level.level}, {game.level.title.toLowerCase()}
+        </span>
+      </div>
+      <Garden
+        days={days}
+        height={height}
+        label={`Bảy ngày qua bạn học ${studied} ngày. Chuỗi hiện tại: ${game.streak.current} ngày liên tiếp.`}
+      />
+    </>
   );
 };
 
 export const Sidebar = ({ activeId }) => {
-  const { cards, game, loading } = useApp();
+  const { cards, loading } = useApp();
   const now = useNow();
-
   const dueCount = loading ? 0 : dueQueue(cards, now).length;
-  const { streak, level } = game;
 
   return (
     <aside className="side">
       <a className="side-logo" href={hrefFor('hom-nay')} onClick={onLinkClick('hom-nay')}>
-        <Logo height={38} />
+        <Logo height={40} />
       </a>
 
       <nav className="side-nav" aria-label="Các trang">
@@ -74,28 +72,8 @@ export const Sidebar = ({ activeId }) => {
         ))}
       </nav>
 
-      <a
-        className="side-streak"
-        href={hrefFor('tien-do')}
-        onClick={onLinkClick('tien-do')}
-        aria-label={`Chuỗi ${streak.current} ngày học liên tiếp, cấp ${level.level}. Xem tiến độ.`}
-      >
-        <div className="row">
-          <span className={`streak-flame ${streak.current > 0 ? 'is-lit' : ''}`}>
-            <Flame size={20} aria-hidden="true" />
-          </span>
-          <div>
-            <strong className="num">{streak.current} ngày</strong>
-            <span className="tiny faint">liên tiếp</span>
-          </div>
-        </div>
-        <WeekDots days={streak.days} now={now} />
-        <div className="side-level">
-          <span className="tiny">
-            Cấp {level.level} · {level.title}
-          </span>
-          <Bar value={level.percent / 100} color="var(--pink)" label="Tiến độ lên cấp" />
-        </div>
+      <a className="side-garden" href={hrefFor('tien-do')} onClick={onLinkClick('tien-do')}>
+        <WeekGarden />
       </a>
     </aside>
   );

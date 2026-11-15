@@ -20,7 +20,7 @@ export const GuestBanner = ({ onSave }) => {
       <span>
         <strong>Bạn đang dùng thử.</strong> Tạo tài khoản để không mất những gì đã làm.
       </span>
-      <button type="button" className="btn btn-ink btn-sm" onClick={onSave}>
+      <button type="button" className="btn btn-sm" onClick={onSave}>
         Lưu tài khoản
       </button>
     </div>

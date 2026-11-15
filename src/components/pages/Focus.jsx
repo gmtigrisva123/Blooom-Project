@@ -2,20 +2,18 @@ import { useEffect, useState } from 'react';
 import { Coffee, Pause, Play, RotateCcw, Timer, Volume2, VolumeX } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { BREAK_RANGE, WORK_RANGE, useTimer } from '../../context/TimerContext';
+import { clearIntent, peekIntent } from '../../lib/intent';
 import { SUBJECTS, subjectColor, subjectLabel } from '../../lib/subjects';
 import { clock, useNow } from '../../lib/time';
 import { minutesOf } from '../../lib/stats';
 import { dayKey, formatMinutes } from '../../services/gamification';
-import { Empty } from '../ui/bits';
+import { Bar, Empty } from '../ui/bits';
 
 const PRESETS = [
   { work: 25, rest: 5 },
   { work: 50, rest: 10 },
   { work: 90, rest: 15 }
 ];
-
-const RADIUS = 136;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const NumberStep = ({ id, label, value, range, onChange }) => (
   <div className="field">
@@ -68,6 +66,15 @@ export const Focus = () => {
   const working = timer.mode === 'work';
   const settingUp = timer.isIdle && working;
 
+  /* Arriving from "Bắt đầu học" on the landing page starts the session the
+     visitor asked for, instead of making them press the button again. */
+  const { start } = timer;
+  useEffect(() => {
+    if (!peekIntent('start-focus')) return;
+    clearIntent();
+    start();
+  }, [start]);
+
   /* Space starts and pauses — but only when the key is not already doing
      something else, like typing or pressing the focused button. */
   const { toggle } = timer;
@@ -95,7 +102,7 @@ export const Focus = () => {
     <div className="focus">
       <section className={`card focus-card ${working ? '' : 'is-break'} is-${timer.status}`}>
         <div className="focus-top">
-          <span className={`tag ${working ? 'tag-orange' : 'tag-green'}`}>
+          <span className={`tag ${working ? 'tag-due' : 'tag-good'}`}>
             {working ? (
               <Timer size={14} aria-hidden="true" />
             ) : (
@@ -115,46 +122,38 @@ export const Focus = () => {
         </div>
 
         <div className="dial">
-          <svg viewBox="0 0 300 300" aria-hidden="true">
-            <circle className="dial-track" cx="150" cy="150" r={RADIUS} />
-            <circle
-              className="dial-value"
-              cx="150"
-              cy="150"
-              r={RADIUS}
-              strokeDasharray={CIRCUMFERENCE}
-              strokeDashoffset={CIRCUMFERENCE * timer.progress}
-            />
-          </svg>
-          <div className="dial-face">
-            <span
-              className="dial-time num"
-              role="timer"
-              aria-label={`Còn ${Math.ceil(timer.remainingSeconds / 60)} phút`}
-            >
-              {clock(timer.remainingSeconds)}
-            </span>
-            <span className="dial-caption">
-              {working ? (
-                <>
-                  <span
-                    className="subject-dot"
-                    style={{ '--dot': subjectColor(timer.subject) }}
-                    aria-hidden="true"
-                  />
-                  {subjectLabel(timer.subject)}
-                </>
-              ) : (
-                'Đứng dậy, uống nước, nhìn ra xa'
-              )}
-            </span>
-          </div>
+          <span
+            className="dial-time num"
+            role="timer"
+            aria-label={`Còn ${Math.ceil(timer.remainingSeconds / 60)} phút`}
+          >
+            {clock(timer.remainingSeconds)}
+          </span>
+          <Bar
+            value={1 - timer.progress}
+            color={working ? 'var(--color-sand)' : 'var(--color-mint)'}
+            label="Thời gian còn lại"
+          />
+          <span className="dial-caption">
+            {working ? (
+              <>
+                <span
+                  className="subject-dot"
+                  style={{ '--dot': subjectColor(timer.subject) }}
+                  aria-hidden="true"
+                />
+                {subjectLabel(timer.subject)}
+              </>
+            ) : (
+              'Đứng dậy, uống nước, nhìn ra xa'
+            )}
+          </span>
         </div>
 
         <div className="focus-controls">
           <button
             type="button"
-            className={`btn btn-lg focus-main ${timer.isRunning ? 'btn-outline' : 'btn-primary'}`}
+            className={`btn btn-lg focus-main ${timer.isRunning ? '' : 'btn-primary'}`}
             onClick={timer.toggle}
           >
             {timer.isRunning ? (
@@ -263,7 +262,7 @@ export const Focus = () => {
             )}
 
             {!custom && (
-              <p className="tiny faint focus-hint">
+              <p className="tiny muted focus-hint">
                 Học {timer.workMinutes} phút, rồi nghỉ {timer.breakMinutes} phút.
               </p>
             )}
@@ -280,7 +279,7 @@ export const Focus = () => {
             {!showAll && (
               <p className="small muted">
                 {todaySessions.length > 0
-                  ? `${formatMinutes(minutesOf(todaySessions))} · ${todaySessions.length} phiên`
+                  ? `${formatMinutes(minutesOf(todaySessions))}, ${todaySessions.length} phiên`
                   : 'Chưa học phiên nào'}
               </p>
             )}
@@ -297,9 +296,7 @@ export const Focus = () => {
         </div>
 
         {listed.length === 0 ? (
-          <Empty icon={<Timer size={30} />} title="Sẵn sàng chưa?">
-            Phiên học xong sẽ được ghi lại ở đây.
-          </Empty>
+          <Empty title="Sẵn sàng chưa?">Phiên học xong sẽ được ghi lại ở đây.</Empty>
         ) : (
           <ul className="rows">
             {listed.map((session) => (
@@ -310,7 +307,7 @@ export const Focus = () => {
                   aria-hidden="true"
                 />
                 <span className="grow truncate">{subjectLabel(session.subject)}</span>
-                <span className="small faint">
+                <span className="small muted">
                   {new Date(session.startedAt).toLocaleString(
                     'vi-VN',
                     showAll

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ExternalLink, FileText, FolderOpen, Trash2, Upload } from 'lucide-react';
+import { ExternalLink, FileText, Trash2, Upload } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import { formatDate } from '../../services/gamification';
@@ -97,15 +97,15 @@ const UploadForm = ({ onClose }) => {
             <>
               <FileText size={28} aria-hidden="true" />
               <strong className="truncate">{file.name}</strong>
-              <span className="tiny faint">
-                {(file.size / 1024 / 1024).toFixed(1).replace('.', ',')} MB · bấm để đổi tệp
+              <span className="tiny muted">
+                {(file.size / 1024 / 1024).toFixed(1).replace('.', ',')} MB, bấm để đổi tệp
               </span>
             </>
           ) : (
             <>
               <Upload size={28} aria-hidden="true" />
               <strong>Chọn tệp hoặc kéo thả vào đây</strong>
-              <span className="tiny faint">Ảnh hoặc PDF, tối đa 10 MB</span>
+              <span className="tiny muted">Ảnh hoặc PDF, tối đa 10 MB</span>
             </>
           )}
         </label>
@@ -215,11 +215,7 @@ export const Library = () => {
 
       {notes.length === 0 ? (
         <div className="card">
-          <Empty
-            icon={<FolderOpen size={32} />}
-            title="Chưa có tài liệu nào"
-            action={uploadButton}
-          >
+          <Empty title="Chưa có tài liệu nào" action={uploadButton}>
             Chụp trang vở hay tải tệp PDF lên, để lúc cần là có ngay.
           </Empty>
         </div>
@@ -265,7 +261,7 @@ export const Library = () => {
                       )}
                     </div>
                     <div className="row-between">
-                      <span className="tiny faint">{formatDate(note.uploadedAt)}</span>
+                      <span className="tiny muted">{formatDate(note.uploadedAt)}</span>
                       <div className="row file-actions">
                         {note.fileUrl && (
                           <a

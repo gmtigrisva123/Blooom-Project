@@ -7,9 +7,9 @@ import { isSupabaseConfigured } from './services/supabase';
 import { purgeLegacyLocalData, writeTimerSnapshot } from './services/storage';
 import { useTheme } from './lib/theme';
 import { navigate, useRoute } from './lib/router';
+import { peekIntent } from './lib/intent';
 import { HOME_ROUTE, pageByRoute } from './lib/nav';
 
-import { DoodleDefs } from './components/ui/Doodles';
 import { Landing } from './components/landing/Landing';
 import { AuthPage } from './components/auth/AuthPage';
 import { SetupScreen } from './components/setup/SetupScreen';
@@ -69,8 +69,10 @@ export function App() {
   useEffect(() => {
     if (!ready || !isSupabaseConfigured) return;
 
-    if (account && !isAppRoute) navigate(HOME_ROUTE, { replace: true });
-    else if (!account && isAppRoute) navigate('dang-nhap', { replace: true });
+    if (account && !isAppRoute) {
+      /* "Bắt đầu học" on the landing page lands on the timer, not the home page. */
+      navigate(peekIntent('start-focus') ? 'tap-trung' : HOME_ROUTE, { replace: true });
+    } else if (!account && isAppRoute) navigate('dang-nhap', { replace: true });
     else if (!account && route !== '' && !authMode) navigate('', { replace: true });
   }, [ready, account, route, isAppRoute, authMode]);
 
@@ -83,12 +85,7 @@ export function App() {
   }, []);
 
   if (!isSupabaseConfigured) {
-    return (
-      <>
-        <DoodleDefs />
-        <SetupScreen />
-      </>
-    );
+    return <SetupScreen />;
   }
 
   if (!ready) return null;
@@ -120,12 +117,7 @@ export function App() {
   /* `screen` is null only for the instant before a redirect lands. */
   if (!screen) return null;
 
-  return (
-    <ToastProvider>
-      <DoodleDefs />
-      {screen}
-    </ToastProvider>
-  );
+  return <ToastProvider>{screen}</ToastProvider>;
 }
 
 export default App;

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Bookmark, ExternalLink, Lightbulb, Plus, Trash2 } from 'lucide-react';
+import { Bookmark, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { formatDate } from '../../services/gamification';
 import { Empty, PageHead, SearchField } from '../ui/bits';
@@ -211,11 +211,7 @@ export const Tips = () => {
 
       {articles.length === 0 ? (
         <div className="card">
-          <Empty
-            icon={<Lightbulb size={32} />}
-            title="Chưa có bài viết nào"
-            action={publishButton}
-          >
+          <Empty title="Chưa có bài viết nào" action={publishButton}>
             Các bài mẹo học sẽ xuất hiện ở đây khi được đăng.
           </Empty>
         </div>
@@ -257,7 +253,7 @@ export const Tips = () => {
                     <img className="tip-cover" src={article.imageUrl} alt="" loading="lazy" />
                   )}
                   <div className="tip-body">
-                    <span className="tag tag-violet">{article.category}</span>
+                    <span className="tag">{article.category}</span>
                     <h3>
                       <button
                         type="button"
@@ -269,8 +265,8 @@ export const Tips = () => {
                     </h3>
                     <p className="small muted clamp-3">{article.content}</p>
                     <div className="row-between tip-foot">
-                      <span className="tiny faint truncate">
-                        {article.createdBy ? `${article.createdBy} · ` : ''}
+                      <span className="tiny muted truncate">
+                        {article.createdBy ? `${article.createdBy}, ` : ''}
                         {formatDate(article.createdAt)}
                       </span>
                       <SaveButton
@@ -293,7 +289,7 @@ export const Tips = () => {
         title={reading?.title || ''}
         description={
           reading
-            ? `${reading.category} · ${reading.createdBy ? `${reading.createdBy} · ` : ''}${formatDate(reading.createdAt)}`
+            ? `${reading.category}, ${reading.createdBy ? `${reading.createdBy}, ` : ''}${formatDate(reading.createdAt)}`
             : ''
         }
         wide
@@ -332,7 +328,7 @@ export const Tips = () => {
               )}
               <button
                 type="button"
-                className={`btn ${bookmarks.includes(reading.id) ? 'btn-soft' : 'btn-primary'}`}
+                className={`btn ${bookmarks.includes(reading.id) ? '' : 'btn-primary'}`}
                 onClick={() => toggleBookmark(reading.id)}
               >
                 <Bookmark

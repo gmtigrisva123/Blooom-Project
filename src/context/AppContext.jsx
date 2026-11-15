@@ -54,7 +54,9 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   const [loadErrors, setLoadErrors] = useState([]);
 
   /* One write, one outcome: the result, or null plus a toast with the real
-     reason. No write is ever allowed to fail silently. */
+     reason. No write is ever allowed to fail silently. Success is silent
+     wherever the effect is already on screen (the row appears, the dialog
+     closes); a toast is kept for failures and for effects nobody can see. */
   const run = useCallback(
     async (action, successMessage, successType = 'success') => {
       try {
@@ -96,7 +98,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   /* ---- Account ---------------------------------------------------------- */
   const updateProfile = useCallback(
     async (patch) => {
-      const updated = await run(() => authService.updateProfile(patch), 'Đã lưu.');
+      const updated = await run(() => authService.updateProfile(patch), null);
       if (updated) setUser(updated);
       return updated;
     },
@@ -156,10 +158,9 @@ export const AppProvider = ({ children, account, onSignOut }) => {
       const created = await run(() => groupsRepo.create(data));
       if (!created) return null;
       setGroups((prev) => [created, ...prev]);
-      showToast(`Đã tạo nhóm “${created.name}”.`);
       return created;
     },
-    [run, showToast]
+    [run]
   );
 
   const toggleJoinGroup = useCallback(
@@ -185,22 +186,13 @@ export const AppProvider = ({ children, account, onSignOut }) => {
           return { ...g, members, memberCount: members.length };
         })
       );
-
-      showToast(
-        isMember ? `Đã rời nhóm “${group.name}”.` : `Đã vào nhóm “${group.name}”.`,
-        isMember ? 'info' : 'success'
-      );
     },
-    [groups, user, run, showToast]
+    [groups, user, run]
   );
 
   const deleteGroup = useCallback(
     async (groupId) => {
-      const done = await run(
-        () => groupsRepo.remove(groupId).then(() => true),
-        'Đã xóa nhóm.',
-        'info'
-      );
+      const done = await run(() => groupsRepo.remove(groupId).then(() => true), null, 'info');
       if (done) setGroups((prev) => prev.filter((g) => g.id !== groupId));
     },
     [run]
@@ -223,7 +215,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   /* ---- Weekly goal ------------------------------------------------------ */
   const updateGoals = useCallback(
     async (next) => {
-      const saved = await run(() => goalsRepo.save(next), 'Đã lưu mục tiêu tuần.');
+      const saved = await run(() => goalsRepo.save(next), null);
       if (saved) setGoals({ ...saved, isDefault: false });
       return saved;
     },
@@ -236,19 +228,14 @@ export const AppProvider = ({ children, account, onSignOut }) => {
       const created = await run(() => notesRepo.create(data));
       if (!created) return null;
       setNotes((prev) => [created, ...prev]);
-      showToast(`Đã lưu “${created.title}”.`);
       return created;
     },
-    [run, showToast]
+    [run]
   );
 
   const deleteNote = useCallback(
     async (id) => {
-      const done = await run(
-        () => notesRepo.remove(id).then(() => true),
-        'Đã xóa tài liệu.',
-        'info'
-      );
+      const done = await run(() => notesRepo.remove(id).then(() => true), null, 'info');
       if (done) setNotes((prev) => prev.filter((n) => n.id !== id));
     },
     [run]
@@ -257,7 +244,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   /* ---- Flashcards ------------------------------------------------------- */
   const addCard = useCallback(
     async (data) => {
-      const created = await run(() => cardsRepo.create(createCard(data)), 'Đã thêm thẻ.');
+      const created = await run(() => cardsRepo.create(createCard(data)), null);
       if (created) setCards((prev) => [created, ...prev]);
       return created;
     },
@@ -281,11 +268,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
 
   const deleteCard = useCallback(
     async (id) => {
-      const done = await run(
-        () => cardsRepo.remove(id).then(() => true),
-        'Đã xóa thẻ.',
-        'info'
-      );
+      const done = await run(() => cardsRepo.remove(id).then(() => true), null, 'info');
       if (done) setCards((prev) => prev.filter((c) => c.id !== id));
     },
     [run]
@@ -294,10 +277,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   /* ---- Experiments ------------------------------------------------------ */
   const addExperiment = useCallback(
     async (design) => {
-      const created = await run(
-        () => experimentsRepo.create(createExperiment(design)),
-        'Đã tạo thử nghiệm.'
-      );
+      const created = await run(() => experimentsRepo.create(createExperiment(design)), null);
       if (created) setExperiments((prev) => [created, ...prev]);
       return created;
     },
@@ -326,10 +306,9 @@ export const AppProvider = ({ children, account, onSignOut }) => {
       if (!updated) return null;
 
       setExperiments((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
-      showToast(`Đã ghi buổi ${updated.trials.length}.`);
       return updated;
     },
-    [run, showToast]
+    [run]
   );
 
   const toggleExperimentDone = useCallback(
@@ -337,7 +316,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
       const nextStatus = experiment.status === 'completed' ? 'running' : 'completed';
       const updated = await run(
         () => experimentsRepo.setStatus(experiment.id, nextStatus),
-        nextStatus === 'completed' ? 'Đã kết thúc thử nghiệm.' : 'Đã mở lại thử nghiệm.',
+        null,
         'info'
       );
       if (updated)
@@ -349,11 +328,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
 
   const deleteExperiment = useCallback(
     async (id) => {
-      const done = await run(
-        () => experimentsRepo.remove(id).then(() => true),
-        'Đã xóa thử nghiệm.',
-        'info'
-      );
+      const done = await run(() => experimentsRepo.remove(id).then(() => true), null, 'info');
       if (done) setExperiments((prev) => prev.filter((e) => e.id !== id));
     },
     [run]
@@ -362,7 +337,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
   /* ---- Study tips ------------------------------------------------------- */
   const addArticle = useCallback(
     async (article) => {
-      const created = await run(() => articlesRepo.create(article), 'Đã đăng bài.');
+      const created = await run(() => articlesRepo.create(article), null);
       if (created) setArticles((prev) => [created, ...prev]);
       return created;
     },
@@ -371,11 +346,7 @@ export const AppProvider = ({ children, account, onSignOut }) => {
 
   const deleteArticle = useCallback(
     async (id) => {
-      const done = await run(
-        () => articlesRepo.remove(id).then(() => true),
-        'Đã xóa bài viết.',
-        'info'
-      );
+      const done = await run(() => articlesRepo.remove(id).then(() => true), null, 'info');
       if (done) setArticles((prev) => prev.filter((a) => a.id !== id));
     },
     [run]
@@ -402,9 +373,8 @@ export const AppProvider = ({ children, account, onSignOut }) => {
           a.id === articleId ? { ...a, likesCount: a.likesCount + (saved ? -1 : 1) } : a
         )
       );
-      showToast(saved ? 'Đã bỏ lưu.' : 'Đã lưu bài viết.', 'info');
     },
-    [bookmarks, run, showToast]
+    [bookmarks, run]
   );
 
   /* ---- Export ----------------------------------------------------------- */

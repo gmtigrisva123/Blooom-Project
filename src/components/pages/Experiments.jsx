@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Check, Dices, FlaskConical, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Dices, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../../context/ToastContext';
 import {
@@ -9,7 +9,7 @@ import {
   analyseExperiment,
   conclusionOf
 } from '../../services/experiments';
-import { Bar, Empty, PageHead } from '../ui/bits';
+import { Bar, PageHead } from '../ui/bits';
 import { Dialog } from '../ui/Dialog';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 
@@ -212,12 +212,10 @@ const ExperimentCard = ({ experiment, onDelete }) => {
         <div className="row" style={{ gap: 2 }}>
           <button
             type="button"
-            className="icon-btn"
+            className="btn btn-sm btn-ghost"
             onClick={() => toggleExperimentDone(experiment)}
-            aria-label={running ? 'Kết thúc thử nghiệm' : 'Mở lại thử nghiệm'}
-            title={running ? 'Kết thúc' : 'Mở lại'}
           >
-            {running ? <Check size={19} /> : <RotateCcw size={19} />}
+            {running ? 'Kết thúc' : 'Mở lại'}
           </button>
           <button
             type="button"
@@ -246,10 +244,10 @@ const ExperimentCard = ({ experiment, onDelete }) => {
                 </div>
                 <Bar
                   value={arm.mean === null ? 0 : arm.mean / scale}
-                  color={arm.key === 'A' ? 'var(--orange)' : 'var(--violet)'}
+                  color={arm.key === 'A' ? 'var(--color-sand)' : 'var(--color-accent-2)'}
                   label={`Trung bình cách ${arm.key}`}
                 />
-                <span className="tiny faint">{arm.count} buổi</span>
+                <span className="tiny muted">{arm.count} buổi</span>
               </div>
             ))}
           </div>
@@ -261,7 +259,7 @@ const ExperimentCard = ({ experiment, onDelete }) => {
 
           <div className="exp-progress">
             <Bar value={progress.percent / 100} label="Số buổi đã ghi" />
-            <span className="tiny faint">
+            <span className="tiny muted">
               {progress.completed}/{progress.target} buổi
             </span>
           </div>
@@ -325,7 +323,7 @@ const ExperimentCard = ({ experiment, onDelete }) => {
                 <span className={`arm-key arm-key-${trial.condition.toLowerCase()}`}>
                   {trial.condition}
                 </span>
-                <span className="small faint">Buổi {experiment.trials.length - index}</span>
+                <span className="small muted">Buổi {experiment.trials.length - index}</span>
                 <span className="grow small muted truncate">{trial.note}</span>
                 <strong className="num">
                   {trial.value} {metric.unit}
@@ -379,7 +377,7 @@ export const Experiments = () => {
           <li>
             <span className="num">2</span>
             <p>
-              Mỗi buổi, <strong>Blooom chọn ngẫu nhiên</strong> một cách cho bạn — để so sánh
+              Mỗi buổi, <strong>Blooom chọn ngẫu nhiên</strong> một cách cho bạn, để so sánh
               công bằng.
             </p>
           </li>
@@ -417,14 +415,8 @@ export const Experiments = () => {
         </ul>
       </section>
 
-      {experiments.length === 0 ? (
-        <div className="card">
-          <Empty icon={<FlaskConical size={32} />} title="Chưa có thử nghiệm nào">
-            Chọn một câu hỏi ở trên, hoặc tự đặt câu hỏi của riêng bạn.
-          </Empty>
-        </div>
-      ) : (
-        <section className="stack" aria-labelledby="myExperiments">
+      {experiments.length > 0 && (
+        <section className="stack mine" aria-labelledby="myExperiments">
           <h2 className="section-title" id="myExperiments">
             Thử nghiệm của bạn
           </h2>

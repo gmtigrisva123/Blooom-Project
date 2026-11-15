@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Flame, Layers, Play, Target, Timer } from 'lucide-react';
+import { Check, Layers, Play, Target, Timer } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useTimer } from '../../context/TimerContext';
 import { navigate } from '../../lib/router';
@@ -8,8 +8,8 @@ import { clock, greetingFor, hoursLabel, longDate, useNow } from '../../lib/time
 import { dailyTotals, minutesOf, minutesOn, sessionsBetween, weekStart } from '../../lib/stats';
 import { dueQueue } from '../../services/srs';
 import { addDays, formatMinutes, relativeTime } from '../../services/gamification';
-import { Bar, Empty, Ring } from '../ui/bits';
-import { WeekDots } from '../shell/Sidebar';
+import { Bar, Empty } from '../ui/bits';
+import { WeekGarden } from '../shell/Sidebar';
 
 const LENGTHS = [
   { work: 25, rest: 5 },
@@ -18,7 +18,7 @@ const LENGTHS = [
 ];
 
 /* ==========================================================================
-   START CARD — the one thing this page is for: begin studying in one tap.
+   START · the one thing this page is for: begin studying in one press.
    While a session is under way it shows that session instead.
    ========================================================================== */
 const StartCard = () => {
@@ -28,31 +28,24 @@ const StartCard = () => {
     const working = timer.mode === 'work';
     return (
       <section className={`card start-card is-live ${working ? '' : 'is-break'}`}>
-        <Ring
+        <p className="muted">
+          {working ? `Đang học ${subjectLabel(timer.subject)}` : 'Đang nghỉ giải lao'}
+        </p>
+        <p className="start-live-time num" role="timer">
+          {clock(timer.remainingSeconds)}
+        </p>
+        <Bar
           value={1 - timer.progress}
-          size={132}
-          stroke={11}
-          color={working ? 'var(--orange)' : 'var(--green)'}
-        >
-          <span className="num start-live-time">{clock(timer.remainingSeconds)}</span>
-        </Ring>
-        <div className="grow">
-          <p className="muted">
-            {working ? `Đang học ${subjectLabel(timer.subject)}` : 'Đang nghỉ giải lao'}
-          </p>
-          <h2>{timer.isRunning ? 'Cứ tiếp tục nhé!' : 'Đang tạm dừng'}</h2>
-          <div className="row wrap start-actions">
-            <button type="button" className="btn btn-primary" onClick={timer.toggle}>
-              {timer.isRunning ? 'Tạm dừng' : 'Học tiếp'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => navigate('tap-trung')}
-            >
-              Mở đồng hồ
-            </button>
-          </div>
+          color={working ? 'var(--color-sand)' : 'var(--color-mint)'}
+          label="Thời gian còn lại"
+        />
+        <div className="row wrap">
+          <button type="button" className="btn btn-primary" onClick={timer.toggle}>
+            {timer.isRunning ? 'Tạm dừng' : 'Học tiếp'}
+          </button>
+          <button type="button" className="btn" onClick={() => navigate('tap-trung')}>
+            Mở đồng hồ
+          </button>
         </div>
       </section>
     );
@@ -67,22 +60,21 @@ const StartCard = () => {
 
   return (
     <section className="card start-card">
-      <div>
-        <h2>Học gì bây giờ?</h2>
-        <div className="chips start-subjects" role="group" aria-label="Chọn môn">
-          {SUBJECTS.map((subject) => (
-            <button
-              key={subject.value}
-              type="button"
-              className={`chip ${timer.subject === subject.value ? 'is-active' : ''}`}
-              aria-pressed={timer.subject === subject.value}
-              onClick={() => timer.setSubject(subject.value)}
-            >
-              <span className="tag-dot" style={{ '--dot': subject.color }} />
-              {subject.label}
-            </button>
-          ))}
-        </div>
+      <h2>Học gì bây giờ?</h2>
+
+      <div className="chips" role="group" aria-label="Chọn môn">
+        {SUBJECTS.map((subject) => (
+          <button
+            key={subject.value}
+            type="button"
+            className={`chip ${timer.subject === subject.value ? 'is-active' : ''}`}
+            aria-pressed={timer.subject === subject.value}
+            onClick={() => timer.setSubject(subject.value)}
+          >
+            <span className="tag-dot" style={{ '--dot': subject.color }} />
+            {subject.label}
+          </button>
+        ))}
       </div>
 
       <div className="start-bottom">
@@ -105,7 +97,7 @@ const StartCard = () => {
           )}
         </div>
 
-        <button type="button" className="btn btn-primary btn-lg" onClick={begin}>
+        <button type="button" className="btn btn-lg btn-primary" onClick={begin}>
           <Play size={18} fill="currentColor" aria-hidden="true" />
           Bắt đầu học
         </button>
@@ -114,13 +106,11 @@ const StartCard = () => {
   );
 };
 
-/* ==========================================================================
-   TODAY'S LIST — three lines that answer "what should I do now?".
-   ========================================================================== */
+/* One line of today's list. */
 const Task = ({ icon: Icon, done, title, detail, action, children }) => (
   <li className={`task ${done ? 'is-done' : ''}`}>
     <span className="task-icon" aria-hidden="true">
-      {done ? <Check size={18} /> : <Icon size={18} />}
+      {done ? <Check size={20} /> : <Icon size={20} />}
     </span>
     <div className="grow">
       <strong>{title}</strong>
@@ -135,7 +125,7 @@ const Task = ({ icon: Icon, done, title, detail, action, children }) => (
    TODAY
    ========================================================================== */
 export const Today = () => {
-  const { user, isGuest, sessions, cards, goals, game } = useApp();
+  const { user, isGuest, sessions, cards, goals } = useApp();
   const timer = useTimer();
   const now = useNow();
 
@@ -143,8 +133,7 @@ export const Today = () => {
 
   const todayMinutes = minutesOn(sessions, now);
   const monday = weekStart(now);
-  const weekSessions = sessionsBetween(sessions, monday, addDays(monday, 7));
-  const weekMinutes = minutesOf(weekSessions);
+  const weekMinutes = minutesOf(sessionsBetween(sessions, monday, addDays(monday, 7)));
   const goalMinutes = goals.targetHoursPerWeek * 60;
 
   const due = dueQueue(cards, now).length;
@@ -199,7 +188,7 @@ export const Today = () => {
                 title="Tạo thẻ nhớ đầu tiên"
                 detail="Ghi lại điều vừa học để khỏi quên"
                 action={
-                  <button type="button" className="btn btn-soft btn-sm" onClick={addCard}>
+                  <button type="button" className="btn btn-sm" onClick={addCard}>
                     Tạo thẻ
                   </button>
                 }
@@ -212,7 +201,7 @@ export const Today = () => {
                 detail={due > 0 ? 'Đến lúc ôn lại rồi' : 'Không còn thẻ nào đến hạn'}
                 action={
                   due > 0 && (
-                    <button type="button" className="btn btn-soft btn-sm" onClick={review}>
+                    <button type="button" className="btn btn-sm" onClick={review}>
                       Ôn ngay
                     </button>
                   )
@@ -223,11 +212,11 @@ export const Today = () => {
             <Task
               icon={Target}
               done={weekMinutes >= goalMinutes}
-              title={`Tuần này: ${hoursLabel(weekMinutes)} / ${goals.targetHoursPerWeek} giờ`}
+              title={`Tuần này: ${hoursLabel(weekMinutes)} trên ${goals.targetHoursPerWeek} giờ`}
             >
               <Bar
                 value={weekMinutes / goalMinutes}
-                color="var(--green)"
+                color="var(--color-mint)"
                 label="Tiến độ mục tiêu tuần"
               />
             </Task>
@@ -235,20 +224,9 @@ export const Today = () => {
         </section>
       </div>
 
-      {/* On a laptop the streak lives in the sidebar; a phone has no sidebar. */}
-      <section className="card streak-card" aria-label="Chuỗi ngày học">
-        <div className="row">
-          <span className={`streak-flame ${game.streak.current > 0 ? 'is-lit' : ''}`}>
-            <Flame size={20} aria-hidden="true" />
-          </span>
-          <div className="grow">
-            <strong className="num">{game.streak.current} ngày liên tiếp</strong>
-            <span className="tiny faint">
-              Cấp {game.level.level} · {game.level.title}
-            </span>
-          </div>
-        </div>
-        <WeekDots days={game.streak.days} now={now} />
+      {/* On a laptop the garden lives in the sidebar; a phone has no sidebar. */}
+      <section className="card garden-card" aria-label="Vườn tuần này">
+        <WeekGarden height={72} />
       </section>
 
       <div className="today-bottom">
@@ -259,10 +237,10 @@ export const Today = () => {
             </h2>
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-sm btn-ghost"
               onClick={() => navigate('tien-do')}
             >
-              Xem tiến độ <ArrowRight size={16} aria-hidden="true" />
+              Xem tiến độ
             </button>
           </div>
           <div className="bars" role="img" aria-label="Số phút học mỗi ngày trong 7 ngày qua">
@@ -272,10 +250,7 @@ export const Today = () => {
                 <span className="bar-track">
                   <span
                     className="bar-fill"
-                    style={{
-                      height: `${Math.max(day.minutes > 0 ? 6 : 0, (day.minutes / peak) * 100)}%`
-                    }}
-                    title={`${day.label}: ${day.minutes} phút`}
+                    style={{ transform: `scaleY(${day.minutes / peak})` }}
                   />
                 </span>
                 <span className="bar-label">{day.isToday ? 'Nay' : day.label}</span>
@@ -289,9 +264,7 @@ export const Today = () => {
             Vừa học
           </h2>
           {recent.length === 0 ? (
-            <Empty icon={<Timer size={30} />} title="Chưa có phiên nào">
-              Phiên đầu tiên của bạn sẽ hiện ở đây.
-            </Empty>
+            <Empty title="Chưa có phiên nào">Phiên đầu tiên của bạn sẽ hiện ở đây.</Empty>
           ) : (
             <ul className="rows">
               {recent.map((session) => (
@@ -302,7 +275,7 @@ export const Today = () => {
                     aria-hidden="true"
                   />
                   <span className="grow truncate">{subjectLabel(session.subject)}</span>
-                  <span className="small faint">{relativeTime(session.startedAt)}</span>
+                  <span className="small muted">{relativeTime(session.startedAt)}</span>
                   <strong className="num">{session.durationMinutes}′</strong>
                 </li>
               ))}
