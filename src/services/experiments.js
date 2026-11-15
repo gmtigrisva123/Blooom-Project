@@ -36,9 +36,10 @@ export const RECOMMENDED_TRIALS_PER_ARM = 8;
 export const METRICS = [
   {
     id: 'focusMinutes',
-    label: 'Số phút tập trung thực sự',
+    label: 'Số phút thật sự tập trung',
+    short: 'phút tập trung',
     unit: 'phút',
-    hint: 'Đếm số phút bạn thực sự tập trung trong phiên, không tính lúc mất tập trung.',
+    hint: 'Chỉ tính những phút bạn thật sự học, bỏ lúc xao nhãng.',
     min: 0,
     max: 240,
     step: 1,
@@ -46,9 +47,10 @@ export const METRICS = [
   },
   {
     id: 'selfRating',
-    label: 'Tự đánh giá mức tập trung (1–10)',
+    label: 'Tự chấm mức tập trung (1–10)',
+    short: 'điểm tập trung',
     unit: 'điểm',
-    hint: 'Chấm ngay sau khi kết thúc phiên, trước khi xem kết quả bài làm.',
+    hint: 'Chấm ngay khi học xong, đừng nghĩ lâu.',
     min: 1,
     max: 10,
     step: 1,
@@ -56,9 +58,10 @@ export const METRICS = [
   },
   {
     id: 'itemsRecalled',
-    label: 'Số câu/thẻ nhớ đúng',
+    label: 'Số câu trả lời đúng',
+    short: 'câu đúng',
     unit: 'câu',
-    hint: 'Số câu trả lời đúng trong bài kiểm tra ngắn ngay sau phiên học.',
+    hint: 'Tự kiểm tra nhanh sau buổi học rồi đếm số câu đúng.',
     min: 0,
     max: 200,
     step: 1,
@@ -66,9 +69,10 @@ export const METRICS = [
   },
   {
     id: 'distractions',
-    label: 'Số lần mất tập trung',
+    label: 'Số lần xao nhãng',
+    short: 'lần xao nhãng',
     unit: 'lần',
-    hint: 'Đếm số lần bạn rời khỏi nhiệm vụ (cầm điện thoại, mở tab khác…).',
+    hint: 'Mỗi lần cầm điện thoại hay mở trang khác tính là một lần.',
     min: 0,
     max: 100,
     step: 1,
@@ -79,40 +83,40 @@ export const METRICS = [
 export const metricById = (id) => METRICS.find((m) => m.id === id) || METRICS[0];
 
 /* --------------------------------------------------------------------------
-   TEMPLATES — pre-written designs, each one a question a student can actually
-   answer with the data this app already collects.
+   TEMPLATES — ready-made questions a student can answer with a week or two
+   of ordinary studying.
    -------------------------------------------------------------------------- */
 export const TEMPLATES = [
   {
-    id: 'pomodoro-length',
-    title: 'Pomodoro 25 phút hay 50 phút?',
-    hypothesis: 'Phiên 50 phút cho số phút tập trung thực sự cao hơn phiên 25 phút.',
-    conditionA: 'Pomodoro 25′ / nghỉ 5′',
-    conditionB: 'Pomodoro 50′ / nghỉ 10′',
+    id: 'session-length',
+    title: 'Học 25 phút hay 50 phút?',
+    hypothesis: 'Mình đoán phiên 50 phút giúp tập trung được nhiều hơn.',
+    conditionA: 'Học 25 phút, nghỉ 5 phút',
+    conditionB: 'Học 50 phút, nghỉ 10 phút',
     metric: 'focusMinutes'
   },
   {
     id: 'music',
-    title: 'Học có nhạc nền hay im lặng?',
-    hypothesis: 'Học trong im lặng làm giảm số lần mất tập trung so với có nhạc nền.',
-    conditionA: 'Có nhạc nền không lời',
+    title: 'Nghe nhạc hay im lặng?',
+    hypothesis: 'Mình đoán học trong im lặng sẽ ít xao nhãng hơn.',
+    conditionA: 'Mở nhạc không lời',
     conditionB: 'Hoàn toàn im lặng',
     metric: 'distractions'
   },
   {
     id: 'phone-away',
-    title: 'Điện thoại để ngoài phòng có ích không?',
-    hypothesis: 'Để điện thoại ở phòng khác làm tăng mức tự đánh giá tập trung.',
+    title: 'Điện thoại để xa có giúp gì không?',
+    hypothesis: 'Mình đoán để điện thoại ở phòng khác sẽ tập trung hơn.',
     conditionA: 'Điện thoại úp trên bàn',
     conditionB: 'Điện thoại để phòng khác',
     metric: 'selfRating'
   },
   {
     id: 'recall-vs-reread',
-    title: 'Active recall hay đọc lại?',
-    hypothesis: 'Tự kiểm tra (active recall) giúp nhớ được nhiều mục hơn đọc lại.',
-    conditionA: 'Đọc lại tài liệu 20 phút',
-    conditionB: 'Tự kiểm tra bằng thẻ ghi nhớ 20 phút',
+    title: 'Tự kiểm tra hay đọc lại?',
+    hypothesis: 'Mình đoán tự kiểm tra giúp nhớ nhiều hơn đọc lại.',
+    conditionA: 'Đọc lại bài 20 phút',
+    conditionB: 'Tự kiểm tra bằng thẻ nhớ 20 phút',
     metric: 'itemsRecalled'
   }
 ];
@@ -223,40 +227,44 @@ export const analyseExperiment = (experiment) => {
   };
 };
 
-/* The plain-language conclusion, kept in one place so the wording can't drift
-   from the numbers it is describing. */
+/* The conclusion in everyday words, kept in one place so the wording can't
+   drift from the numbers it describes. `tone` drives the colour:
+   pending (not enough data) · even (no clear difference) · lead (a clear
+   winner) · hint (a winner, but on too few sessions to trust yet). */
 export const conclusionOf = (experiment, analysis) => {
-  const { test, underpowered, winner, metric } = analysis;
+  const { test, underpowered, winner, metric, armA, armB } = analysis;
 
   if (!test.valid) {
+    const missing = Math.max(0, 2 - armA.length) + Math.max(0, 2 - armB.length);
     return {
       tone: 'pending',
-      headline: 'Chưa đủ dữ liệu để kết luận',
-      body: test.reason || 'Hãy ghi thêm vài phiên nữa ở cả hai điều kiện.'
+      headline: 'Chưa đủ dữ liệu để so sánh',
+      body:
+        missing > 0
+          ? `Ghi thêm ${missing} buổi nữa là Blooom bắt đầu so sánh được.`
+          : 'Kết quả các buổi đang giống hệt nhau. Ghi thêm vài buổi nữa nhé.'
     };
   }
 
+  const gap = `${Math.abs(test.difference).toFixed(1).replace('.', ',')} ${metric.unit}`;
+
   if (!test.significant) {
     return {
-      tone: 'null',
-      headline: 'Chưa thấy khác biệt có ý nghĩa thống kê',
-      body:
-        `Với dữ liệu hiện tại, chênh lệch giữa hai điều kiện không vượt ngưỡng α = 0,05. ` +
-        `Điều này KHÔNG chứng minh hai cách là như nhau — chỉ nghĩa là thí nghiệm này chưa đủ bằng chứng để khẳng định khác biệt.` +
-        (underpowered ? ' Cỡ mẫu còn nhỏ nên khả năng phát hiện khác biệt thật vẫn thấp.' : '')
+      tone: 'even',
+      headline: 'Chưa thấy khác biệt rõ ràng',
+      body: underpowered
+        ? `Hai cách đang chênh nhau ${gap}, nhưng số buổi còn ít nên chưa nói chắc được. Ghi thêm vài buổi nữa nhé.`
+        : `Hai cách chỉ chênh nhau ${gap} — có thể chỉ là ngẫu nhiên. Bạn cứ chọn cách mình thấy thoải mái hơn.`
     };
   }
 
   const label = winner === 'A' ? experiment.conditionA : experiment.conditionB;
 
   return {
-    tone: 'signal',
-    headline: `“${label}” cho kết quả tốt hơn`,
-    body:
-      `Chênh lệch trung bình ${Math.abs(test.difference).toFixed(1)} ${metric.unit} ` +
-      `là có ý nghĩa thống kê ở mức α = 0,05.` +
-      (underpowered
-        ? ' Tuy nhiên cỡ mẫu còn nhỏ, nên hãy chạy thêm vài phiên trước khi đổi hẳn thói quen học.'
-        : '')
+    tone: underpowered ? 'hint' : 'lead',
+    headline: underpowered ? `“${label}” đang nhỉnh hơn` : `“${label}” hợp với bạn hơn`,
+    body: underpowered
+      ? `Cách này tốt hơn trung bình ${gap} mỗi buổi. Ghi đủ ${RECOMMENDED_TRIALS_PER_ARM} buổi mỗi cách để chắc chắn.`
+      : `Cách này tốt hơn trung bình ${gap} mỗi buổi, và khác biệt đủ rõ để tin được.`
   };
 };
